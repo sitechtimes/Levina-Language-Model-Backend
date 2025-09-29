@@ -10,8 +10,8 @@ def run():
         "migrate courses",
         "makemigrations assignments",
         "migrate assignments",
-        "makemigrations guidance",
-        "migrate guidance",
+        "makemigrations questions",
+        "migrate questions",
         "migrate",
     ]
 

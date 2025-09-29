@@ -3,7 +3,7 @@ import sys
 
 
 def run():
-    print("\nCreating superuser...")
+    print("\nCreating users...")
     student = CustomUser.objects.create_user(
         email="student@example.com", password="student", user_type=0
     )
@@ -14,5 +14,10 @@ def run():
         email="admin@example.com", password="admin", user_type=2
     )
     superuser = CustomUser.objects.create_superuser(
-        email="superuser@example.com", password="superuser", user_type=3
+        email="superuser@example.com", password="superuser"
     )
+
+    print(f"Created student: {student.email}, {student.password}")
+    print(f"Created teacher: {teacher.email}, {teacher.password}")
+    print(f"Created admin: {admin.email}, {admin.password}")
+    print(f"Created superuser: {superuser.email}, {superuser.password}")

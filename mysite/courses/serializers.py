@@ -9,11 +9,6 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "teacher"]
 
     def create(self, validated_data):
-        teacher = self.context.get("request").user
-        if not teacher.user_type == 1:
-            raise serializers.ValidationError(
-                "You must be a teacher to create a course."
-            )
         return Course.objects.create(
             title=validated_data["title"],
             description=validated_data["description"],
