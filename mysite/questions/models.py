@@ -10,13 +10,15 @@ class Question(models.Model):
         ("EQ", "Essay Question"),
         ("AQ", "Audio Question"),
     ]
+    title = models.CharField(max_length=100)
     question_type = models.CharField(choices=QUESTION_TYPES)
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField()
 
 
 class QuestionInstance(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    question = models.ForeignKey("questions.Question", on_delete=models.CASCADE)
+    student = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField()
     submitted = models.BooleanField(default=False)

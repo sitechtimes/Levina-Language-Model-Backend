@@ -18,6 +18,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             return Response(
                 "Assignment already assigned", status=status.HTTP_400_BAD_REQUEST
             )
+        course.assignments.add(instance)
         assignment_instances = [
             AssignmentInstance(
                 assignment=instance,

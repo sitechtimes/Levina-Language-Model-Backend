@@ -9,3 +9,6 @@ class Course(models.Model):
     description = models.TextField()
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     students = models.ManyToManyField(CustomUser, related_name="courses")
+    assignments = models.ManyToManyField(
+        "assignments.Assignment", related_name="courses"
+    )

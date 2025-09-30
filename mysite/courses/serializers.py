@@ -1,12 +1,15 @@
 from .models import Course
 from rest_framework import serializers
+from assignments.serializers import AssignmentSerializer
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    assignments = AssignmentSerializer(many=True, read_only=True)
+
     class Meta:
         model = Course
-        fields = ["id", "title", "description", "teacher", "students"]
-        read_only_fields = ["id", "teacher", "students"]
+        fields = ["id", "title", "description", "teacher", "students", "assignments"]
+        read_only_fields = ["id", "teacher", "students", "assignments"]
 
     def create(self, validated_data):
         return Course.objects.create(
