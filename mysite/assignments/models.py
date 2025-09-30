@@ -7,7 +7,8 @@ from users.models import CustomUser
 class Assignment(models.Model):
     title = models.CharField(max_length=100)
     due_date = models.DateTimeField()
-    course = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    courses = models.ManyToManyField("courses.Course", related_name="assignments")
 
 
 class AssignmentInstance(models.Model):

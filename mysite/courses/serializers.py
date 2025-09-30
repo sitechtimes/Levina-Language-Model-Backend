@@ -5,8 +5,8 @@ from rest_framework import serializers
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ["id", "title", "description", "teacher"]
-        read_only_fields = ["id", "teacher"]
+        fields = ["id", "title", "description", "teacher", "students"]
+        read_only_fields = ["id", "teacher", "students"]
 
     def create(self, validated_data):
         return Course.objects.create(
