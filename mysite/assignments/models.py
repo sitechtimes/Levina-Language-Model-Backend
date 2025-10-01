@@ -1,5 +1,4 @@
 from django.db import models
-from users.models import CustomUser
 
 # Create your models here.
 
@@ -8,7 +7,7 @@ class Assignment(models.Model):
     title = models.CharField(max_length=100)
     due_date = models.DateTimeField()
     timed = models.BooleanField(default=False)
-    time_limit = models.DurationField()
+    time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     questions = models.ManyToManyField("questions.Question", related_name="assignments")
 

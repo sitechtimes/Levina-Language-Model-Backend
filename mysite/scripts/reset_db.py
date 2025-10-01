@@ -7,7 +7,7 @@ def run():
         script_commands = [
             "runscript purge_db",
             "runscript init_db",
-            "runscript create_test_data",
+            "runscript reset_test_data",
         ]
 
         for command in script_commands:

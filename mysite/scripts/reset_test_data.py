@@ -3,11 +3,12 @@ from questions.models import Question
 from assignments.models import Assignment, AssignmentInstance
 from courses.models import Course
 from .utils import run_django_command
+from utils.create import assign_assignment
 
 
 def run():
     run_django_command("flush --no-input")
-    print("\nCreating users...")
+    print("\nCreating test data...")
     student = CustomUser.objects.create_user(
         email="student@example.com", password="student", user_type=0
     )
@@ -29,6 +30,8 @@ def run():
         title="Test Assignment",
         due_date="2025-10-15T23:59:00Z",
         teacher=teacher,
+        timed=True,
+        time_limit=3600,
     )
     assignment.questions.add(question)
     course = Course.objects.create(
@@ -37,13 +40,5 @@ def run():
         teacher=teacher,
     )
     student.courses.add(course)
-    course.assignments.add(assignment)
-    assignment_instances = [
-        AssignmentInstance(
-            assignment=assignment,
-            student=student,
-        )
-        for student in course.students.all()
-    ]
-    AssignmentInstance.objects.bulk_create(assignment_instances)
+    assign_assignment(assignment, course)
     print("Users created successfully.")
