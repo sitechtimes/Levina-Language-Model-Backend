@@ -19,7 +19,9 @@ class Question(models.Model):
 class QuestionInstance(models.Model):
     title = models.CharField(max_length=100)
     question = models.ForeignKey("questions.Question", on_delete=models.CASCADE)
-    student = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+    assignment_instance = models.ForeignKey(
+        "assignments.AssignmentInstance", on_delete=models.CASCADE
+    )
     text_answer = models.CharField(null=True, blank=True)  # for MCQ or EQ
     audio_answer = models.FileField(null=True, blank=True)  # for AQ
     submitted = models.BooleanField(default=False)

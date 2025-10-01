@@ -21,3 +21,4 @@ class AssignmentInstance(models.Model):
     student = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField()
     submitted = models.BooleanField(default=False)
+    question_instances = models.ManyToManyField("questions.QuestionInstance")
