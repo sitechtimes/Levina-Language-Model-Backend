@@ -5,7 +5,13 @@ from rest_framework import serializers
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = ["id", "question_type", "answer", "author"]
+        fields = [
+            "id",
+            "question_type",
+            "answer",
+            "author",
+            "title",
+        ]
 
 
 class QuestionInstanceSerializer(serializers.ModelSerializer):

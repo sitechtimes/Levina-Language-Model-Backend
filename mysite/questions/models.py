@@ -17,7 +17,6 @@ class Question(models.Model):
 
 
 class QuestionInstance(models.Model):
-    title = models.CharField(max_length=100)
     question = models.ForeignKey("questions.Question", on_delete=models.CASCADE)
     assignment_instance = models.ForeignKey(
         "assignments.AssignmentInstance", on_delete=models.CASCADE

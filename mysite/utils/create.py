@@ -12,4 +12,9 @@ def assign_assignment(assignment, course):
         for student in course.students.all()
     ]
     AssignmentInstance.objects.bulk_create(assignment_instances)
-    question_instances = [QuestionInstance()]
+    question_instances = [
+        QuestionInstance(assignment_instance=assignment_instance, question=question)
+        for question in assignment.questions.all()
+        for assignment_instance in assignment_instances
+    ]
+    QuestionInstance.objects.bulk_create(question_instances)
