@@ -13,6 +13,7 @@ class Question(models.Model):
     title = models.CharField(max_length=100)
     question_type = models.CharField(choices=QUESTION_TYPES)
     author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+    answer = models.CharField(null=True, blank=True)
 
 
 class QuestionInstance(models.Model):

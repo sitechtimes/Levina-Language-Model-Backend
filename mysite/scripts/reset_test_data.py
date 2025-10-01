@@ -41,4 +41,4 @@ def run():
     )
     student.courses.add(course)
     assign_assignment(assignment, course)
-    print("Users created successfully.")
+    print("Test data created successfully.")
