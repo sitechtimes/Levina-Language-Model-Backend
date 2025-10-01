@@ -2,10 +2,11 @@ from users.models import CustomUser
 from questions.models import Question
 from assignments.models import Assignment, AssignmentInstance
 from courses.models import Course
-import sys
+from .utils import run_django_command
 
 
 def run():
+    run_django_command("flush --no-input")
     print("\nCreating users...")
     student = CustomUser.objects.create_user(
         email="student@example.com", password="student", user_type=0
@@ -22,7 +23,6 @@ def run():
     question = Question.objects.create(
         title="Test Question",
         question_type="MCQ",
-        answer="A",
         author=teacher,
     )
     assignment = Assignment.objects.create(

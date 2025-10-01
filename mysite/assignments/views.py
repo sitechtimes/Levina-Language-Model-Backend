@@ -4,6 +4,7 @@ from courses.models import Course
 from .models import Assignment, AssignmentInstance
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from utils.create import assign_assignment
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -18,15 +19,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             return Response(
                 "Assignment already assigned", status=status.HTTP_400_BAD_REQUEST
             )
-        course.assignments.add(instance)
-        assignment_instances = [
-            AssignmentInstance(
-                assignment=instance,
-                student=student,
-            )
-            for student in course.students.all()
-        ]
-        AssignmentInstance.objects.bulk_create(assignment_instances)
+        assign_assignment(instance, course)
         return Response(
             AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
         )
