@@ -9,7 +9,6 @@ class Assignment(models.Model):
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
-    questions = models.ManyToManyField("questions.Question", related_name="assignments")
 
 
 class AssignmentInstance(models.Model):
@@ -21,4 +20,3 @@ class AssignmentInstance(models.Model):
     student = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField()
     submitted = models.BooleanField(default=False)
-    question_instances = models.ManyToManyField("questions.QuestionInstance")

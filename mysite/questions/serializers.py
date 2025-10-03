@@ -17,4 +17,10 @@ class QuestionSerializer(serializers.ModelSerializer):
 class QuestionInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionInstance
-        fields = ["id", "answer", "submitted", "question", "student"]
+        fields = [
+            "id",
+            "text_answer",
+            "audio_answer",
+            "submitted",
+            "question",
+        ]

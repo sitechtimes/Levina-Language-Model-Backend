@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import CourseSerializer
 from .models import Course
+from utils.random import random_alphanumberic
 
 
 class CourseViewSet(
@@ -14,8 +15,15 @@ class CourseViewSet(
     @action(detail=True, methods=["post"])
     def join(self, request, pk=None):
         course = self.get_object()
-        request.user.courses.add(course)
+        course.students.add(request.user)
         return Response(
             CourseSerializer(course).data,
             status=status.HTTP_201_CREATED,
         )
+
+    @action(detail=True, methods=["get"])
+    def join_code(self, request, pk=None):
+        course = self.get_object()
+        join_code = random_alphanumberic(6)
+        course.join_code = join_code
+        return Response(join_code)

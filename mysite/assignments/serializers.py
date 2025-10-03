@@ -1,14 +1,23 @@
 from .models import Assignment, AssignmentInstance
 from courses.models import Course
 from rest_framework import serializers
-from questions.serializers import QuestionSerializer
+from questions.serializers import QuestionSerializer, QuestionInstanceSerializer
 
 
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
+    question_instances = QuestionInstanceSerializer(many=True, read_only=True)
+
     class Meta:
         model = AssignmentInstance
-        fields = ["id", "assignment", "student", "submitted"]
-        read_only_fields = ["id", "assignment", "student"]
+        fields = [
+            "id",
+            "assignment",
+            "student",
+            "submitted",
+            "answer",
+            "question_instances",
+        ]
+        read_only_fields = ["id", "assignment", "student", "question_instances"]
 
     def update(self, instance, validated_data):
         instance.submitted = validated_data.get("submitted", instance.submitted)

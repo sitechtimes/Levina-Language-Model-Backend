@@ -12,3 +12,4 @@ class Course(models.Model):
     assignments = models.ManyToManyField(
         "assignments.Assignment", related_name="courses"
     )
+    join_code = models.CharField(max_length=100)

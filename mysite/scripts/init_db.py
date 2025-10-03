@@ -6,10 +6,10 @@ def run():
     migration_commands = [
         "makemigrations users",
         "migrate users",
-        "makemigrations questions",
-        "migrate questions",
         "makemigrations assignments",
         "migrate assignments",
+        "makemigrations questions",
+        "migrate questions",
         "makemigrations courses",
         "migrate courses",
         "migrate",

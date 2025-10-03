@@ -14,12 +14,17 @@ class Question(models.Model):
     question_type = models.CharField(choices=QUESTION_TYPES)
     author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField(null=True, blank=True)
+    assignments = models.ManyToManyField(
+        "assignments.Assignment", related_name="questions"
+    )
 
 
 class QuestionInstance(models.Model):
     question = models.ForeignKey("questions.Question", on_delete=models.CASCADE)
     assignment_instance = models.ForeignKey(
-        "assignments.AssignmentInstance", on_delete=models.CASCADE
+        "assignments.AssignmentInstance",
+        on_delete=models.CASCADE,
+        related_name="question_instances",
     )
     text_answer = models.CharField(null=True, blank=True)  # for MCQ or EQ
     audio_answer = models.FileField(null=True, blank=True)  # for AQ

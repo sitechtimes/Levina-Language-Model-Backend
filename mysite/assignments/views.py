@@ -34,6 +34,7 @@ class AssignmentInstanceViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.submitted = True
         instance.save()
+        instance.question_instances.all().update(submitted=True)
         return Response(
             AssignmentInstanceSerializer(instance).data, status=status.HTTP_201_CREATED
         )
