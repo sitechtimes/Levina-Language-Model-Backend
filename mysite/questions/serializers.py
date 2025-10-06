@@ -12,6 +12,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "author",
             "title",
         ]
+        read_only_fields = ["id", "author"]
 
 
 class QuestionInstanceSerializer(serializers.ModelSerializer):
@@ -24,3 +25,4 @@ class QuestionInstanceSerializer(serializers.ModelSerializer):
             "submitted",
             "question",
         ]
+        read_only_fields = ["id", "submitted"]
