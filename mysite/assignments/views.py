@@ -32,9 +32,20 @@ class AssignmentInstanceViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def submit(self, request, pk=None):
         instance = self.get_object()
+        if instance.submitted:
+            return Response(
+                "Assignment already submitted", status=status.HTTP_400_BAD_REQUEST
+            )
         instance.submitted = True
         instance.save()
         instance.question_instances.all().update(submitted=True)
         return Response(
             AssignmentInstanceSerializer(instance).data, status=status.HTTP_201_CREATED
         )
+
+    @action(detail=True, methods=["post"])
+    def increment_time_used(self, request, pk=None):
+        instance = self.get_object()
+        instance.time_used += int(request.data.get("time_used"))
+        instance.save()
+        return Response(AssignmentInstanceSerializer(instance).data)

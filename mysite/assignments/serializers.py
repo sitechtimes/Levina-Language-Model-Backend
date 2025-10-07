@@ -14,16 +14,15 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
             "assignment",
             "student",
             "submitted",
-            "answer",
+            "time_used",
             "question_instances",
         ]
-        read_only_fields = ["id", "assignment", "student", "question_instances"]
-
-    def update(self, instance, validated_data):
-        instance.submitted = validated_data.get("submitted", instance.submitted)
-        instance.answer = validated_data.get("answer", instance.answer)
-        instance.save()
-        return instance
+        read_only_fields = [
+            "id",
+            "assignment",
+            "student",
+            "question_instances",
+        ]
 
     def delete(self, instance):
         instance.delete()

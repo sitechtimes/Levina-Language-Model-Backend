@@ -18,5 +18,5 @@ class AssignmentInstance(models.Model):
         related_name="assignment_instances",
     )
     student = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
-    answer = models.CharField()
     submitted = models.BooleanField(default=False)
+    time_used = models.IntegerField(default=0)
