@@ -3,8 +3,7 @@ from speech_detection import SpeechDetection
 
 interpreter = SpeechInterpreter()
 dectector = SpeechDetection()
-speech_detection_result = dectector.transcribe("audio.wav")
+speech_detection_result = dectector.transcribe("audio3.wav")
 print(speech_detection_result)
-#speech detectoin result is returning None
-result = interpreter.interpret(speech_detection_result[0])
+result = interpreter.interpret(speech_detection_result)
 print(result)

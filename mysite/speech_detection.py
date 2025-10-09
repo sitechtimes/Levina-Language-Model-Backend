@@ -13,7 +13,7 @@ class SpeechDetection:
     def transcribe(self,audio_file_path):
         self.audio_file_path = audio_file_path
         batch = self.speech_file_to_array_fn(self.audio_file_path)
-        self.audio_to_text(batch)
+        return self.audio_to_text(batch)
 
 
     def speech_file_to_array_fn(self,file_path):
@@ -28,7 +28,7 @@ class SpeechDetection:
 
         predicted_ids = torch.argmax(logits, dim=-1)
         predicted_sentence = self.processor.batch_decode(predicted_ids)
-        return predicted_sentence
+        return predicted_sentence[0]
         # predictions = []
         # for i, predicted_sentence in enumerate(predicted_sentences):
         #     predictions.append(predicted_sentence)
