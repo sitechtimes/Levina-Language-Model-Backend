@@ -1,10 +1,16 @@
 from rest_framework import mixins, viewsets, status
-from .serializers import AssignmentSerializer, AssignmentInstanceSerializer
+from .serializers import (
+    AssignmentSerializer,
+    AssignmentInstanceSerializer,
+    SessionSerializer,
+    SessionInstanceSerializer,
+)
 from courses.models import Course
-from .models import Assignment, AssignmentInstance
+from .models import Assignment, AssignmentInstance, Session, SessionInstance
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from utils.create import assign_assignment
+from utils.random import random_alphanumberic
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -23,6 +29,24 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         return Response(
             AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
         )
+
+    @action(detail=True, methods=["post"])
+    def host_session(self, request, pk=None):
+        instance = self.get_object()
+        print(request.user)
+        session = Session.objects.create(
+            assignment=instance,
+            host=request.user,
+            access_code=random_alphanumberic(6),
+        )
+        return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
+
+    def join_session(self, request, pk=None):
+        instance = self.get_object()
+        AssignmentInstance.objects.create(
+            assignment=instance, student_name=request.data["student_name"]
+        )
+        return Response(AssignmentInstanceSerializer(instance).data)
 
 
 class AssignmentInstanceViewSet(viewsets.ModelViewSet):

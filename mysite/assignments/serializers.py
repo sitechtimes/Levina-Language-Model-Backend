@@ -1,4 +1,4 @@
-from .models import Assignment, AssignmentInstance
+from .models import Assignment, AssignmentInstance, Session, SessionInstance
 from courses.models import Course
 from rest_framework import serializers
 from questions.serializers import QuestionSerializer, QuestionInstanceSerializer
@@ -70,3 +70,19 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     def delete(self, instance):
         instance.delete()
+
+
+class SessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Session
+        fields = ["id", "assignment", "host", "access_code"]
+        read_only_fields = ["id", "assignment", "host"]
+
+
+class SessionInstanceSerializer(serializers.ModelSerializer):
+    question_instances = QuestionInstanceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = SessionInstance
+        fields = ["id", "session", "student", "joined_at", "question_instances"]
+        read_only_fields = ["id", "session", "joined_at", "question_instances"]
