@@ -1,0 +1,21 @@
+meta {
+  name: Submit Assignment Instance
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/assignment-instances/1/submit/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "course": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+}

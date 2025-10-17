@@ -1,0 +1,21 @@
+meta {
+  name: Get Question Instance
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/question-instances/1/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "course": 1
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Course List
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/courses/
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+settings {
+  encodeUrl: true
+}

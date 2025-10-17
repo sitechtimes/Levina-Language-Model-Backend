@@ -1,0 +1,22 @@
+meta {
+  name: Create Question Copy
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{base_url}}/questions/2/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "question_type": "MCQ",
+      "title": "What is 2 + 2"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Delete Assignment
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{base_url}}/assignments/1/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "title": "the title but updated",
+      "description": "the description"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
