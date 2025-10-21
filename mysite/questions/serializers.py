@@ -28,7 +28,9 @@ class QuestionInstanceSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "submitted"]
 
 
-class SessionQuestionInstanceSerializer(serializers.ModelSerializer):
+class ExpandedQuestionInstanceSerializer(serializers.ModelSerializer):
+    question = QuestionSerializer(read_only=True)
+
     class Meta:
         model = QuestionInstance
         fields = [

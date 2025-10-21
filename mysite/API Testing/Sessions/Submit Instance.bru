@@ -1,0 +1,22 @@
+meta {
+  name: Submit Instance
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_url}}/session-instances/submit/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{session_token}}"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
