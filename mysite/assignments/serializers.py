@@ -84,5 +84,5 @@ class SessionInstanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SessionInstance
-        fields = ["id", "session", "student", "joined_at", "question_instances"]
+        fields = ["id", "session", "student_name", "joined_at", "question_instances"]
         read_only_fields = ["id", "session", "joined_at", "question_instances"]

@@ -37,5 +37,5 @@ class Session(models.Model):
 
 class SessionInstance(models.Model):
     session = models.ForeignKey("assignments.Session", on_delete=models.CASCADE)
-    student = models.CharField(max_length=100)
+    student_name = models.CharField(max_length=100)
     joined_at = models.DateTimeField(auto_now_add=True)

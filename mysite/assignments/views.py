@@ -30,23 +30,33 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
         )
 
+
+class SessionViewSet(viewsets.ModelViewSet):
+    queryset = Session.objects.all()
+    serializer_class = SessionSerializer
+
     @action(detail=True, methods=["post"])
     def host_session(self, request, pk=None):
-        instance = self.get_object()
+        assignment = Assignment.objects.get(id=pk)
         print(request.user)
         session = Session.objects.create(
-            assignment=instance,
+            assignment=assignment,
             host=request.user,
             access_code=random_alphanumberic(6),
         )
         return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
 
-    def join_session(self, request, pk=None):
-        instance = self.get_object()
-        AssignmentInstance.objects.create(
-            assignment=instance, student_name=request.data["student_name"]
+    @action(detail=False, methods=["post"])
+    def join_session(self, request):
+        if not request.data.get("student_name"):
+            return Response(
+                "student_name is required", status=status.HTTP_400_BAD_REQUEST
+            )
+        session = Session.objects.get(access_code=request.data.get("access_code"))
+        session_instance = SessionInstance.objects.create(
+            session=session, student_name=request.data.get("student_name")
         )
-        return Response(AssignmentInstanceSerializer(instance).data)
+        return Response(SessionInstanceSerializer(session_instance).data)
 
 
 class AssignmentInstanceViewSet(viewsets.ModelViewSet):
