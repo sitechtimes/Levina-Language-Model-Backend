@@ -1,7 +1,11 @@
 from .models import Assignment, AssignmentInstance, Session, SessionInstance
 from courses.models import Course
 from rest_framework import serializers
-from questions.serializers import QuestionSerializer, QuestionInstanceSerializer
+from questions.serializers import (
+    QuestionSerializer,
+    QuestionInstanceSerializer,
+    ExpandedQuestionInstanceSerializer,
+)
 
 
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
@@ -80,9 +84,17 @@ class SessionSerializer(serializers.ModelSerializer):
 
 
 class SessionInstanceSerializer(serializers.ModelSerializer):
-    question_instances = QuestionInstanceSerializer(many=True, read_only=True)
+    session_question_instances = ExpandedQuestionInstanceSerializer(
+        many=True, read_only=True
+    )
 
     class Meta:
         model = SessionInstance
-        fields = ["id", "session", "student_name", "joined_at", "question_instances"]
-        read_only_fields = ["id", "session", "joined_at", "question_instances"]
+        fields = [
+            "id",
+            "session",
+            "student_name",
+            "joined_at",
+            "session_question_instances",
+        ]
+        read_only_fields = ["id", "session", "joined_at", "session_question_instances"]

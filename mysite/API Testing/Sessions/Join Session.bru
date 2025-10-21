@@ -7,14 +7,27 @@ meta {
 post {
   url: {{base_url}}/sessions/join_session/
   body: json
-  auth: inherit
+  auth: none
 }
 
 body:json {
   {
     "student_name": "Samuel Kipnis",
-    "access_code": "y45foc"
+    "access_code": "5321n6"
   }
+}
+
+script:post-response {
+  const responseBody = await res.getBody();
+  const token = responseBody.token;
+  
+  if (token) {
+    bru.setVar("session_token", token);
+    console.log("✅ Token saved:", token);
+  } else {
+    console.error("❌ No token found in response!");
+  }
+  
 }
 
 settings {

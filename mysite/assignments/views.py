@@ -9,7 +9,8 @@ from courses.models import Course
 from .models import Assignment, AssignmentInstance, Session, SessionInstance
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from utils.create import assign_assignment
+from rest_framework.permissions import AllowAny
+from utils.create import assign_assignment, join_session
 from utils.random import random_alphanumberic
 
 
@@ -53,10 +54,49 @@ class SessionViewSet(viewsets.ModelViewSet):
                 "student_name is required", status=status.HTTP_400_BAD_REQUEST
             )
         session = Session.objects.get(access_code=request.data.get("access_code"))
-        session_instance = SessionInstance.objects.create(
+        session_instance, token = join_session(
             session=session, student_name=request.data.get("student_name")
         )
-        return Response(SessionInstanceSerializer(session_instance).data)
+        return Response(
+            {
+                "session_instance": SessionInstanceSerializer(session_instance).data,
+                "token": session_instance.token,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    @action(detail=True, methods=["post"])
+    def end_session(self, request, pk=None):
+        session = self.get_object()
+        session.active = False
+        session.save()
+        return Response(SessionSerializer(session).data)
+
+
+class SessionInstanceViewSet(viewsets.ModelViewSet):
+    queryset = SessionInstance.objects.all()
+    permission_classes = [AllowAny]
+
+    @action(detail=False, methods=["post"])
+    def update_answer(self, request):
+        session_instance = SessionInstance.objects.get(token=request.data.get("token"))
+        if not session_instance.session.active:
+            return Response("session_inactive", status=status.HTTP_400_BAD_REQUEST)
+        session_question_instance = session_instance.session_question_instances.get(
+            id=request.data.get("question_instance")
+        )
+        if request.data.get("text_answer"):
+            session_question_instance.text_answer = request.data.get("text_answer")
+        elif request.data.get("audio_answer"):
+            session_question_instance.audio_answer = request.data.get("audio_answer")
+        else:
+            return Response("answer_required", status=status.HTTP_400_BAD_REQUEST)
+        session_question_instance.save()
+
+        return Response(
+            SessionInstanceSerializer(session_instance).data,
+            status=status.HTTP_200_OK,
+        )
 
 
 class AssignmentInstanceViewSet(viewsets.ModelViewSet):

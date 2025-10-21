@@ -33,9 +33,11 @@ class Session(models.Model):
     host = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     access_code = models.CharField(max_length=6, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
 
 
 class SessionInstance(models.Model):
     session = models.ForeignKey("assignments.Session", on_delete=models.CASCADE)
     student_name = models.CharField(max_length=100)
     joined_at = models.DateTimeField(auto_now_add=True)
+    token = models.CharField(max_length=128, unique=True, null=True, blank=True)

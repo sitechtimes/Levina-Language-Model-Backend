@@ -36,7 +36,7 @@ class SessionQuestionInstance(models.Model):
     session_instance = models.ForeignKey(
         "assignments.SessionInstance",
         on_delete=models.CASCADE,
-        related_name="question_instances",
+        related_name="session_question_instances",
     )
     text_answer = models.CharField(null=True, blank=True)  # for MCQ or EQ
     audio_answer = models.FileField(null=True, blank=True)  # for AQ

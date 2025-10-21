@@ -1,0 +1,28 @@
+meta {
+  name: End Session
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/sessions/1/end_session/
+  body: json
+  auth: none
+}
+
+script:post-response {
+  const responseBody = await res.getBody();
+  const token = responseBody.token;
+  
+  if (token) {
+    bru.setVar("session_token", token);
+    console.log("✅ Token saved:", token);
+  } else {
+    console.error("❌ No token found in response!");
+  }
+  
+}
+
+settings {
+  encodeUrl: true
+}
