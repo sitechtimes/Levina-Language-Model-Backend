@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import CourseSerializer
 from .models import Course
+from core.permissions import IsStudent, IsTeacher, IsAdmin
 from utils.random import random_alphanumberic
 
 
@@ -11,6 +12,21 @@ class CourseViewSet(
 ):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
+    def get_permissions(self):
+        if self.action == "join":
+            perms = [IsStudent]
+        elif self.action in [
+            "list",
+            "retrieve",
+            "join_code",
+            "create",
+            "update",
+            "partial_update",
+            "destroy",
+        ]:
+            perms = [IsTeacher | IsAdmin]
+        return [p() for p in perms]
 
     @action(detail=True, methods=["post"])
     def join(self, request, pk=None):
