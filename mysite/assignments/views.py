@@ -68,6 +68,10 @@ class SessionViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def end_session(self, request, pk=None):
         session = self.get_object()
+        if not session.active:
+            return Response(
+                "Session already inactive", status=status.HTTP_400_BAD_REQUEST
+            )
         session.active = False
         session.save()
         return Response(SessionSerializer(session).data)
@@ -98,17 +102,33 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK,
         )
 
+    @action(detail=False, methods=["post"])
+    def submit(self, request, pk=None):
+        session_instance = SessionInstance.objects.get(token=request.data.get("token"))
+        if not session_instance.session.active:
+            return Response("session_inactive", status=status.HTTP_400_BAD_REQUEST)
+        if session_instance.submitted:
+            return Response(
+                "SessionInstance_already_submitted", status=status.HTTP_400_BAD_REQUEST
+            )
+        session_instance.submitted = True
+        session_instance.save()
+        return Response(
+            SessionInstanceSerializer(session_instance).data,
+            status=status.HTTP_200_OK,
+        )
+
 
 class AssignmentInstanceViewSet(viewsets.ModelViewSet):
     queryset = AssignmentInstance.objects.all()
     serializer_class = AssignmentInstanceSerializer
 
-    @action(detail=True, methods=["post"])
+    @action(detail=False, methods=["post"])
     def submit(self, request, pk=None):
         instance = self.get_object()
         if instance.submitted:
             return Response(
-                "Assignment already submitted", status=status.HTTP_400_BAD_REQUEST
+                "Assignment_already_submitted", status=status.HTTP_400_BAD_REQUEST
             )
         instance.submitted = True
         instance.save()

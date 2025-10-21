@@ -76,13 +76,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
         instance.delete()
 
 
-class SessionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Session
-        fields = ["id", "assignment", "host", "access_code"]
-        read_only_fields = ["id", "assignment", "host"]
-
-
 class SessionInstanceSerializer(serializers.ModelSerializer):
     session_question_instances = ExpandedQuestionInstanceSerializer(
         many=True, read_only=True
@@ -95,6 +88,29 @@ class SessionInstanceSerializer(serializers.ModelSerializer):
             "session",
             "student_name",
             "joined_at",
+            "submitted",
             "session_question_instances",
         ]
-        read_only_fields = ["id", "session", "joined_at", "session_question_instances"]
+        read_only_fields = [
+            "id",
+            "session",
+            "joined_at",
+            "submitted",
+            "session_question_instances",
+        ]
+
+
+class SessionSerializer(serializers.ModelSerializer):
+    session_instances = SessionInstanceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Session
+        fields = [
+            "id",
+            "assignment",
+            "host",
+            "access_code",
+            "active",
+            "session_instances",
+        ]
+        read_only_fields = ["id", "assignment", "host", "active", "session_instances"]

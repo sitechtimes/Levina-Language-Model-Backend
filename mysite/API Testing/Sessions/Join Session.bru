@@ -1,7 +1,7 @@
 meta {
   name: Join Session
   type: http
-  seq: 2
+  seq: 3
 }
 
 post {
@@ -13,7 +13,7 @@ post {
 body:json {
   {
     "student_name": "Samuel Kipnis",
-    "access_code": "5321n6"
+    "access_code": "b27gdz"
   }
 }
 
@@ -32,4 +32,5 @@ script:post-response {
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
