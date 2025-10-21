@@ -1,0 +1,28 @@
+meta {
+  name: API Token (Student)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/token/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "email": "student1@example.com",
+      "password": "student"
+  }
+}
+
+script:post-response {
+  const responseJson = res.getBody();
+  bru.setVar("access_token", responseJson.access)
+  bru.setVar("refresh_token", responseJson.refresh)
+}
+
+settings {
+  encodeUrl: true
+}

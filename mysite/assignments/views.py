@@ -1,10 +1,16 @@
 from rest_framework import mixins, viewsets, status
-from .serializers import AssignmentSerializer, AssignmentInstanceSerializer
+from .serializers import (
+    AssignmentSerializer,
+    AssignmentInstanceSerializer,
+    SessionSerializer,
+    SessionInstanceSerializer,
+)
 from courses.models import Course
-from .models import Assignment, AssignmentInstance
+from .models import Assignment, AssignmentInstance, Session, SessionInstance
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from utils.create import assign_assignment
+from utils.random import random_alphanumberic
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -23,6 +29,34 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         return Response(
             AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
         )
+
+
+class SessionViewSet(viewsets.ModelViewSet):
+    queryset = Session.objects.all()
+    serializer_class = SessionSerializer
+
+    @action(detail=True, methods=["post"])
+    def host_session(self, request, pk=None):
+        assignment = Assignment.objects.get(id=pk)
+        print(request.user)
+        session = Session.objects.create(
+            assignment=assignment,
+            host=request.user,
+            access_code=random_alphanumberic(6),
+        )
+        return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=["post"])
+    def join_session(self, request):
+        if not request.data.get("student_name"):
+            return Response(
+                "student_name is required", status=status.HTTP_400_BAD_REQUEST
+            )
+        session = Session.objects.get(access_code=request.data.get("access_code"))
+        session_instance = SessionInstance.objects.create(
+            session=session, student_name=request.data.get("student_name")
+        )
+        return Response(SessionInstanceSerializer(session_instance).data)
 
 
 class AssignmentInstanceViewSet(viewsets.ModelViewSet):

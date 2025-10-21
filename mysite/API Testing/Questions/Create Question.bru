@@ -1,0 +1,22 @@
+meta {
+  name: Create Question
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/questions/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "question_type": "MCQ",
+      "title": "What is 1 + 1"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

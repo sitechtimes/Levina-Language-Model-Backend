@@ -1,0 +1,15 @@
+meta {
+  name: Host Session
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/sessions/1/host_session/
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

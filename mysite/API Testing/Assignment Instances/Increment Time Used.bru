@@ -1,0 +1,21 @@
+meta {
+  name: Increment Time Used
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/assignment-instances/1/increment_time_used/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "time_used": "1000"
+  }
+}
+
+settings {
+  encodeUrl: true
+}
