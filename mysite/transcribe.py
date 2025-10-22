@@ -12,6 +12,7 @@ import soundfile as sf
 
 processor = Wav2Vec2Processor.from_pretrained("jonatasgrosman/wav2vec2-large-xlsr-53-russian")
 model = Wav2Vec2ForCTC.from_pretrained("jonatasgrosman/wav2vec2-large-xlsr-53-russian")
+#NEEED TO CHANGE MODEL !!!!!!!!!!!!! FIND A GOOD ONE
 
 audio_file = "audio3.wav"
 
