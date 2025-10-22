@@ -12,3 +12,10 @@ def random_alphanumberic(digits):
         else:
             string += numbers[randint(0, 8)]
     return string
+
+
+def random_numeric(digits):
+    string = ""
+    for i in range(digits):
+        string += numbers[randint(0, 9)]
+    return string

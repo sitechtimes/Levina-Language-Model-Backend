@@ -1,3 +1,12 @@
-from django.shortcuts import render
+# views.py
+from rest_framework import generics
+from rest_framework.response import Response
+from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 
-# Create your views here.
+
+class PasswordResetRequestView(generics.CreateAPIView):
+    serializer_class = PasswordResetRequestSerializer
+
+
+class PasswordResetConfirmView(generics.CreateAPIView):
+    serializer_class = PasswordResetConfirmSerializer
