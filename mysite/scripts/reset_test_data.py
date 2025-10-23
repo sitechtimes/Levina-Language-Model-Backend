@@ -14,6 +14,9 @@ def run():
     student2 = CustomUser.objects.create_user(
         email="student2@example.com", password="student", user_type=0
     )
+    sam = CustomUser.objects.create_user(
+        email="sam.kipnis@gmail.com", password="student", user_type=0
+    )
     teacher = CustomUser.objects.create_user(
         email="teacher@example.com", password="teacher", user_type=1
     )
@@ -41,6 +44,6 @@ def run():
         description="This is a test course",
         teacher=teacher,
     )
-    course.students.add(student1, student2)
+    course.students.add(student1, student2, sam)
     assign_assignment(assignment, course)
     print("Test data created successfully.")

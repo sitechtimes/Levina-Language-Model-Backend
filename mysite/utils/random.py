@@ -17,5 +17,5 @@ def random_alphanumberic(digits):
 def random_numeric(digits):
     string = ""
     for i in range(digits):
-        string += numbers[randint(0, 9)]
+        string += numbers[randint(0, 8)]
     return string

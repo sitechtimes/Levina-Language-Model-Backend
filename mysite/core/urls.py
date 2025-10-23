@@ -13,5 +13,5 @@ urlpatterns = [
     path("", include("courses.urls")),
     path("", include("assignments.urls")),
     path("", include("questions.urls")),
-    # path("", include("urls")),
+    path("users/", include("users.urls")),
 ]
