@@ -6,11 +6,20 @@ from .models import CustomUser, PasswordResetCode
 from utils.random import random_numeric
 from django.core.mail import send_mail
 import os
+from .permissions import (
+    StudentPermission,
+    TeacherPermission,
+    AdminPermission,
+    SuperuserPermission,
+)
+from rest_framework.permissions import AllowAny
 
 
 class PasswordResetRequestView(generics.GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
     queryset = CustomUser.objects.all()
+    permission_classes = [AllowAny]
+
 
     def post(self, request):
         try:
@@ -32,6 +41,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
 class PasswordResetConfirmView(generics.GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
     queryset = CustomUser.objects.all()
+    permission_classes = [AllowAny]
 
     def post(self, request):
         try:
