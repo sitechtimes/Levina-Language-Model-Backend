@@ -1,0 +1,24 @@
+meta {
+  name: Get User
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{base_url}}/users/get-user/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "code": "812896", // 598365
+      "new_password": "test"
+      
+    
+  }
+}
+
+settings {
+  encodeUrl: true
+}

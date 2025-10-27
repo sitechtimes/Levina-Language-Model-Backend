@@ -1,7 +1,11 @@
 # views.py
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
+from .serializers import (
+    PasswordResetRequestSerializer,
+    PasswordResetConfirmSerializer,
+    UserSerializer,
+)
 from .models import CustomUser, PasswordResetCode
 from utils.random import random_numeric
 from django.core.mail import send_mail
@@ -19,7 +23,6 @@ class PasswordResetRequestView(generics.GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
     queryset = CustomUser.objects.all()
     permission_classes = [AllowAny]
-
 
     def post(self, request):
         try:
@@ -61,3 +64,16 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         return Response(
             {"message": "Password has been reset successfully."}, status=200
         )
+
+
+class GetUserView(generics.GenericAPIView):
+    serializer_class = PasswordResetConfirmSerializer
+    queryset = CustomUser.objects.all()
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            user = CustomUser.objects.get(id=request.user.id)
+            return Response(UserSerializer(user).data, status=200)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "User not found."}, status=404)

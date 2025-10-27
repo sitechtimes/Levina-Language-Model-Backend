@@ -42,6 +42,8 @@ def run():
     course = Course.objects.create(
         title="Test Course",
         description="This is a test course",
+        period=1,
+        class_type="FR",
         teacher=teacher,
     )
     course.students.add(student1, student2, sam)
