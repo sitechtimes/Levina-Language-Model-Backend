@@ -72,9 +72,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def delete(self, instance):
-        instance.delete()
-
 
 class SessionInstanceSerializer(serializers.ModelSerializer):
     session_question_instances = ExpandedQuestionInstanceSerializer(

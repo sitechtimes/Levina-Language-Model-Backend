@@ -31,6 +31,13 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
         )
 
+    def destroy(self, instance, pk=None):
+        if instance.courses.exists():
+            return Response(
+                "Cannot delete assigned assignment", status=status.HTTP_400_BAD_REQUEST
+            )
+        instance.delete()
+
 
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
