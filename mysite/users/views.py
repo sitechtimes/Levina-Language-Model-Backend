@@ -67,7 +67,7 @@ class PasswordResetConfirmView(generics.GenericAPIView):
 
 
 class GetUserView(generics.GenericAPIView):
-    serializer_class = PasswordResetConfirmSerializer
+    serializer_class = UserSerializer
     queryset = CustomUser.objects.all()
     permission_classes = [AllowAny]
 

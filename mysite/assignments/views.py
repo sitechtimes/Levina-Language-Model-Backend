@@ -6,6 +6,7 @@ from .serializers import (
     SessionInstanceSerializer,
 )
 from courses.models import Course
+from questions.models import Question
 from .models import Assignment, AssignmentInstance, Session, SessionInstance
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -30,6 +31,35 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         return Response(
             AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
         )
+
+    def create(self, request, *args, **kwargs):
+        questions = request.data.get("questions")
+        if not questions:
+            return Response(
+                "At least one question is required", status=status.HTTP_400_BAD_REQUEST
+            )
+        question_set = Question.objects.filter(id__in=questions)
+        assignment = Assignment.objects.create(
+            title=request.data["title"],
+            due_date=request.data["due_date"],
+            timed=request.data["timed"],
+            time_limit=request.data["time_limit"],
+            teacher=self.request.user,
+        )
+        assignment.questions.set(question_set)
+        return Response(
+            AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.courses.exists():
+            return Response(
+                "Cannot delete assignment assigned to courses.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SessionViewSet(viewsets.ModelViewSet):

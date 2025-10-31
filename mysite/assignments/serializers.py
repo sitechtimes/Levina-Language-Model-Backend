@@ -72,9 +72,6 @@ class AssignmentSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    def delete(self, instance):
-        instance.delete()
-
 
 class SessionInstanceSerializer(serializers.ModelSerializer):
     session_question_instances = ExpandedQuestionInstanceSerializer(
@@ -114,3 +111,9 @@ class SessionSerializer(serializers.ModelSerializer):
             "session_instances",
         ]
         read_only_fields = ["id", "assignment", "host", "active", "session_instances"]
+
+    def destroy(self, instance):
+        if instance.session_instances.exists():
+            raise serializers.ValidationError(
+                "Cannot delete session with active session instances."
+            )
