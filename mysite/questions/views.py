@@ -26,13 +26,15 @@ class QuestionViewSet(viewsets.ModelViewSet):
             QuestionSerializer(question).data, status=status.HTTP_201_CREATED
         )
 
-    def destroy(self, instance, pk=None):
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
         if instance.assignments.exists():
             return Response(
-                "Cannot delete question assigned to assignment",
+                "Cannot delete question assigned to assignment.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        instance.delete()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class QuestionInstanceViewSet(viewsets.ModelViewSet):

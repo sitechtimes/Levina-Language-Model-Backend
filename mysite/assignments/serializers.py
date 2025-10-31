@@ -111,3 +111,9 @@ class SessionSerializer(serializers.ModelSerializer):
             "session_instances",
         ]
         read_only_fields = ["id", "assignment", "host", "active", "session_instances"]
+
+    def destroy(self, instance):
+        if instance.session_instances.exists():
+            raise serializers.ValidationError(
+                "Cannot delete session with active session instances."
+            )
