@@ -1,20 +1,23 @@
-import whisperx
-from phonemizer import phonemize
+import whisper
+
+import subprocess
 
 
-audio_file = "audio.wav"
+audio_path = "data/corpus/audio.wav"
 
-#STep 1: transcribe the audio
-model = whisperx.load_model("small", device="cuda")
-result = model.transcribe(audio_file, language="ru")
-print("Transcription:", result)
+model = whisper.load_model("turbo")
+result = model.transcribe(audio_path, language="ru")
+print(result["text"])
 
-#Then align the transcription (this means get the word-level timestamps)
-align_model, metadata = whisperx.load_align_model(language_code="ru", device="cuda")
-aligned = whisperx.align(result["segments"], align_model, metadata, audio_file, device="cuda")
-print("Aligned", aligned)
+with open("data/corpus/audio.lab", "w", encoding="utf8") as f:
+    f.write(result["text"].strip())
 
-# Cycle through the result and grab those phonemes
-for segment in aligned["segments"]:
-    phonemes = phonemize(segment["text"], language="ru", backend="espeak", strip=True, preserve_punctuation=True, with_stress=False)
-    print(f'Segment {segment["id"]}: {phonemes}')
+
+subprocess.run([
+    r"C:\mconda\envs\aligner\Scripts\mfa.exe",
+    "align",
+    r"data/corpus",
+    "russian_mfa",
+    'russian_mfa',
+    r"data/aligned"
+])
