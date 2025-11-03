@@ -1,0 +1,15 @@
+meta {
+  name: Assignment Instances
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/assignment-instances/
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

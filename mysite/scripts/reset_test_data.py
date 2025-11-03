@@ -9,22 +9,45 @@ from utils.create import assign_assignment
 def run():
     print("\nCreating test data...")
     student1 = CustomUser.objects.create_user(
-        email="student1@example.com", password="student", user_type=0
+        email="student1@example.com",
+        password="student",
+        user_type=0,
+        first_name="Student",
+        last_name="One",
     )
     student2 = CustomUser.objects.create_user(
-        email="student2@example.com", password="student", user_type=0
+        email="student2@example.com",
+        password="student",
+        user_type=0,
+        first_name="Student",
+        last_name="Two",
     )
     sam = CustomUser.objects.create_user(
-        email="sam.kipnis@gmail.com", password="student", user_type=0
+        email="sam.kipnis@gmail.com",
+        password="student",
+        user_type=0,
+        first_name="Sam",
+        last_name="Kipnis",
     )
     teacher = CustomUser.objects.create_user(
-        email="teacher@example.com", password="teacher", user_type=1
+        email="teacher@example.com",
+        password="teacher",
+        user_type=1,
+        first_name="Teacher",
+        last_name="User",
     )
     admin = CustomUser.objects.create_user(
-        email="admin@example.com", password="admin", user_type=2
+        email="admin@example.com",
+        password="admin",
+        user_type=2,
+        first_name="Admin",
+        last_name="User",
     )
     superuser = CustomUser.objects.create_superuser(
-        email="superuser@example.com", password="superuser"
+        email="superuser@example.com",
+        password="superuser",
+        first_name="Super",
+        last_name="User",
     )
     question = Question.objects.create(
         title="Test Question",
