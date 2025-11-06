@@ -14,6 +14,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "description",
             "period",
             "class_type",
+            "join_code",
             "teacher",
             "students",
             "assignments",

@@ -1,0 +1,15 @@
+meta {
+  name: Generate New Join Code
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/courses/1/new_join_code/
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

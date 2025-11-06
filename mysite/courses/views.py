@@ -17,18 +17,30 @@ class CourseViewSet(
     @action(detail=True, methods=["post"])
     def join(self, request, pk=None):
         course = self.get_object()
+        if request.user in course.students.all():
+            return Response(
+                "User already in course", status=status.HTTP_400_BAD_REQUEST
+            )
+        if request.data.get("join_code") != course.join_code:
+            return Response("Invalid join code", status=status.HTTP_400_BAD_REQUEST)
         course.students.add(request.user)
         return Response(
             CourseSerializer(course).data,
             status=status.HTTP_201_CREATED,
         )
 
-    @action(detail=True, methods=["get"])
-    def join_code(self, request, pk=None):
+    @action(detail=True, methods=["post"])
+    def new_join_code(self, request, pk=None):
         course = self.get_object()
         join_code = random_alphanumberic(6)
         course.join_code = join_code
+        course.save()
         return Response(join_code)
+
+    @action(detail=True, methods=["get"])
+    def join_code(self, request, pk=None):
+        course = self.get_object()
+        return Response(course.join_code)
 
     @action(detail=True, methods=["get"])
     def assignments(self, request, pk=None):
