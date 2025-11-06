@@ -13,6 +13,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from utils.create import assign_assignment, join_session
 from utils.random import random_alphanumberic
+from django.utils import timezone
+from datetime import datetime
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -36,19 +38,20 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         questions = request.data.get("questions")
         if not questions:
             return Response(
-                "At least one question is required", status=status.HTTP_400_BAD_REQUEST
+                {"error": "At least one question is required"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        assignment = serializer.save(teacher=request.user)
+
         question_set = Question.objects.filter(id__in=questions)
-        assignment = Assignment.objects.create(
-            title=request.data["title"],
-            due_date=request.data["due_date"],
-            timed=request.data["timed"],
-            time_limit=request.data["time_limit"],
-            teacher=self.request.user,
-        )
         assignment.questions.set(question_set)
+
         return Response(
-            AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED
+            AssignmentSerializer(assignment).data,
+            status=status.HTTP_201_CREATED,
         )
 
     def destroy(self, request, *args, **kwargs):

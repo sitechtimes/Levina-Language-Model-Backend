@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -9,6 +10,10 @@ class Assignment(models.Model):
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+
+    @property
+    def is_active(self):
+        return timezone.now() < self.due_date
 
 
 class AssignmentInstance(models.Model):

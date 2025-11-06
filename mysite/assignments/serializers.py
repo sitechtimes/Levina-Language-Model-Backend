@@ -42,6 +42,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "due_date",
+            "is_active",
             "timed",
             "time_limit",
             "teacher",
