@@ -8,7 +8,7 @@ from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, Ge
 print('Loading feedback.py')
 print(torch.__version__)
 print(torch.cuda.is_available())
-print(torch.cuda.get_device_name(0)) 
+print(torch.cuda.get_device_name(0))
 
 @dataclass
 class env:
@@ -21,61 +21,70 @@ class env:
 
 class model_gen:
     def __init__(self):
-        self.model = None
         self.tokenizer = AutoTokenizer.from_pretrained(env.model_name, use_fast=True)
-        self.device = None
-        self.max_length = 512
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.max_length = 16000
+        # load model once; adjust device_map/quantization as needed for your setup
+        try:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                env.quantized_model_directory,
+                device_map="auto" if torch.cuda.is_available() else None,
+                trust_remote_code=True,
+            )
+            # ensure the model is on the right device if device_map wasn't used
+            try:
+                self.model.to(self.device)
+            except Exception:
+                pass
+        except Exception as e:
+            print("Model load failed:", e)
+            self.model = None
 
     def fetch_prompt(self):
         with open("dynamic-prompt.txt", "r", encoding="utf-8") as f:
-            prompt = f.read()
-        return prompt
+            return f.read().strip()
 
     def generate_response(self):
         torch.cuda.empty_cache()
 
-        prompt = self.fetch_prompt()
-
-        self.model = AutoModelForCausalLM.from_pretrained(
-            env.quantized_model_directory,
-            device_map={"":"cuda:0"},
-            load_in_4bit=True,
-            trust_remote_code=True
-        )
+        if self.model is None:
+            raise RuntimeError("Model not loaded")
 
         print('test 1')
 
-        if torch.cuda.is_available():
-            self.device = torch.device('cuda:0')
-        else:
-            self.device = torch.device('cpu')
+        prompt = self.fetch_prompt()
+        if not prompt:
+            raise ValueError("Prompt is empty")
 
-        # self.model.to(self.device)
+        tokens = self.tokenizer(
+            prompt,
+            truncation=True,
+            max_length=self.max_length,
+            return_tensors="pt",
+        )
+        # move each tensor to device
+        input_tokens = {k: v.to(self.device) for k, v in tokens.items()}
 
-        input_tokens = self.tokenizer(
-                prompt,
-                max_length=self.max_length,
-                truncation=True,
-                add_special_tokens=False,
-                return_tensors="pt",
-        ).to(self.device)
-        
         print('test 2')
 
-        output_tokens = self.model.generate(
-            input_ids=input_tokens['input_ids'],
-            max_new_tokens=256,
-            do_sample=True,
+        # IMPORTANT: set a generation limit
+        print(next(self.model.parameters()).device)
+        output_ids = self.model.generate(
+            input_ids=input_tokens.get("input_ids"),
+            attention_mask=input_tokens.get("attention_mask"),
+            max_new_tokens=1024,      # limit generated tokens
+            do_sample=False,          # deterministic; set True to sample
+            num_beams=1,
             temperature=0.7,
+            top_k=50,
             top_p=0.9,
-            repetition_penalty=1.1,
+            early_stopping=True,
         )
 
         print('test 3')
-        
-        response = self.tokenizer.decode(output_tokens[0], skip_special_tokens=True)
 
-        return torch.cuda.is_available(), env.quantized_model_directory, output_tokens, response
+        response = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+        return response
     
 if __name__ == "__main__":
     model_instance = model_gen()
