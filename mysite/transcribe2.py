@@ -17,13 +17,17 @@ print(result["text"])
 with open("data/corpus/audio.lab", "w", encoding="utf8") as f:
     f.write(result["text"].strip())
 
-path_to_mfa_env = conda_base_path + r"\envs\aligner\Scripts\activate.bat"
+path_to_mfa_env = conda_base_path + r"Scripts\activate"
 print(path_to_mfa_env)
-subprocess.run([
+
+cmd = [
     path_to_mfa_env,
-    "align",
-    r"data/corpus",
-    "russian_mfa",
-    'russian_mfa',
-    r"data/aligned"
-])
+    "run",
+    "-n",
+    "aligner",
+    "mfa",    # or "align" if your MFA CLI entrypoint is named "align"
+    "version"
+]
+
+print("Running:", " ".join(cmd))
+subprocess.run(cmd, check=True)
