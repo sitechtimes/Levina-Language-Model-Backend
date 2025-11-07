@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 import json
 from Config.config import config
-from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, GPTQConfig
+from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, GPTQConfig, BitsAndBytesConfig
 
 print('Loading feedback.py')
 print(torch.__version__)
@@ -26,12 +26,21 @@ class model_gen:
         self.max_length = 16000
         # load model once; adjust device_map/quantization as needed for your setup
         try:
-            self.model = AutoModelForCausalLM.from_pretrained(
-                env.quantized_model_directory,
-                device_map="auto" if torch.cuda.is_available() else None,
-                trust_remote_code=True,
-            )
-            # ensure the model is on the right device if device_map wasn't used
+            if env.load_quantized_model:
+                bnb_cfg = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_compute_dtype=torch.float16,
+                    bnb_4bit_use_double_quant=True,
+                    bnb_4bit_quant_type="nf4",
+                )
+                print("Loading quantized model (bitsandbytes)...")
+                self.model = AutoModelForCausalLM.from_pretrained(
+                    env.quantized_model_directory,
+                    quantization_config=bnb_cfg,
+                    device_map="auto" if torch.cuda.is_available() else None,
+                    low_cpu_mem_usage=True,
+                    trust_remote_code=True,
+                )
             try:
                 self.model.to(self.device)
             except Exception:
@@ -62,8 +71,8 @@ class model_gen:
             max_length=self.max_length,
             return_tensors="pt",
         )
-        # move each tensor to device
-        input_tokens = {k: v.to(self.device) for k, v in tokens.items()}
+
+        input_tokens = tokens.to(self.device)
 
         print('test 2')
 
@@ -72,7 +81,7 @@ class model_gen:
         output_ids = self.model.generate(
             input_ids=input_tokens.get("input_ids"),
             attention_mask=input_tokens.get("attention_mask"),
-            max_new_tokens=1024,      # limit generated tokens
+            max_new_tokens=None,      # limit generated tokens
             do_sample=False,          # deterministic; set True to sample
             num_beams=1,
             temperature=0.7,
