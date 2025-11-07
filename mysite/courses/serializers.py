@@ -24,6 +24,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "teacher",
             "students",
             "assignments",
+            "join_code",
         ]
 
     def create(self, validated_data):

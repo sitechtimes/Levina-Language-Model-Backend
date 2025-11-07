@@ -15,11 +15,20 @@ from utils.create import assign_assignment, join_session
 from utils.random import random_alphanumberic
 from django.utils import timezone
 from datetime import datetime
+from core.permissions import IsStudent, IsTeacher, IsAdmin, IsStudentAndOwnsObject
+from utils.permissions import UNSAFE_ACTIONS
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
+
+    def get_permissions(self):
+        if self.action in [*UNSAFE_ACTIONS, "assign"]:
+            permission_classes = [IsTeacher | IsAdmin]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
 
     @action(detail=True, methods=["post"])
     def assign(self, request, pk=None):
@@ -68,6 +77,17 @@ class AssignmentViewSet(viewsets.ModelViewSet):
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
+
+    def get_permissions(self):
+        if self.action in [
+            *UNSAFE_ACTIONS,
+            "host_session",
+            "end_session",
+        ]:
+            permission_classes = [IsTeacher | IsAdmin]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
 
     @action(detail=True, methods=["post"])
     def host_session(self, request, pk=None):
@@ -156,7 +176,16 @@ class AssignmentInstanceViewSet(viewsets.ModelViewSet):
     queryset = AssignmentInstance.objects.all()
     serializer_class = AssignmentInstanceSerializer
 
-    @action(detail=False, methods=["post"])
+    def get_permissions(self):
+        if self.action in [*UNSAFE_ACTIONS]:
+            permission_classes = [IsAdmin]
+        elif self.action in ["submit", "increment_time_used"]:
+            permission_classes = [IsStudentAndOwnsObject]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
+
+    @action(detail=True, methods=["post"])
     def submit(self, request, pk=None):
         instance = self.get_object()
         if instance.submitted:

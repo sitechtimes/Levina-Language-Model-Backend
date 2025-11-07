@@ -3,18 +3,26 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import QuestionSerializer, QuestionInstanceSerializer
 from .models import Question, QuestionInstance
-from users.permissions import (
-    TeacherPermission,
-    AdminPermission,
-    SuperuserPermission,
-    StudentPermission,
+from core.permissions import (
+    IsStudent,
+    IsTeacher,
+    IsAdmin,
+    IsStudentAndOwnsObject,
+    IsStudentAndOwnsAssignmentInstance,
 )
+from utils.permissions import UNSAFE_ACTIONS
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
     queryset = Question.objects.all()
-    permission_classes = [TeacherPermission | AdminPermission | SuperuserPermission]
+
+    def get_permissions(self):
+        if self.action in [*UNSAFE_ACTIONS]:
+            permission_classes = [IsTeacher | IsAdmin]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
 
     def create(self, request, *args, **kwargs):
         question = Question.objects.create(
@@ -38,5 +46,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 
 class QuestionInstanceViewSet(viewsets.ModelViewSet):
+    def get_permissions(self):
+        if self.action in [*UNSAFE_ACTIONS]:
+            permission_classes = [IsStudentAndOwnsAssignmentInstance]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
+
     serializer_class = QuestionInstanceSerializer
     queryset = QuestionInstance.objects.all()

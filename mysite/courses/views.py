@@ -6,6 +6,14 @@ from assignments.serializers import AssignmentSerializer
 from users.serializers import UserSerializer
 from .models import Course
 from utils.random import random_alphanumberic
+from core.permissions import (
+    IsStudent,
+    IsTeacher,
+    IsAdmin,
+    IsStudentAndOwnsObject,
+    IsStudentAndIsInCourse,
+)
+from utils.permissions import UNSAFE_ACTIONS
 
 
 class CourseViewSet(
@@ -13,6 +21,17 @@ class CourseViewSet(
 ):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+
+    def get_permissions(self):
+        if self.action in [*UNSAFE_ACTIONS, "new_join_code", "join_code"]:
+            permission_classes = [IsTeacher | IsAdmin]
+        elif self.action in ["assignments", "students"]:
+            permission_classes = [IsStudentAndIsInCourse]
+        elif self.action == "join":
+            permission_classes = [IsStudent]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
 
     @action(detail=True, methods=["post"])
     def join(self, request, pk=None):
