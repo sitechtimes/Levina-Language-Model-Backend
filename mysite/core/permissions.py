@@ -33,6 +33,11 @@ class IsTeacher(BasePermission):
         return has_user_type(request.user, 1)
 
 
+class IsTeacherAndOwnsObject(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return has_user_type(request.user, 1) and obj.teacher == request.user
+
+
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         return has_user_type(request.user, 2)

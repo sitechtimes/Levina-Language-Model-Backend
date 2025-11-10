@@ -9,6 +9,7 @@ from utils.random import random_alphanumberic
 from core.permissions import (
     IsStudent,
     IsTeacher,
+    IsTeacherAndOwnsObject,
     IsAdmin,
     IsStudentAndOwnsObject,
     IsStudentAndIsInCourse,
@@ -24,7 +25,7 @@ class CourseViewSet(
 
     def get_permissions(self):
         if self.action in [*UNSAFE_ACTIONS, "new_join_code", "join_code"]:
-            permission_classes = [IsTeacher | IsAdmin]
+            permission_classes = [IsTeacherAndOwnsObject | IsAdmin]
         elif self.action in ["assignments", "students"]:
             permission_classes = [IsStudentAndIsInCourse]
         elif self.action == "join":
