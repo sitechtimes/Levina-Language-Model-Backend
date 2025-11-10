@@ -8,7 +8,7 @@ import shutil
 dotenv.load_dotenv()
 
 conda_bat = os.getenv("CONDA_BAT")
-
+print(conda_bat)
 audio_path = "data/corpus/audio.wav"
 
 model = whisper.load_model("turbo")
@@ -24,9 +24,9 @@ mfa_info = {
     "dictionary": "russian_mfa",
     "acoustic_model": "russian_mfa",
 }
+cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --clean --verbose'
 
-
-cmd = f'"{conda_bat}" run -n aligner mfa version'
+# cmd = f'"{conda_bat}" run -n aligner mfa version'
 
 subprocess.run(cmd, shell=True, check=True)
 
