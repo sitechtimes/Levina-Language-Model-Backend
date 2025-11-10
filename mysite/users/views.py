@@ -7,7 +7,7 @@ from .serializers import (
     UserSerializer,
 )
 from .models import CustomUser, PasswordResetCode
-from utils.random import random_numeric
+from utils.random import random_alphanumeric
 from django.core.mail import send_mail
 import os
 from .permissions import (
@@ -29,11 +29,12 @@ class PasswordResetRequestView(generics.GenericAPIView):
             requested_user = CustomUser.objects.get(email=request.data.get("email"))
         except CustomUser.DoesNotExist:
             return Response({"error": "No account found with this email."}, status=404)
-        code = random_numeric(6)
+        code = random_alphanumeric(20)
         PasswordResetCode.objects.create(user=requested_user, code=code)
+        url = f'{os.getenv("FRONTEND_URL")}/reset-password?code={code}'
         send_mail(
             subject="Your Password Reset Code",
-            message=f"Your password reset code is: {code}\nIt expires in 10 minutes.",
+            message=f"Click this link to reset your password: {url}\nIt expires in 10 minutes.",
             recipient_list=[requested_user.email],
             fail_silently=False,
             from_email=os.getenv("GMAIL"),

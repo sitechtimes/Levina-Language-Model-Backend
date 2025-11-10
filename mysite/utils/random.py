@@ -4,7 +4,7 @@ letters = "abcdefghijklmnopqrstuvwxyz"
 numbers = "123456789"
 
 
-def random_alphanumberic(digits):
+def random_alphanumeric(digits):
     string = ""
     for i in range(digits):
         if randint(1, 2) == 1:

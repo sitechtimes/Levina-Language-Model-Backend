@@ -5,7 +5,7 @@ from .serializers import CourseSerializer
 from assignments.serializers import AssignmentSerializer
 from users.serializers import UserSerializer
 from .models import Course
-from utils.random import random_alphanumberic
+from utils.random import random_alphanumeric
 from core.permissions import (
     IsStudent,
     IsTeacher,
@@ -52,7 +52,7 @@ class CourseViewSet(
     @action(detail=True, methods=["post"])
     def new_join_code(self, request, pk=None):
         course = self.get_object()
-        join_code = random_alphanumberic(6)
+        join_code = random_alphanumeric(6)
         course.join_code = join_code
         course.save()
         return Response(join_code)

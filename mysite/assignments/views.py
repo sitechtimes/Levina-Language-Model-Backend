@@ -12,7 +12,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from utils.create import assign_assignment, join_session
-from utils.random import random_alphanumberic
+from utils.random import random_alphanumeric
 from django.utils import timezone
 from datetime import datetime
 from core.permissions import IsStudent, IsTeacher, IsAdmin, IsStudentAndOwnsObject
@@ -96,7 +96,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         session = Session.objects.create(
             assignment=assignment,
             host=request.user,
-            access_code=random_alphanumberic(6),
+            access_code=random_alphanumeric(6),
         )
         return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
 
