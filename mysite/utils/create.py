@@ -6,22 +6,21 @@ import hashlib
 
 
 def assign_assignment(assignment, course):
-    course.assignments.add(assignment)
-    CourseAssignment.objects.create(
-        course=course, assignment=assignment, date_assigned=timezone.now()
+    course_assignment, created = CourseAssignment.objects.get_or_create(
+        course=course, assignment=assignment, defaults={"date_assigned": timezone.now()}
     )
     assignment_instances = [
         AssignmentInstance(
-            assignment=assignment,
+            course_assignment=course_assignment,
             student=student,
         )
         for student in course.students.all()
     ]
     AssignmentInstance.objects.bulk_create(assignment_instances)
     question_instances = [
-        QuestionInstance(assignment_instance=assignment_instance, question=question)
+        QuestionInstance(assignment_instance=instance, question=question)
+        for instance in assignment_instances
         for question in assignment.questions.all()
-        for assignment_instance in assignment_instances
     ]
     QuestionInstance.objects.bulk_create(question_instances)
 

@@ -16,9 +16,15 @@ class Assignment(models.Model):
         return timezone.now() < self.due_date
 
 
+class CourseAssignment(models.Model):
+    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
+    assignment = models.ForeignKey("assignments.Assignment", on_delete=models.CASCADE)
+    date_assigned = models.DateTimeField(default=timezone.now)
+
+
 class AssignmentInstance(models.Model):
-    assignment = models.ForeignKey(
-        "assignments.Assignment",
+    course_assignment = models.ForeignKey(
+        "assignments.CourseAssignment",
         on_delete=models.CASCADE,
         related_name="assignment_instances",
     )

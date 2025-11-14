@@ -1,14 +1,9 @@
 from django.db import models
 from users.models import CustomUser
 from django.utils import timezone
+from rest_framework import serializers
 
 # Create your models here.
-
-
-class CourseAssignment(models.Model):
-    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
-    assignment = models.ForeignKey("assignments.Assignment", on_delete=models.CASCADE)
-    date_assigned = models.DateTimeField(default=timezone.now)
 
 
 class Course(models.Model):
@@ -32,6 +27,6 @@ class Course(models.Model):
     assignments = models.ManyToManyField(
         "assignments.Assignment",
         related_name="courses",
-        through="courses.CourseAssignment",
+        through="assignments.CourseAssignment",
     )
     join_code = models.CharField(max_length=6)

@@ -7,6 +7,7 @@ from utils.create import assign_assignment
 
 
 def run():
+    run_django_command("flush --noinput")
     print("\nCreating test data...")
     student1 = CustomUser.objects.create_user(
         email="student1@example.com",

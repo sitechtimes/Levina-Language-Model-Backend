@@ -1,5 +1,11 @@
-from .models import Assignment, AssignmentInstance, Session, SessionInstance
-from courses.models import Course
+from .models import (
+    Assignment,
+    CourseAssignment,
+    AssignmentInstance,
+    Session,
+    SessionInstance,
+)
+
 from rest_framework import serializers
 from questions.serializers import (
     QuestionSerializer,
@@ -15,7 +21,7 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
         model = AssignmentInstance
         fields = [
             "id",
-            "assignment",
+            "course_assignment",
             "student",
             "submitted",
             "time_used",
