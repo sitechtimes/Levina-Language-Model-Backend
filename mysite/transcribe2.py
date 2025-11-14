@@ -50,21 +50,48 @@ def extract_phonemes(text_grid_content):
             phonemes.append(phoneme)
     return "".join(phonemes)
 
-def adjusted_llh():
-    csv = pd.read_csv(mfa_info["output_dir"] + "/alignment_analysis.csv")
-    adjusted_llh = csv["overall_log_likelihood"] / csv["end"]
-    print("Adjusted Log Likelihood:", adjusted_llh.iloc[0])
-    #TRY PER PHONEME BECAUSE A SLOWER SPEAKER WILL HAVE A HIGHER LOG LIKELIHOOD BUT IF YOU DIVIDE BY TIME IT WILL BE LOWER
+def adjusted_llh(csv,phonemes):
+    llh_second = csv["overall_log_likelihood"] / csv["end"]
+    llh_second = llh_second.iloc[0]
+    print("Log Likelihood Per Second:", llh_second)
+    llh_phoneme = csv["overall_log_likelihood"] / len([p for p in phonemes if p != "" or p != " " or p != "sil" or p != "sp" or p != "pau"])
+    llh_phoneme = llh_phoneme.iloc[0]
+    print("Log Likelihood Per Phoneme:", llh_phoneme)
+    return llh_second, llh_phoneme
+# def calculate_speaking_rate(phonemes, total_time):
+#     num_phonemes = len([p for p in phonemes if p != ""])
+#     speaking_rate = num_phonemes / total_time
+#     print("Speaking Rate (phonemes per second):", speaking_rate)
+#     return speaking_rate
 
+def analyze_audio_quality(csv):
+    snr = csv["snr"].iloc[0]
+    snr_scores = {3:"Super Noisy/ Unusable",6:"Noisy But Usable",10:"Usable/ Slight Noise",15:"Excellent/ No Noise"}
+    for i in snr_scores:
+        if snr < i:
+            return snr_scores[i],snr
+
+def phoneme_timing(csv):
+    pdd = csv["phone_duration_deviation"].iloc[0]
+    duration_scores = {.7:"Great/Native",1:"Good/Acceptable",1.5:"Noticably Off",4:"Very Bad/Non-Native"}
+    for i in duration_scores:
+        if pdd < i:
+            return duration_scores[i],pdd
 def analyze_textgrid():
-
     text_grid_path = mfa_info["output_dir"] + "/audio.TextGrid"
     with open(text_grid_path, "r", encoding="utf8") as f:
         text_grid_content = f.read()
     phonemes = extract_phonemes(text_grid_content)
     print(phonemes)
-    adjusted_llh()
-        
+    csv = pd.read_csv(mfa_info["output_dir"] + "/alignment_analysis.csv")
+    llh_second,llh_phoneme = adjusted_llh(csv,phonemes)
+    phoneme_rating, phoneme_timing_score = phoneme_timing(csv)
+    print("Phoneme Timing Score:", phoneme_timing_score, "-", phoneme_rating)
+    audio_quality = analyze_audio_quality(csv)
+    print("Audio Quality:", audio_quality[1], "dB -", audio_quality[0])
+
+
+
 
 
 analyze_textgrid()
