@@ -2,9 +2,9 @@
      "generate_model":{
         "enabled": true,
         "log_prompt": true,
-        "model": "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
+        "model": "Qwen/Qwen3-30B-A3B-GPTQ-Int4",
         "load_quantized_model": true,
-        "quantized_model": "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
+        "quantized_model": "Qwen/Qwen3-30B-A3B-GPTQ-Int4",
         "basename": "model",
         "bits": 4,
         "group_size": 128

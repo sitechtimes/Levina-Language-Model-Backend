@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import json
 from Config.config import config
 from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, GPTQConfig, BitsAndBytesConfig
+# from gptqmodel import GPTQModel
 
 print('Loading feedback.py')
 print(torch.__version__)
@@ -26,25 +27,21 @@ class model_gen:
         self.max_length = 16000
         # load model once; adjust device_map/quantization as needed for your setup
         try:
-            if env.load_quantized_model:
-                bnb_cfg = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_compute_dtype=torch.float16,
-                    bnb_4bit_use_double_quant=True,
-                    bnb_4bit_quant_type="nf4",
-                )
-                print("Loading quantized model (bitsandbytes)...")
-                self.model = AutoModelForCausalLM.from_pretrained(
-                    env.quantized_model_directory,
-                    quantization_config=bnb_cfg,
-                    device_map="auto" if torch.cuda.is_available() else None,
-                    low_cpu_mem_usage=True,
-                    trust_remote_code=True,
-                )
-            try:
-                self.model.to(self.device)
-            except Exception:
-                pass
+            gptq_config = GPTQConfig(
+                bits=env.bits,
+                dataset="c4",
+                group_size=env.group_size,
+                model_basename=env.model_basename,
+                tokenizer=self.tokenizer
+            )
+            print("Loading quantized model...")
+            self.model = AutoModelForCausalLM.from_pretrained(
+                env.quantized_model_directory,
+                quantization_config=gptq_config,
+                device_map="auto" if torch.cuda.is_available() else None,
+                low_cpu_mem_usage=True,
+                trust_remote_code=True,
+            )
         except Exception as e:
             print("Model load failed:", e)
             self.model = None
@@ -74,21 +71,23 @@ class model_gen:
 
         input_tokens = tokens.to(self.device)
 
+        simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
+        print('1 - Simple Generative Output: ', simple_gen)
+
         print('test 2')
 
         # IMPORTANT: set a generation limit
-        print(next(self.model.parameters()).device)
         output_ids = self.model.generate(
             input_ids=input_tokens.get("input_ids"),
             attention_mask=input_tokens.get("attention_mask"),
-            max_new_tokens=None,      # limit generated tokens
+            max_new_tokens=256,      # limit generated tokens
             do_sample=False,          # deterministic; set True to sample
             num_beams=1,
-            temperature=0.7,
-            top_k=50,
-            top_p=0.9,
             early_stopping=True,
         )
+
+        simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
+        print('2 - Simple Generative Output: ', simple_gen)
 
         print('test 3')
 
