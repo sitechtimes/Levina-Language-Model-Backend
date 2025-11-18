@@ -11,19 +11,22 @@ class AssignmentTemplate(models.Model):
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
 
 
-class CourseAssignment(models.Model):
+class Assignment(models.Model):
     title = models.CharField(max_length=100)
     due_date = models.DateTimeField()
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     course = models.ForeignKey(
-        "courses.Course", related_name="course_assignments", on_delete=models.CASCADE
+        "courses.Course", related_name="assignments", on_delete=models.CASCADE
     )
     date_assigned = models.DateTimeField(default=timezone.now)
     assignment_template = models.ForeignKey(
         "assignments.AssignmentTemplate",
         on_delete=models.CASCADE,
+        related_name="assignments",
+        null=True,
+        blank=True,
     )
 
     @property
@@ -32,8 +35,8 @@ class CourseAssignment(models.Model):
 
 
 class AssignmentInstance(models.Model):
-    course_assignment = models.ForeignKey(
-        "assignments.CourseAssignment",
+    assignment = models.ForeignKey(
+        "assignments.Assignment",
         on_delete=models.CASCADE,
         related_name="assignment_instances",
     )

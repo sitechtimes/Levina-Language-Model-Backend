@@ -2,10 +2,10 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import CourseSerializer
-from assignments.serializers import AssignmentTemplateSerializer, CourseAssignmentSerializer
+from assignments.serializers import AssignmentTemplateSerializer, AssignmentSerializer
 from users.serializers import UserSerializer
 from .models import Course
-from assignments.models import CourseAssignment
+from assignments.models import Assignment
 from utils.random import random_alphanumeric
 from core.permissions import (
     IsStudent,
@@ -73,8 +73,8 @@ class CourseViewSet(
     @action(detail=True, methods=["get"])
     def assignments(self, request, pk=None):
         course = self.get_object()
-        assignments = course.course_assignments.all()
-        return Response(CourseAssignmentSerializer(assignments, many=True).data)
+        assignments = course.assignments.all()
+        return Response(AssignmentSerializer(assignments, many=True).data)
 
     @action(detail=True, methods=["get"])
     def students(self, request, pk=None):
@@ -86,12 +86,12 @@ class CourseViewSet(
     def assignment(self, request, pk=None, assignment_id=None):
         course = self.get_object()
         try:
-            course_assignment = CourseAssignment.objects.select_related(
+            assignment = Assignment.objects.select_related(
                 "assignment"
             ).get(course=course, assignment_id=assignment_id)
-        except CourseAssignment.DoesNotExist:
+        except Assignment.DoesNotExist:
             return Response(
                 {"detail": "Assignment not found for this course."},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        return Response(CourseAssignmentSerializer(course_assignment).data)
+        return Response(AssignmentSerializer(assignment).data)

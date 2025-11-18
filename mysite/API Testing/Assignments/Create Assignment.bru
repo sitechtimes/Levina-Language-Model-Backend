@@ -5,17 +5,19 @@ meta {
 }
 
 post {
-  url: {{base_url}}/course-assignment/
+  url: {{base_url}}/assignments/
   body: json
   auth: inherit
 }
 
 body:json {
   {
-      "title": "the title 2",
-      "timed": true,
-      "time_limit": 3600,
-      "questions": [1,2]
+    "title": "the title 2",
+    "timed": true,
+    "time_limit": 3600,
+    "questions": [1,2],
+    "due_date": "2025-12-15T23:59:00Z",
+    "course": 1
   }
 }
 

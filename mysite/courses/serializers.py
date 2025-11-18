@@ -1,10 +1,10 @@
 from .models import Course
 from rest_framework import serializers
-from assignments.serializers import CourseAssignmentSerializer
+from assignments.serializers import AssignmentSerializer
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    assignments = CourseAssignmentSerializer(many=True, read_only=True)
+    assignments = AssignmentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Course
@@ -17,13 +17,13 @@ class CourseSerializer(serializers.ModelSerializer):
             "join_code",
             "teacher",
             "students",
-            "course_assignments",
+            "assignments",
         ]
         read_only_fields = [
             "id",
             "teacher",
             "students",
-            "course_assignments",
+            "assignments",
             "join_code",
         ]
 

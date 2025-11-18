@@ -3,7 +3,7 @@ from assignments.models import (
     AssignmentInstance,
     Session,
     SessionInstance,
-    CourseAssignment,
+    Assignment,
 )
 from questions.models import QuestionInstance, SessionQuestionInstance
 from django.utils import timezone
@@ -11,7 +11,7 @@ import hashlib
 
 
 def assign_assignment(assignment_template, course, due_date=None):
-    course_assignment = CourseAssignment.objects.create(
+    assignment = Assignment.objects.create(
         course=course,
         assignment_template=assignment_template,
         title=assignment_template.title,
@@ -23,7 +23,7 @@ def assign_assignment(assignment_template, course, due_date=None):
     )
     assignment_instances = [
         AssignmentInstance(
-            course_assignment=course_assignment,
+            assignment=assignment,
             student=student,
         )
         for student in course.students.all()
@@ -35,7 +35,7 @@ def assign_assignment(assignment_template, course, due_date=None):
         for question in assignment_template.questions.all()
     ]
     QuestionInstance.objects.bulk_create(question_instances)
-    return course_assignment
+    return assignment
 
 
 def join_session(session, student_name):
@@ -44,7 +44,7 @@ def join_session(session, student_name):
     )
     session_question_instances = [
         SessionQuestionInstance(session_instance=session_instance, question=question)
-        for question in session.assignment.questions.all()
+        for question in session.assignment_template.questions.all()
     ]
     SessionQuestionInstance.objects.bulk_create(session_question_instances)
     token_string = f"token_{session_instance.id}"

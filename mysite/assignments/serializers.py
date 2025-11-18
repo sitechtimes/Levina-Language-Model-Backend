@@ -1,6 +1,6 @@
 from .models import (
     AssignmentTemplate,
-    CourseAssignment,
+    Assignment,
     AssignmentInstance,
     Session,
     SessionInstance,
@@ -20,7 +20,7 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
         model = AssignmentInstance
         fields = [
             "id",
-            "course_assignment",
+            "assignment",
             "student",
             "submitted",
             "time_used",
@@ -67,12 +67,12 @@ class AssignmentTemplateSerializer(serializers.ModelSerializer):
         )
 
 
-class CourseAssignmentSerializer(serializers.ModelSerializer):
+class AssignmentSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
     assignment_instances = AssignmentInstanceSerializer(many=True, read_only=True)
 
     class Meta:
-        model = CourseAssignment
+        model = Assignment
         fields = [
             "id",
             "title",
@@ -98,7 +98,7 @@ class CourseAssignmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         teacher = self.context.get("request").user
-        return CourseAssignment.objects.create(
+        return Assignment.objects.create(
             title=validated_data["title"],
             due_date=validated_data["due_date"],
             teacher=teacher,
@@ -145,13 +145,13 @@ class SessionSerializer(serializers.ModelSerializer):
         model = Session
         fields = [
             "id",
-            "assignment",
+            "assignment_template",
             "host",
             "access_code",
             "active",
             "session_instances",
         ]
-        read_only_fields = ["id", "assignment", "host", "active", "session_instances"]
+        read_only_fields = ["id", "assignment_template", "host", "active", "session_instances"]
 
     def destroy(self, instance):
         if instance.session_instances.exists():

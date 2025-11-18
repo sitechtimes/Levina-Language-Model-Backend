@@ -3,14 +3,14 @@ from django.utils.dateparse import parse_datetime
 from rest_framework.response import Response
 from assignments.serializers import (
     AssignmentTemplateSerializer,
-    CourseAssignmentSerializer,
+    AssignmentSerializer,
     AssignmentInstanceSerializer,
     SessionSerializer,
     SessionInstanceSerializer,
 )
 from assignments.models import (
     AssignmentTemplate,
-    CourseAssignment,
+    Assignment,
     AssignmentInstance,
     Session,
     SessionInstance,
@@ -51,13 +51,13 @@ class AssignmentTemplateViewSet(viewsets.ModelViewSet):
             return Response(
                 "Course does not exist", status=status.HTTP_400_BAD_REQUEST
             )
-        if course.course_assignments.filter(assignment_template=assignment_template).exists():
+        if course.assignments.filter(assignment_template=assignment_template).exists():
             return Response(
                 "Assignment template already assigned to course", status=status.HTTP_400_BAD_REQUEST
             )
         due_date = parse_datetime(request.data.get("due_date"))
-        course_assignment = assign_assignment(assignment_template, course, due_date=due_date)
-        return Response(CourseAssignmentSerializer(course_assignment).data, status=status.HTTP_200_OK)
+        assignment = assign_assignment(assignment_template, course, due_date=due_date)
+        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_200_OK)
 
 
     def create(self, request, *args, **kwargs):
@@ -76,9 +76,9 @@ class AssignmentTemplateViewSet(viewsets.ModelViewSet):
         )
 
 
-class CourseAssignmentViewSet(viewsets.ModelViewSet):
-    queryset = CourseAssignment.objects.all()
-    serializer_class = CourseAssignmentSerializer
+class AssignmentViewSet(viewsets.ModelViewSet):
+    queryset = Assignment.objects.all()
+    serializer_class = AssignmentSerializer
 
     def get_permissions(self):
         if self.action in UNSAFE_ACTIONS:
@@ -86,6 +86,19 @@ class CourseAssignmentViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = []
         return [p() for p in permission_classes]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        assignment = serializer.save(teacher=request.user)
+        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        assignment = serializer.save()
+        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -106,7 +119,7 @@ class AssignmentInstanceViewSet(viewsets.ModelViewSet):
         if self.action in [*UNSAFE_ACTIONS]:
             permission_classes = [IsAdmin]
         elif self.action in ["submit", "increment_time_used"]:
-            permission_classes = [IsStudentAndOwnsObject]
+            permission_classes = [IsStudentAndOwnsObject | IsAdmin]
         else:
             permission_classes = []
         return [p() for p in permission_classes]
@@ -169,25 +182,32 @@ class SessionViewSet(viewsets.ModelViewSet):
             permission_classes = []
         return [p() for p in permission_classes]
 
-    @action(detail=True, methods=["post"])
-    def host_session(self, request, pk=None):
-        assignment = Assignment.objects.get(id=pk)
-        print(request.user)
+    @action(detail=False, methods=["post"])
+    def host_session(self, request):
+        try:
+            assignment_template = AssignmentTemplate.objects.get(id=request.data.get("assignment_template"))
+        except AssignmentTemplate.DoesNotExist:
+            return Response(
+                "Assignment template does not exist", status=status.HTTP_400_BAD_REQUEST
+            )
         session = Session.objects.create(
-            assignment=assignment,
+            assignment_template=assignment_template,
             host=request.user,
-            access_code=random_alphanumeric(6),
-        )
-        return Response(
-            SessionSerializer(session).data, status=status.HTTP_201_CREATED
-        ) @ action(detail=False, methods=["post"])
+            access_code=random_alphanumeric(6))
+        return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=["post"])
     def join_session(self, request):
         if not request.data.get("student_name"):
             return Response(
                 "student_name is required", status=status.HTTP_400_BAD_REQUEST
             )
-        session = Session.objects.get(access_code=request.data.get("access_code"))
+        try:
+            session = Session.objects.get(access_code=request.data.get("access_code"))
+        except Session.DoesNotExist:
+            return Response(
+                "Session does not exist", status=status.HTTP_400_BAD_REQUEST
+            )
         session_instance, token = join_session(
             session=session, student_name=request.data.get("student_name")
         )

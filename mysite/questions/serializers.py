@@ -25,7 +25,7 @@ class QuestionInstanceSerializer(serializers.ModelSerializer):
             "submitted",
             "question",
         ]
-        read_only_fields = ["id", "submitted"]
+        read_only_fields = ["id", "submitted", "question"]
 
 
 class ExpandedQuestionInstanceSerializer(serializers.ModelSerializer):

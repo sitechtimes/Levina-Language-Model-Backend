@@ -47,11 +47,23 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 class QuestionInstanceViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
-        if self.action in [*UNSAFE_ACTIONS]:
-            permission_classes = [IsStudentAndOwnsAssignmentInstance]
+        if self.action in [*UNSAFE_ACTIONS, "submit"]:
+            permission_classes = [IsStudentAndOwnsAssignmentInstance | IsAdmin]
         else:
             permission_classes = []
         return [p() for p in permission_classes]
 
     serializer_class = QuestionInstanceSerializer
     queryset = QuestionInstance.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.assignment_instance.submitted:
+            return Response(
+                "Cannot update question instance that has been submitted.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response(QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK)
