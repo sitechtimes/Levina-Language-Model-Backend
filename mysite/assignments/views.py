@@ -1,19 +1,21 @@
 from rest_framework import viewsets, status
+from django.utils.dateparse import parse_datetime
 from rest_framework.response import Response
 from assignments.serializers import (
-    AssignmentSerializer,
+    AssignmentTemplateSerializer,
     CourseAssignmentSerializer,
     AssignmentInstanceSerializer,
     SessionSerializer,
     SessionInstanceSerializer,
 )
 from assignments.models import (
-    Assignment,
+    AssignmentTemplate,
     CourseAssignment,
     AssignmentInstance,
     Session,
     SessionInstance,
 )
+from courses.models import Course
 from questions.models import Question
 from utils.random import random_alphanumeric
 from core.permissions import (
@@ -29,35 +31,47 @@ from utils.create import assign_assignment, join_session
 from utils.permissions import UNSAFE_ACTIONS
 
 
-class AssignmentViewSet(viewsets.ModelViewSet):
-    queryset = Assignment.objects.all()
-    serializer_class = AssignmentSerializer
+class AssignmentTemplateViewSet(viewsets.ModelViewSet):
+    queryset = AssignmentTemplate.objects.all()
+    serializer_class = AssignmentTemplateSerializer
 
     def get_permissions(self):
-        if self.action in UNSAFE_ACTIONS:
+        if self.action in [*UNSAFE_ACTIONS, "assign"]:
             permission_classes = [IsTeacher | IsAdmin]
         else:
             permission_classes = []
         return [p() for p in permission_classes]
 
-    def create(self, request, *args, **kwargs):
-        if "course" not in request.data:
+    @action(detail=True, methods=["post"])
+    def assign(self, request, pk=None):
+        assignment_template = self.get_object()
+        try:
+            course = Course.objects.get(id=request.data.get("course"))
+        except Course.DoesNotExist:
             return Response(
-                {"error": "Course is required"},
-                status=status.HTTP_400_BAD_REQUEST,
+                "Course does not exist", status=status.HTTP_400_BAD_REQUEST
             )
+        if course.course_assignments.filter(assignment_template=assignment_template).exists():
+            return Response(
+                "Assignment template already assigned to course", status=status.HTTP_400_BAD_REQUEST
+            )
+        due_date = parse_datetime(request.data.get("due_date"))
+        course_assignment = assign_assignment(assignment_template, course, due_date=due_date)
+        return Response(CourseAssignmentSerializer(course_assignment).data, status=status.HTTP_200_OK)
 
+
+    def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        assignment = serializer.save(teacher=request.user)
+        assignment_template = serializer.save(teacher=request.user)
 
         questions = request.data.get("questions")
         if questions:
             qs = Question.objects.filter(id__in=questions)
-            assignment.questions.set(qs)
+            assignment_template.questions.set(qs)
 
         return Response(
-            AssignmentSerializer(assignment).data,
+            AssignmentTemplateSerializer(assignment_template).data,
             status=status.HTTP_201_CREATED,
         )
 

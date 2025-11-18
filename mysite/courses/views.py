@@ -2,7 +2,7 @@ from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import CourseSerializer
-from assignments.serializers import AssignmentSerializer, CourseAssignmentSerializer
+from assignments.serializers import AssignmentTemplateSerializer, CourseAssignmentSerializer
 from users.serializers import UserSerializer
 from .models import Course
 from assignments.models import CourseAssignment
@@ -74,7 +74,7 @@ class CourseViewSet(
     def assignments(self, request, pk=None):
         course = self.get_object()
         assignments = course.course_assignments.all()
-        return Response(AssignmentSerializer(assignments, many=True).data)
+        return Response(CourseAssignmentSerializer(assignments, many=True).data)
 
     @action(detail=True, methods=["get"])
     def students(self, request, pk=None):

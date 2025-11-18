@@ -1,0 +1,22 @@
+meta {
+  name: Update Assignment Template
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{base_url}}/assignment-templates/1/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "title": "the title but updated"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

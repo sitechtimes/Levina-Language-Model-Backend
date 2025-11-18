@@ -15,7 +15,7 @@ class Question(models.Model):
     author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField(null=True, blank=True)
     assignments = models.ManyToManyField(
-        "assignments.Assignment", related_name="questions"
+        "assignments.AssignmentTemplate", related_name="questions"
     )
 
 

@@ -1,5 +1,5 @@
 from assignments.models import (
-    Assignment,
+    AssignmentTemplate,
     AssignmentInstance,
     Session,
     SessionInstance,
@@ -10,15 +10,15 @@ from django.utils import timezone
 import hashlib
 
 
-def assign_assignment(assignment, course):
+def assign_assignment(assignment_template, course, due_date=None):
     course_assignment = CourseAssignment.objects.create(
         course=course,
-        assignment=assignment,
-        title=assignment.title,
-        due_date=assignment.due_date,
-        timed=assignment.timed,
-        time_limit=assignment.time_limit,
-        teacher=assignment.teacher,
+        assignment_template=assignment_template,
+        title=assignment_template.title,
+        due_date=due_date,
+        timed=assignment_template.timed,
+        time_limit=assignment_template.time_limit,
+        teacher=assignment_template.teacher,
         date_assigned=timezone.now(),
     )
     assignment_instances = [
@@ -32,9 +32,10 @@ def assign_assignment(assignment, course):
     question_instances = [
         QuestionInstance(assignment_instance=instance, question=question)
         for instance in assignment_instances
-        for question in assignment.questions.all()
+        for question in assignment_template.questions.all()
     ]
     QuestionInstance.objects.bulk_create(question_instances)
+    return course_assignment
 
 
 def join_session(session, student_name):

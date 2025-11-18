@@ -1,6 +1,6 @@
 from users.models import CustomUser
 from questions.models import Question
-from assignments.models import Assignment, AssignmentInstance
+from assignments.models import AssignmentTemplate, AssignmentInstance
 from courses.models import Course
 from .utils import run_django_command
 from utils.create import assign_assignment
@@ -55,14 +55,13 @@ def run():
         question_type="MCQ",
         author=teacher,
     )
-    assignment = Assignment.objects.create(
+    assignment_template = AssignmentTemplate.objects.create(
         title="Test Assignment",
-        due_date="2025-10-15T23:59:00Z",
         teacher=teacher,
         timed=True,
         time_limit=3600,
     )
-    assignment.questions.add(question)
+    assignment_template.questions.add(question)
     course = Course.objects.create(
         title="Test Course",
         description="This is a test course",
@@ -71,5 +70,5 @@ def run():
         teacher=teacher,
     )
     course.students.add(student1, student2, sam)
-    assign_assignment(assignment, course)
+    assign_assignment(assignment_template, course, due_date="2025-12-15T23:59:00Z")
     print("Test data created successfully.")

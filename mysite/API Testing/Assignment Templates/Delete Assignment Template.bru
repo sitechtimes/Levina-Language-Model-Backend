@@ -1,0 +1,16 @@
+meta {
+  name: Delete Assignment Template
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{base_url}}/assignment-templates/2/
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

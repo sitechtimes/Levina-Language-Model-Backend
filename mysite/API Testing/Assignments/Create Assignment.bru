@@ -1,11 +1,11 @@
 meta {
   name: Create Assignment
   type: http
-  seq: 2
+  seq: 3
 }
 
 post {
-  url: {{base_url}}/assignments/
+  url: {{base_url}}/course-assignment/
   body: json
   auth: inherit
 }
@@ -13,13 +13,13 @@ post {
 body:json {
   {
       "title": "the title 2",
-      "due_date": "2025-10-15T23:59:00Z",
       "timed": true,
       "time_limit": 3600,
-      "questions": [2]
+      "questions": [1,2]
   }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

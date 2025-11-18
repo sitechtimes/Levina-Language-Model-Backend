@@ -25,3 +25,6 @@ def run():
             os.remove(db_path)
 
     print("Cleanup completed.")
+
+if __name__ == "__main__":
+    run()

@@ -1,5 +1,5 @@
 from .models import (
-    Assignment,
+    AssignmentTemplate,
     CourseAssignment,
     AssignmentInstance,
     Session,
@@ -12,7 +12,6 @@ from questions.serializers import (
     QuestionInstanceSerializer,
     ExpandedQuestionInstanceSerializer,
 )
-
 
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
     question_instances = QuestionInstanceSerializer(many=True, read_only=True)
@@ -38,15 +37,14 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
         instance.delete()
 
 
-class AssignmentSerializer(serializers.ModelSerializer):
+class AssignmentTemplateSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Assignment
+        model = AssignmentTemplate
         fields = [
             "id",
             "title",
-            "due_date",
             "timed",
             "time_limit",
             "teacher",
@@ -61,19 +59,12 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         teacher = self.context.get("request").user
-        return Assignment.objects.create(
+        return AssignmentTemplate.objects.create(
             title=validated_data["title"],
-            due_date=validated_data["due_date"],
             teacher=teacher,
             timed=validated_data["timed"],
             time_limit=validated_data["time_limit"],
         )
-
-    def update(self, instance, validated_data):
-        instance.title = validated_data.get("title", instance.title)
-        instance.due_date = validated_data.get("due_date", instance.due_date)
-        instance.save()
-        return instance
 
 
 class CourseAssignmentSerializer(serializers.ModelSerializer):
@@ -107,7 +98,7 @@ class CourseAssignmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         teacher = self.context.get("request").user
-        return Assignment.objects.create(
+        return CourseAssignment.objects.create(
             title=validated_data["title"],
             due_date=validated_data["due_date"],
             teacher=teacher,

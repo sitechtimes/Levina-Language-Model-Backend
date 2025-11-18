@@ -4,9 +4,8 @@ from django.utils import timezone
 # Create your models here.
 
 
-class Assignment(models.Model):
+class AssignmentTemplate(models.Model):
     title = models.CharField(max_length=100)
-    due_date = models.DateTimeField()
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
@@ -22,8 +21,8 @@ class CourseAssignment(models.Model):
         "courses.Course", related_name="course_assignments", on_delete=models.CASCADE
     )
     date_assigned = models.DateTimeField(default=timezone.now)
-    assignment = models.ForeignKey(
-        "assignments.Assignment",
+    assignment_template = models.ForeignKey(
+        "assignments.AssignmentTemplate",
         on_delete=models.CASCADE,
     )
 
@@ -46,8 +45,8 @@ class AssignmentInstance(models.Model):
 
 
 class Session(models.Model):
-    assignment = models.ForeignKey(
-        "assignments.Assignment",
+    assignment_template = models.ForeignKey(
+        "assignments.AssignmentTemplate",
         on_delete=models.CASCADE,
         related_name="sessions",
     )
