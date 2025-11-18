@@ -13,7 +13,7 @@ post {
 body:json {
   {
       "email": "sam.kipnis@gmail.com",
-      "password": "test"
+      "password": "password"
   }
 }
 
@@ -23,6 +23,19 @@ script:post-response {
   bru.setVar("refresh_token", responseJson.refresh)
 }
 
+tests {
+  test("response should contain refresh and access tokens", () => {
+    expect(res.body).to.be.a("object");
+  
+    expect(res.body).to.have.property("refresh");
+    expect(res.body.refresh).to.be.a("string");
+  
+    expect(res.body).to.have.property("access");
+    expect(res.body.access).to.be.a("string");
+  });
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }

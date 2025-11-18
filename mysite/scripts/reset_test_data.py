@@ -25,7 +25,7 @@ def run():
     )
     sam = CustomUser.objects.create_user(
         email="sam.kipnis@gmail.com",
-        password="student",
+        password="password",
         user_type=0,
         first_name="Sam",
         last_name="Kipnis",

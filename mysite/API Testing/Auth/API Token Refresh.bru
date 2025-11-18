@@ -22,6 +22,16 @@ script:post-response {
   
 }
 
+tests {
+  test("response should contain refresh token", () => {
+    expect(res.body).to.be.a("object");
+  
+    expect(res.body).to.have.property("access");
+    expect(res.body.access).to.be.a("string");
+  });
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }
