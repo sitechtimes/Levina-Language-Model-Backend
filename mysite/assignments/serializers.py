@@ -40,7 +40,6 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
-    assignment_instances = AssignmentInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Assignment
@@ -48,18 +47,15 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "due_date",
-            "is_active",
             "timed",
             "time_limit",
             "teacher",
-            "assignment_instances",
             "questions",
         ]
 
         read_only_fields = [
             "id",
             "teacher",
-            "assignment_instances",
             "questions",
         ]
 
@@ -71,6 +67,53 @@ class AssignmentSerializer(serializers.ModelSerializer):
             teacher=teacher,
             timed=validated_data["timed"],
             time_limit=validated_data["time_limit"],
+        )
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get("title", instance.title)
+        instance.due_date = validated_data.get("due_date", instance.due_date)
+        instance.save()
+        return instance
+
+
+class CourseAssignmentSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+    assignment_instances = AssignmentInstanceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CourseAssignment
+        fields = [
+            "id",
+            "title",
+            "due_date",
+            "is_active",
+            "timed",
+            "time_limit",
+            "teacher",
+            "course",
+            "date_assigned",
+            "assignment_instances",
+            "questions",
+        ]
+
+        read_only_fields = [
+            "id",
+            "teacher",
+            "assignment_instances",
+            "questions",
+            "date_assigned",
+            "is_active",
+        ]
+
+    def create(self, validated_data):
+        teacher = self.context.get("request").user
+        return Assignment.objects.create(
+            title=validated_data["title"],
+            due_date=validated_data["due_date"],
+            teacher=teacher,
+            timed=validated_data["timed"],
+            time_limit=validated_data["time_limit"],
+            course=validated_data["course"],
         )
 
     def update(self, instance, validated_data):

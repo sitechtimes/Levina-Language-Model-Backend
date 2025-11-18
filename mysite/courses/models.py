@@ -24,9 +24,4 @@ class Course(models.Model):
     class_type = models.CharField(max_length=3, choices=CLASS_TYPES)
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     students = models.ManyToManyField(CustomUser, related_name="courses")
-    assignments = models.ManyToManyField(
-        "assignments.Assignment",
-        related_name="courses",
-        through="assignments.CourseAssignment",
-    )
     join_code = models.CharField(max_length=6)

@@ -11,15 +11,25 @@ class Assignment(models.Model):
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
 
+
+class CourseAssignment(models.Model):
+    title = models.CharField(max_length=100)
+    due_date = models.DateTimeField()
+    timed = models.BooleanField(default=False)
+    time_limit = models.IntegerField()
+    teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        "courses.Course", related_name="course_assignments", on_delete=models.CASCADE
+    )
+    date_assigned = models.DateTimeField(default=timezone.now)
+    assignment = models.ForeignKey(
+        "assignments.Assignment",
+        on_delete=models.CASCADE,
+    )
+
     @property
     def is_active(self):
         return timezone.now() < self.due_date
-
-
-class CourseAssignment(models.Model):
-    course = models.ForeignKey("courses.Course", on_delete=models.CASCADE)
-    assignment = models.ForeignKey("assignments.Assignment", on_delete=models.CASCADE)
-    date_assigned = models.DateTimeField(default=timezone.now)
 
 
 class AssignmentInstance(models.Model):

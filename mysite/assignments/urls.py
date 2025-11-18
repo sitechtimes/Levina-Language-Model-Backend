@@ -1,14 +1,14 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
 from .views import (
-    AssignmentViewSet,
+    CourseAssignmentViewSet,
     AssignmentInstanceViewSet,
     SessionViewSet,
     SessionInstanceViewSet,
 )
 
 router = DefaultRouter()
-router.register("assignments", AssignmentViewSet)
+router.register("assignments", CourseAssignmentViewSet)
 router.register("assignment-instances", AssignmentInstanceViewSet)
 router.register("sessions", SessionViewSet)
 router.register("session-instances", SessionInstanceViewSet)

@@ -1,10 +1,11 @@
 from rest_framework import mixins, viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .serializers import CourseSerializer, FlatCourseAssignmentSerializer
-from assignments.serializers import AssignmentSerializer
+from .serializers import CourseSerializer
+from assignments.serializers import AssignmentSerializer, CourseAssignmentSerializer
 from users.serializers import UserSerializer
-from .models import Course, CourseAssignment
+from .models import Course
+from assignments.models import CourseAssignment
 from utils.random import random_alphanumeric
 from core.permissions import (
     IsStudent,
@@ -72,7 +73,7 @@ class CourseViewSet(
     @action(detail=True, methods=["get"])
     def assignments(self, request, pk=None):
         course = self.get_object()
-        assignments = course.assignments.all()
+        assignments = course.course_assignments.all()
         return Response(AssignmentSerializer(assignments, many=True).data)
 
     @action(detail=True, methods=["get"])
@@ -80,21 +81,6 @@ class CourseViewSet(
         course = self.get_object()
         students = course.students.all()
         return Response(UserSerializer(students, many=True).data)
-
-    @action(detail=True, methods=["get"])
-    def assignments(self, request, pk=None):
-        course = self.get_object()
-        try:
-            course_assignments = CourseAssignment.objects.select_related(
-                "assignment"
-            ).filter(course=course)
-        except Course.DoesNotExist:
-            return Response(
-                {"detail": "Course not found."}, status=status.HTTP_404_NOT_FOUND
-            )
-        return Response(
-            FlatCourseAssignmentSerializer(course_assignments, many=True).data
-        )
 
     @action(detail=True, methods=["get"], url_path=r"assignment/(?P<assignment_id>\d+)")
     def assignment(self, request, pk=None, assignment_id=None):
@@ -108,4 +94,4 @@ class CourseViewSet(
                 {"detail": "Assignment not found for this course."},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        return Response(FlatCourseAssignmentSerializer(course_assignment).data)
+        return Response(CourseAssignmentSerializer(course_assignment).data)

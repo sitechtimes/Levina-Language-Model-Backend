@@ -1,21 +1,31 @@
-from rest_framework import mixins, viewsets, status
-from .serializers import (
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from assignments.serializers import (
     AssignmentSerializer,
+    CourseAssignmentSerializer,
     AssignmentInstanceSerializer,
     SessionSerializer,
     SessionInstanceSerializer,
 )
-from courses.models import Course
+from assignments.models import (
+    Assignment,
+    CourseAssignment,
+    AssignmentInstance,
+    Session,
+    SessionInstance,
+)
 from questions.models import Question
-from .models import Assignment, AssignmentInstance, Session, SessionInstance
+from utils.random import random_alphanumeric
+from core.permissions import (
+    IsStudent,
+    IsTeacher,
+    IsTeacherAndOwnsObject,
+    IsAdmin,
+    IsStudentAndOwnsObject,
+)
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from utils.create import assign_assignment, join_session
-from utils.random import random_alphanumeric
-from django.utils import timezone
-from datetime import datetime
-from core.permissions import IsStudent, IsTeacher, IsAdmin, IsStudentAndOwnsObject
 from utils.permissions import UNSAFE_ACTIONS
 
 
@@ -24,30 +34,16 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     serializer_class = AssignmentSerializer
 
     def get_permissions(self):
-        if self.action in [*UNSAFE_ACTIONS, "assign"]:
+        if self.action in UNSAFE_ACTIONS:
             permission_classes = [IsTeacher | IsAdmin]
         else:
             permission_classes = []
         return [p() for p in permission_classes]
 
-    @action(detail=True, methods=["post"])
-    def assign(self, request, pk=None):
-        instance = self.get_object()
-        course = Course.objects.get(id=request.data["course"])
-        if instance in course.assignments.all():
-            return Response(
-                "Assignment already assigned", status=status.HTTP_400_BAD_REQUEST
-            )
-        assign_assignment(instance, course)
-        return Response(
-            AssignmentSerializer(instance).data, status=status.HTTP_201_CREATED
-        )
-
     def create(self, request, *args, **kwargs):
-        questions = request.data.get("questions")
-        if not questions:
+        if "course" not in request.data:
             return Response(
-                {"error": "At least one question is required"},
+                {"error": "Course is required"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -55,23 +51,93 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save(teacher=request.user)
 
-        question_set = Question.objects.filter(id__in=questions)
-        assignment.questions.set(question_set)
+        questions = request.data.get("questions")
+        if questions:
+            qs = Question.objects.filter(id__in=questions)
+            assignment.questions.set(qs)
 
         return Response(
             AssignmentSerializer(assignment).data,
             status=status.HTTP_201_CREATED,
         )
 
+
+class CourseAssignmentViewSet(viewsets.ModelViewSet):
+    queryset = CourseAssignment.objects.all()
+    serializer_class = CourseAssignmentSerializer
+
+    def get_permissions(self):
+        if self.action in UNSAFE_ACTIONS:
+            permission_classes = [IsTeacher | IsAdmin]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.courses.exists():
+        if instance.assignment_instances.exists():
             return Response(
-                "Cannot delete assignment assigned to courses.",
+                "Cannot delete assignment that has been assigned to students.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AssignmentInstanceViewSet(viewsets.ModelViewSet):
+    queryset = AssignmentInstance.objects.all()
+    serializer_class = AssignmentInstanceSerializer
+
+    def get_permissions(self):
+        if self.action in [*UNSAFE_ACTIONS]:
+            permission_classes = [IsAdmin]
+        elif self.action in ["submit", "increment_time_used"]:
+            permission_classes = [IsStudentAndOwnsObject]
+        else:
+            permission_classes = []
+        return [p() for p in permission_classes]
+
+    @action(detail=True, methods=["post"])
+    def submit(self, request, pk=None):
+        instance = self.get_object()
+
+        if instance.submitted:
+            return Response(
+                "Assignment_already_submitted",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        instance.submitted = True
+        instance.save()
+
+        # Mark all related question_instances as submitted
+        instance.question_instances.all().update(submitted=True)
+
+        return Response(
+            AssignmentInstanceSerializer(instance).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["post"])
+    def increment_time_used(self, request, pk=None):
+        instance = self.get_object()
+
+        # Must be int; request.data may be a string
+        try:
+            delta = int(request.data.get("time_used", 0))
+        except ValueError:
+            return Response(
+                "Invalid time_used value",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        instance.time_used += delta
+        instance.save()
+
+        return Response(
+            AssignmentInstanceSerializer(instance).data,
+            status=status.HTTP_200_OK,
+        )
 
 
 class SessionViewSet(viewsets.ModelViewSet):
@@ -98,9 +164,10 @@ class SessionViewSet(viewsets.ModelViewSet):
             host=request.user,
             access_code=random_alphanumeric(6),
         )
-        return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
+        return Response(
+            SessionSerializer(session).data, status=status.HTTP_201_CREATED
+        ) @ action(detail=False, methods=["post"])
 
-    @action(detail=False, methods=["post"])
     def join_session(self, request):
         if not request.data.get("student_name"):
             return Response(
@@ -149,7 +216,6 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
         else:
             return Response("answer_required", status=status.HTTP_400_BAD_REQUEST)
         session_question_instance.save()
-
         return Response(
             SessionInstanceSerializer(session_instance).data,
             status=status.HTTP_200_OK,
@@ -170,38 +236,3 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
             SessionInstanceSerializer(session_instance).data,
             status=status.HTTP_200_OK,
         )
-
-
-class AssignmentInstanceViewSet(viewsets.ModelViewSet):
-    queryset = AssignmentInstance.objects.all()
-    serializer_class = AssignmentInstanceSerializer
-
-    def get_permissions(self):
-        if self.action in [*UNSAFE_ACTIONS]:
-            permission_classes = [IsAdmin]
-        elif self.action in ["submit", "increment_time_used"]:
-            permission_classes = [IsStudentAndOwnsObject]
-        else:
-            permission_classes = []
-        return [p() for p in permission_classes]
-
-    @action(detail=True, methods=["post"])
-    def submit(self, request, pk=None):
-        instance = self.get_object()
-        if instance.submitted:
-            return Response(
-                "Assignment_already_submitted", status=status.HTTP_400_BAD_REQUEST
-            )
-        instance.submitted = True
-        instance.save()
-        instance.question_instances.all().update(submitted=True)
-        return Response(
-            AssignmentInstanceSerializer(instance).data, status=status.HTTP_201_CREATED
-        )
-
-    @action(detail=True, methods=["post"])
-    def increment_time_used(self, request, pk=None):
-        instance = self.get_object()
-        instance.time_used += int(request.data.get("time_used"))
-        instance.save()
-        return Response(AssignmentInstanceSerializer(instance).data)

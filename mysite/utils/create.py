@@ -1,13 +1,25 @@
-from assignments.models import Assignment, AssignmentInstance, Session, SessionInstance
+from assignments.models import (
+    Assignment,
+    AssignmentInstance,
+    Session,
+    SessionInstance,
+    CourseAssignment,
+)
 from questions.models import QuestionInstance, SessionQuestionInstance
-from courses.models import CourseAssignment
 from django.utils import timezone
 import hashlib
 
 
 def assign_assignment(assignment, course):
-    course_assignment, created = CourseAssignment.objects.get_or_create(
-        course=course, assignment=assignment, defaults={"date_assigned": timezone.now()}
+    course_assignment = CourseAssignment.objects.create(
+        course=course,
+        assignment=assignment,
+        title=assignment.title,
+        due_date=assignment.due_date,
+        timed=assignment.timed,
+        time_limit=assignment.time_limit,
+        teacher=assignment.teacher,
+        date_assigned=timezone.now(),
     )
     assignment_instances = [
         AssignmentInstance(
