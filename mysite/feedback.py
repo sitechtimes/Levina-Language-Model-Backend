@@ -3,8 +3,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 import json
 from Config.config import config
-from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, GPTQConfig, BitsAndBytesConfig
-# from gptqmodel import GPTQModel
+from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, BitsAndBytesConfig
 
 print('Loading feedback.py')
 print(torch.__version__)
@@ -27,7 +26,7 @@ class model_gen:
         self.max_length = 16000
         # load model once; adjust device_map/quantization as needed for your setup
         try:
-            gptq_config = GPTQConfig(
+            generative_config = BitsAndBytesConfig(
                 bits=env.bits,
                 dataset="c4",
                 group_size=env.group_size,
@@ -37,7 +36,7 @@ class model_gen:
             print("Loading quantized model...")
             self.model = AutoModelForCausalLM.from_pretrained(
                 env.quantized_model_directory,
-                quantization_config=gptq_config,
+                quantization_config=generative_config,
                 device_map="auto" if torch.cuda.is_available() else None,
                 low_cpu_mem_usage=True,
                 trust_remote_code=True,
@@ -71,23 +70,25 @@ class model_gen:
 
         input_tokens = tokens.to(self.device)
 
-        simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
-        print('1 - Simple Generative Output: ', simple_gen)
+        # simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
+        # print('1 - Simple Generative Output: ', simple_gen)
 
         print('test 2')
+
+        pad_id = self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
+        eos_id = self.tokenizer.eos_token_id
 
         # IMPORTANT: set a generation limit
         output_ids = self.model.generate(
             input_ids=input_tokens.get("input_ids"),
             attention_mask=input_tokens.get("attention_mask"),
             max_new_tokens=256,      # limit generated tokens
-            do_sample=False,          # deterministic; set True to sample
-            num_beams=1,
-            early_stopping=True,
+            do_sample=False,
+            temperature=0.7,
+            top_p=0.9,
+            pad_token_id=pad_id,
+            eos_token_id=eos_id
         )
-
-        simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
-        print('2 - Simple Generative Output: ', simple_gen)
 
         print('test 3')
 
