@@ -7,11 +7,13 @@ import shutil
 import pandas as pd
 
 dotenv.load_dotenv()
-def transcribe():
+def transcribe(audio_path="data/corpus/audio.wav"):
     model = whisper.load_model("turbo")
     result = model.transcribe(audio_path, language="ru")
-    print(result["text"])  
-    with open("data/corpus/audio.lab", "w", encoding="utf8") as f:
+    print(result["text"])
+    _,_,output_path = audio_path.partition("corpus/")
+    output_path,_,_ = output_path.partition(".wav")
+    with open(f"data/corpus/{output_path}.lab", "w", encoding="utf8") as f:
         f.write(result["text"].strip())
 
 
@@ -29,16 +31,26 @@ def align():
     audio_path = "data/corpus/audio.wav"
 
 
-    cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --clean --verbose --output_per_utterance_log_likelihoods false'
+    cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --clean --verbose --single_speaker'
 
     # cmd = f'"{conda_bat}" run -n aligner mfa version'
 
     subprocess.run(cmd, shell=True, check=True)
 
+def expected_phoneme():
+    conda_bat = os.getenv("CONDA_BAT")
+    print(conda_bat)
+    audio_path = "data/corpus/audio.wav"
+
+    cmd = f'"{conda_bat}" run -n aligner mfa g2p "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --clean --verbose'
+
+    # cmd = f'"{conda_bat}" run -n aligner mfa version'
+
+    subprocess.run(cmd, shell=True, check=True)
 
 #ADD in later somethjing about how fast speaker is vs a normal russian speaker
 #ADD in later posibly adding a space if delta x is too big
-
+    
 def extract_phonemes(text_grid_content):
     phonemes = []
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
@@ -77,23 +89,27 @@ def phoneme_timing(csv):
     for i in duration_scores:
         if pdd < i:
             return duration_scores[i],pdd
+    
 def analyze_textgrid():
-    text_grid_path = mfa_info["output_dir"] + "/audio.TextGrid"
-    with open(text_grid_path, "r", encoding="utf8") as f:
-        text_grid_content = f.read()
-    phonemes = extract_phonemes(text_grid_content)
-    print(phonemes)
-    csv = pd.read_csv(mfa_info["output_dir"] + "/alignment_analysis.csv")
-    llh_second,llh_phoneme = adjusted_llh(csv,phonemes)
-    phoneme_rating, phoneme_timing_score = phoneme_timing(csv)
-    print("Phoneme Timing Score:", phoneme_timing_score, "-", phoneme_rating)
-    audio_quality = analyze_audio_quality(csv)
-    print("Audio Quality:", audio_quality[1], "dB -", audio_quality[0])
+    for text_grid_file in os.listdir(mfa_info["output_dir"]):
+        if text_grid_file.endswith(".TextGrid"):
+            text_grid_path = mfa_info["output_dir"] + "/audio.TextGrid"
+            with open(text_grid_path, "r", encoding="utf8") as f:
+                text_grid_content = f.read()
+            phonemes = extract_phonemes(text_grid_content)
+            print(phonemes)
+            csv = pd.read_csv(mfa_info["output_dir"] + "/alignment_analysis.csv")
+            llh_second,llh_phoneme = adjusted_llh(csv,phonemes)
+            phoneme_rating, phoneme_timing_score = phoneme_timing(csv)
+            print("Phoneme Timing Score:", phoneme_timing_score, "-", phoneme_rating)
+            audio_quality = analyze_audio_quality(csv)
+            print("Audio Quality:", audio_quality[1], "dB -", audio_quality[0])
 
 
 
 
-
+transcribe("data/corpus/audio2.wav")
+align()
 analyze_textgrid()
 
 
