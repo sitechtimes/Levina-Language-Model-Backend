@@ -38,10 +38,10 @@ item []:
             text = "" 
         intervals [7]:
             xmin = 3.96 
-            xmax = 4.15 
+            xmax = 4.16 
             text = "из" 
         intervals [8]:
-            xmin = 4.15 
+            xmin = 4.16 
             xmax = 4.76 
             text = "шести" 
         intervals [9]:
@@ -332,10 +332,10 @@ item []:
             text = "i" 
         intervals [21]:
             xmin = 4.07 
-            xmax = 4.15 
+            xmax = 4.16 
             text = "z̪" 
         intervals [22]:
-            xmin = 4.15 
+            xmin = 4.16 
             xmax = 4.27 
             text = "ʂ" 
         intervals [23]:
@@ -552,10 +552,10 @@ item []:
             text = "e" 
         intervals [76]:
             xmin = 13.13 
-            xmax = 13.16 
+            xmax = 13.21 
             text = "d̪" 
         intervals [77]:
-            xmin = 13.16 
+            xmin = 13.21 
             xmax = 13.25 
             text = "ʊ" 
         intervals [78]:

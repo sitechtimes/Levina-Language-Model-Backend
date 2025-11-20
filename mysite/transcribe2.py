@@ -31,7 +31,7 @@ def align():
     audio_path = "data/corpus/audio.wav"
 
 
-    cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --clean --verbose --single_speaker'
+    cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --clean --verbose --single_speaker --output_per_utterance_log_likelihoods true --output_per_phone_log_likelihoods true"'
 
     # cmd = f'"{conda_bat}" run -n aligner mfa version'
 
@@ -53,14 +53,23 @@ def expected_phoneme():
     
 def extract_phonemes(text_grid_content):
     phonemes = []
+    durations = []
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
     for interval in intervals:
         if "text" in interval:
             _,_,text = interval.partition("text = ")
             phoneme = text.strip().strip('"')
+            _,_,xmin = interval.partition("xmin = ")
+            xmin,_,_ = xmin.partition("\n")
+            xmin = float(xmin.strip())
+            _,_,xmax = interval.partition("xmax = ")
+            xmax,_,_ = xmax.partition("\n")
+            xmax = float(xmax.strip())
+            duration = xmax - xmin
+            durations.append(duration)
             phonemes.append(phoneme)
-    return "".join(phonemes)
+    return "".join(phonemes),phonemes, durations
 
 def adjusted_llh(csv,phonemes):
     llh_second = csv["overall_log_likelihood"] / csv["end"]
@@ -89,6 +98,10 @@ def phoneme_timing(csv):
     for i in duration_scores:
         if pdd < i:
             return duration_scores[i],pdd
+
+# def specific_phoneme_timing(csv,phoneme):
+
+
     
 def analyze_textgrid():
     for text_grid_file in os.listdir(mfa_info["output_dir"]):
@@ -96,7 +109,7 @@ def analyze_textgrid():
             text_grid_path = mfa_info["output_dir"] + "/audio.TextGrid"
             with open(text_grid_path, "r", encoding="utf8") as f:
                 text_grid_content = f.read()
-            phonemes = extract_phonemes(text_grid_content)
+            phonemes,phoneme_list,durations = extract_phonemes(text_grid_content)
             print(phonemes)
             csv = pd.read_csv(mfa_info["output_dir"] + "/alignment_analysis.csv")
             llh_second,llh_phoneme = adjusted_llh(csv,phonemes)
@@ -108,8 +121,8 @@ def analyze_textgrid():
 
 
 
-transcribe("data/corpus/audio2.wav")
-align()
+# transcribe("data/corpus/audio2.wav")
+# align()
 analyze_textgrid()
 
 
