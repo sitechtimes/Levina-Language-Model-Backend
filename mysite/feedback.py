@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import json
 from Config.config import config
 from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, BitsAndBytesConfig
+from threading import Thread
 
 print('Loading feedback.py')
 print(torch.__version__)
@@ -26,21 +27,20 @@ class model_gen:
         self.max_length = 16000
         # load model once; adjust device_map/quantization as needed for your setup
         try:
-            generative_config = BitsAndBytesConfig(
-                bits=env.bits,
-                dataset="c4",
-                group_size=env.group_size,
-                model_basename=env.model_basename,
-                tokenizer=self.tokenizer
-            )
+            """ generative_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_quant_type="nf4",
+            ) """
             print("Loading quantized model...")
             self.model = AutoModelForCausalLM.from_pretrained(
                 env.quantized_model_directory,
-                quantization_config=generative_config,
-                device_map="auto" if torch.cuda.is_available() else None,
+                device_map={"":"cuda:0"},
                 low_cpu_mem_usage=True,
                 trust_remote_code=True,
             )
+            self.model.eval()
         except Exception as e:
             print("Model load failed:", e)
             self.model = None
@@ -75,28 +75,39 @@ class model_gen:
 
         print('test 2')
 
-        pad_id = self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
-        eos_id = self.tokenizer.eos_token_id
+        # pad_id = self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
+        # eos_id = self.tokenizer.eos_token_id
 
-        # IMPORTANT: set a generation limit
-        output_ids = self.model.generate(
-            input_ids=input_tokens.get("input_ids"),
-            attention_mask=input_tokens.get("attention_mask"),
-            max_new_tokens=256,      # limit generated tokens
-            do_sample=False,
-            temperature=0.7,
-            top_p=0.9,
-            pad_token_id=pad_id,
-            eos_token_id=eos_id
+        streamer = TextIteratorStreamer(
+            self.tokenizer, skip_prompt=True, skip_special_tokens=True
         )
 
-        print('test 3')
+        # IMPORTANT: set a generation limit
+        generation_kwargs = dict(
+            input_ids=input_tokens["input_ids"],
+            attention_mask=tokens["attention_mask"],
+            max_new_tokens=512,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.5,
+            length_penalty=5.0,
+            streamer=streamer,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
+        )
 
-        response = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
-        return response
+        thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
+        thread.start()
+
+        return streamer, thread
     
 if __name__ == "__main__":
     model_instance = model_gen()
-    response = model_instance.generate_response()
-    dynamic_prompt = model_instance.fetch_prompt()
-    print(response)
+    streamer, thread = model_instance.generate_response()
+
+    # Read tokens as they stream
+    for new_text in streamer:
+        print(new_text, end="", flush=True)
+
+    thread.join()
