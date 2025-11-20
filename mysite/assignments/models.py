@@ -5,14 +5,14 @@ from django.utils import timezone
 
 
 class AssignmentTemplate(models.Model):
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
 
 
 class Assignment(models.Model):
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     due_date = models.DateTimeField()
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()

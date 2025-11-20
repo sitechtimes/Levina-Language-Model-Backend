@@ -1,1097 +1,911 @@
 {
-  "info": {
-    "name": "Russian Prep API",
-    "description": "",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Assignment Instances",
-      "item": [
-        {
-          "name": "Increment Time Used",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignment-instances/1/increment_time_used/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignment-instances",
-                "1",
-                "increment_time_used",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"time_used\": \"1000\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Submit Assignment Instance",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignment-instances/1/submit/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignment-instances",
-                "1",
-                "submit",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"course\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Assignments",
-      "item": [
-        {
-          "name": "Update Assignment",
-          "event": [],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignments/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignments",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"the title but updated\",\n    \"description\": \"the description\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Assignment",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignments/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignments",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Assignment List",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignments/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignments",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Assign Assignment",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignments/1/assign/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignments",
-                "1",
-                "assign",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"course\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Create Assignment",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignments/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignments",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"the title 2\",\n    \"due_date\": \"2025-10-15T23:59:00Z\",\n    \"timed\": true,\n    \"time_limit\": 3600\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Delete Assignment",
-          "event": [],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/assignments/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "assignments",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"the title but updated\",\n    \"description\": \"the description\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Auth",
-      "item": [
-        {
-          "name": "API Token (Admin)",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/api/token/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "token",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "API Token (Student 2)",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/api/token/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "token",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"student2@example.com\",\n    \"password\": \"student\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "API Token (Student)",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/api/token/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "token",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"student1@example.com\",\n    \"password\": \"student\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "API Token (Superuser)",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/api/token/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "token",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"superuser@example.com\",\n    \"password\": \"superuser\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "API Token (Teacher)",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/api/token/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "token",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"email\": \"teacher@example.com\",\n    \"password\": \"teacher\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "API Token Refresh",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/api/token/refresh/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "token",
-                "refresh",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Questions",
-      "item": [
-        {
-          "name": "Create Question Copy",
-          "event": [],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/questions/2/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "questions",
-                "2",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"question_type\": \"MCQ\",\n    \"title\": \"What is 2 + 2\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Create Question",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/questions/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "questions",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"question_type\": \"MCQ\",\n    \"title\": \"What is 1 + 1\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Delete Question",
-          "event": [],
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/questions/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "questions",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"question_type\": \"MCQ\",\n    \"title\": \"What is 1 + 1\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Get Question",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/questions/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "questions",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"course\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Get Questions",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/questions/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "questions",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"course\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Course",
-      "item": [
-        {
-          "name": "Course List",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "bearer",
-              "bearer": {
-                "key": "token",
-                "value": "{{access_token}}",
-                "type": "string"
-              }
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Delete Course",
-          "event": [],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"the title but updated\",\n    \"description\": \"the description\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Create Course",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"the title\",\n    \"description\": \"the description\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Course",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Join Code",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/1/join_code/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                "1",
-                "join_code",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        },
-        {
-          "name": "Update Course",
-          "event": [],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"title\": \"the title but updated\",\n    \"description\": \"the description\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Join Course",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/courses/1/join/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "courses",
-                "1",
-                "join",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Question Instances",
-      "item": [
-        {
-          "name": "Get Question Instance",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/question-instances/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "question-instances",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"course\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Update Question Instance",
-          "event": [],
-          "request": {
-            "method": "PATCH",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/question-instances/1/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "question-instances",
-                "1",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"text_answer\": \"text\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Get Question Instances",
-          "event": [],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/question-instances/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "question-instances",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"course\": 1\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Sessions",
-      "item": [
-        {
-          "name": "Host Session",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/sessions/1/host_session/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "sessions",
-                "1",
-                "host_session",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
-          "name": "Join Session",
-          "event": [],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "auth": {
-              "type": "noauth"
-            },
-            "description": "",
-            "url": {
-              "raw": "{{base_url}}/sessions/join_session/",
-              "protocol": "",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "sessions",
-                "join_session",
-                ""
-              ],
-              "query": [],
-              "variable": []
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"student_name\": \"Samuel Kipnis\",\n  \"access_code\": \"y45foc\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "",
-      "type": "default"
-    },
-    {
-      "key": "refresh_token",
-      "value": "",
-      "type": "default"
-    },
-    {
-      "key": "access_token",
-      "value": "",
-      "type": "default"
-    }
-  ]
+	"info": {
+		"name": "Russian Prep API",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Assignment Instances",
+			"item": [
+				{
+					"name": "Increment Time Used",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignment-instances/1/increment_time_used/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignment-instances", "1", "increment_time_used", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"time_used\": \"1000\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Submit Assignment Instance",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignment-instances/1/submit/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignment-instances", "1", "submit", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Assignments",
+			"item": [
+				{
+					"name": "Update Assignment",
+					"event": [],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignments/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"the name but updated\",\n    \"description\": \"the description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Assignment",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignments/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "1", ""],
+							"query": [],
+							"variable": []
+						}
+					}
+				},
+				{
+					"name": "Assignment List",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignments/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", ""],
+							"query": [],
+							"variable": []
+						}
+					}
+				},
+				{
+					"name": "Assign Assignment",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignments/1/assign/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "1", "assign", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Create Assignment",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignments/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"the name 2\",\n    \"due_date\": \"2025-10-15T23:59:00Z\",\n    \"timed\": true,\n    \"time_limit\": 3600\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Delete Assignment",
+					"event": [],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/assignments/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["assignments", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"the name but updated\",\n    \"description\": \"the description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "API Token (Admin)",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/api/token/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "API Token (Student 2)",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/api/token/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"student2@example.com\",\n    \"password\": \"student\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "API Token (Student)",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/api/token/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"student1@example.com\",\n    \"password\": \"student\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "API Token (Superuser)",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/api/token/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"superuser@example.com\",\n    \"password\": \"superuser\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "API Token (Teacher)",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/api/token/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"teacher@example.com\",\n    \"password\": \"teacher\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "API Token Refresh",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/api/token/refresh/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["api", "token", "refresh", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Questions",
+			"item": [
+				{
+					"name": "Create Question Copy",
+					"event": [],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/questions/2/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["questions", "2", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question_type\": \"MCQ\",\n    \"name\": \"What is 2 + 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Create Question",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/questions/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["questions", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question_type\": \"MCQ\",\n    \"name\": \"What is 1 + 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Delete Question",
+					"event": [],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/questions/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["questions", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"question_type\": \"MCQ\",\n    \"name\": \"What is 1 + 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get Question",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/questions/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["questions", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get Questions",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/questions/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["questions", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Course",
+			"item": [
+				{
+					"name": "Course List",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"key": "token",
+								"value": "{{access_token}}",
+								"type": "string"
+							}
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", ""],
+							"query": [],
+							"variable": []
+						}
+					}
+				},
+				{
+					"name": "Delete Course",
+					"event": [],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"the name but updated\",\n    \"description\": \"the description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Create Course",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"the name\",\n    \"description\": \"the description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Course",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", "1", ""],
+							"query": [],
+							"variable": []
+						}
+					}
+				},
+				{
+					"name": "Join Code",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/1/join_code/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", "1", "join_code", ""],
+							"query": [],
+							"variable": []
+						}
+					}
+				},
+				{
+					"name": "Update Course",
+					"event": [],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"the name but updated\",\n    \"description\": \"the description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Join Course",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/courses/1/join/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["courses", "1", "join", ""],
+							"query": [],
+							"variable": []
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Question Instances",
+			"item": [
+				{
+					"name": "Get Question Instance",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/question-instances/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["question-instances", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Update Question Instance",
+					"event": [],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/question-instances/1/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["question-instances", "1", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text_answer\": \"text\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get Question Instances",
+					"event": [],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/question-instances/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["question-instances", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"course\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Sessions",
+			"item": [
+				{
+					"name": "Host Session",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/sessions/1/host_session/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["sessions", "1", "host_session", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Join Session",
+					"event": [],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "",
+						"url": {
+							"raw": "{{base_url}}/sessions/join_session/",
+							"protocol": "",
+							"host": ["{{base_url}}"],
+							"path": ["sessions", "join_session", ""],
+							"query": [],
+							"variable": []
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"student_name\": \"Samuel Kipnis\",\n  \"access_code\": \"y45foc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "default"
+		}
+	]
 }

@@ -51,19 +51,19 @@ def run():
         last_name="User",
     )
     question = Question.objects.create(
-        title="Test Question",
+        name="Test Question",
         question_type="MCQ",
         author=teacher,
     )
     assignment_template = AssignmentTemplate.objects.create(
-        title="Test Assignment",
+        name="Test Assignment",
         teacher=teacher,
         timed=True,
         time_limit=3600,
     )
     assignment_template.questions.add(question)
     course = Course.objects.create(
-        title="Test Course",
+        name="Test Course",
         period=1,
         class_type="Freshman Russian",
         teacher=teacher,

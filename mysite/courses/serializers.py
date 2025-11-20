@@ -10,7 +10,7 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             "id",
-            "title",
+            "name",
             "period",
             "class_type",
             "join_code",
@@ -28,14 +28,14 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Course.objects.create(
-            title=validated_data["title"],
+            name=validated_data["name"],
             period=validated_data["period"],
             class_type=validated_data["class_type"],
             teacher=self.context.get("request").user,
         )
 
     def update(self, instance, validated_data):
-        instance.title = validated_data.get("title", instance.title)
+        instance.name = validated_data.get("name", instance.name)
         instance.period = validated_data.get("period", instance.period)
         instance.class_type = validated_data.get("class_type", instance.class_type)
         instance.save()

@@ -13,6 +13,7 @@ from questions.serializers import (
     ExpandedQuestionInstanceSerializer,
 )
 
+
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
     question_instances = QuestionInstanceSerializer(many=True, read_only=True)
 
@@ -44,7 +45,7 @@ class AssignmentTemplateSerializer(serializers.ModelSerializer):
         model = AssignmentTemplate
         fields = [
             "id",
-            "title",
+            "name",
             "timed",
             "time_limit",
             "teacher",
@@ -60,7 +61,7 @@ class AssignmentTemplateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         teacher = self.context.get("request").user
         return AssignmentTemplate.objects.create(
-            title=validated_data["title"],
+            name=validated_data["name"],
             teacher=teacher,
             timed=validated_data["timed"],
             time_limit=validated_data["time_limit"],
@@ -75,7 +76,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = [
             "id",
-            "title",
+            "name",
             "due_date",
             "is_active",
             "timed",
@@ -99,7 +100,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         teacher = self.context.get("request").user
         return Assignment.objects.create(
-            title=validated_data["title"],
+            name=validated_data["name"],
             due_date=validated_data["due_date"],
             teacher=teacher,
             timed=validated_data["timed"],
@@ -108,7 +109,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        instance.title = validated_data.get("title", instance.title)
+        instance.name = validated_data.get("name", instance.name)
         instance.due_date = validated_data.get("due_date", instance.due_date)
         instance.save()
         return instance
@@ -151,7 +152,13 @@ class SessionSerializer(serializers.ModelSerializer):
             "active",
             "session_instances",
         ]
-        read_only_fields = ["id", "assignment_template", "host", "active", "session_instances"]
+        read_only_fields = [
+            "id",
+            "assignment_template",
+            "host",
+            "active",
+            "session_instances",
+        ]
 
     def destroy(self, instance):
         if instance.session_instances.exists():

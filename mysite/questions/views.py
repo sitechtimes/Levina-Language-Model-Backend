@@ -26,7 +26,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         question = Question.objects.create(
-            title=request.data["title"],
+            name=request.data["name"],
             question_type=request.data["question_type"],
             author=self.request.user,
         )
@@ -66,4 +66,6 @@ class QuestionInstanceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        return Response(QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK)
+        return Response(
+            QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK
+        )

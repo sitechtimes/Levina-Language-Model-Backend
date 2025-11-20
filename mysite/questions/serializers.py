@@ -10,7 +10,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "question_type",
             "answer",
             "author",
-            "title",
+            "name",
         ]
         read_only_fields = ["id", "author"]
 

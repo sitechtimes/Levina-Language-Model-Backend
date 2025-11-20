@@ -10,7 +10,7 @@ class Question(models.Model):
         ("EQ", "Essay Question"),
         ("AQ", "Audio Question"),
     ]
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     question_type = models.CharField(choices=QUESTION_TYPES)
     author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField(null=True, blank=True)

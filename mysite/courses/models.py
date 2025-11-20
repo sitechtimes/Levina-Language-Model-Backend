@@ -19,7 +19,7 @@ class ClassTypes(models.TextChoices):
 
 
 class Course(models.Model):
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     period = models.IntegerField()
     class_type = models.CharField(choices=ClassTypes.choices)
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
