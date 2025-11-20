@@ -11,7 +11,6 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "description",
             "period",
             "class_type",
             "join_code",
@@ -30,7 +29,6 @@ class CourseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Course.objects.create(
             title=validated_data["title"],
-            description=validated_data["description"],
             period=validated_data["period"],
             class_type=validated_data["class_type"],
             teacher=self.context.get("request").user,
@@ -38,7 +36,6 @@ class CourseSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.title = validated_data.get("title", instance.title)
-        instance.description = validated_data.get("description", instance.description)
         instance.period = validated_data.get("period", instance.period)
         instance.class_type = validated_data.get("class_type", instance.class_type)
         instance.save()

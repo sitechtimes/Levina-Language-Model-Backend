@@ -6,22 +6,22 @@ from rest_framework import serializers
 # Create your models here.
 
 
+class ClassTypes(models.TextChoices):
+    FR = "Freshman Russian"
+    FHR = "Freshman Heritage Russian"
+    SR = "Sophomore Russian"
+    SAR = "Sophomore Advanced Russian"
+    SHR = "Sophomore Heritage Russian"
+    JR = "Junior Russian"
+    CR = "College Russian"
+    RIB = "Russian in Business"
+    CHR = "College Heritage Russian"
+
+
 class Course(models.Model):
-    CLASS_TYPES = [
-        ("FR", "Freshman Russian"),
-        ("FHR", "Freshman Heritage Russian"),
-        ("SR", "Sophomore Russian"),
-        ("SAR", "Sophomore Advanced Russian"),
-        ("SHR", "Sophomore Heritage Russian"),
-        ("JR", "Junior Russian"),
-        ("CR", "College Russian"),
-        ("CHR", "College Heritage Russian"),
-        ("RIB", "Russian in Business"),
-    ]
     title = models.CharField(max_length=100)
-    description = models.TextField()
     period = models.IntegerField()
-    class_type = models.CharField(max_length=3, choices=CLASS_TYPES)
+    class_type = models.CharField(choices=ClassTypes.choices)
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     students = models.ManyToManyField(CustomUser, related_name="courses")
     join_code = models.CharField(max_length=6)

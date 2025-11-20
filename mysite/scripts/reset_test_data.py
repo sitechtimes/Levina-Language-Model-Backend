@@ -64,9 +64,8 @@ def run():
     assignment_template.questions.add(question)
     course = Course.objects.create(
         title="Test Course",
-        description="This is a test course",
         period=1,
-        class_type="FR",
+        class_type="Freshman Russian",
         teacher=teacher,
     )
     course.students.add(student1, student2, sam)
