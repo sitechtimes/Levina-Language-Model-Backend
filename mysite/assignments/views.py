@@ -48,17 +48,17 @@ class AssignmentTemplateViewSet(viewsets.ModelViewSet):
         try:
             course = Course.objects.get(id=request.data.get("course"))
         except Course.DoesNotExist:
-            return Response(
-                "Course does not exist", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Course does not exist", status=status.HTTP_400_BAD_REQUEST)
         if course.assignments.filter(assignment_template=assignment_template).exists():
             return Response(
-                "Assignment template already assigned to course", status=status.HTTP_400_BAD_REQUEST
+                "Assignment template already assigned to course",
+                status=status.HTTP_400_BAD_REQUEST,
             )
         due_date = parse_datetime(request.data.get("due_date"))
         assignment = assign_assignment(assignment_template, course, due_date=due_date)
-        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_200_OK)
-
+        return Response(
+            AssignmentSerializer(assignment).data, status=status.HTTP_200_OK
+        )
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -91,14 +91,25 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save(teacher=request.user)
-        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED)
+        return Response(
+            AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED
+        )
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
+        if new_questions := request.data.get("questions"):
+            current_ids = set(instance.questions.values_list("id", flat=True))
+            new_ids = set(new_questions.values_list("id", flat=True))
+            to_add = new_ids - current_ids
+            to_remove = current_ids - new_ids
+            instance.questions.add(*to_add)
+            instance.questions.remove(*to_remove)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save()
-        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_200_OK)
+        return Response(
+            AssignmentSerializer(assignment).data, status=status.HTTP_200_OK
+        )
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -185,7 +196,9 @@ class SessionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     def host_session(self, request):
         try:
-            assignment_template = AssignmentTemplate.objects.get(id=request.data.get("assignment_template"))
+            assignment_template = AssignmentTemplate.objects.get(
+                id=request.data.get("assignment_template")
+            )
         except AssignmentTemplate.DoesNotExist:
             return Response(
                 "Assignment template does not exist", status=status.HTTP_400_BAD_REQUEST
@@ -193,7 +206,8 @@ class SessionViewSet(viewsets.ModelViewSet):
         session = Session.objects.create(
             assignment_template=assignment_template,
             host=request.user,
-            access_code=random_alphanumeric(6))
+            access_code=random_alphanumeric(6),
+        )
         return Response(SessionSerializer(session).data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=["post"])

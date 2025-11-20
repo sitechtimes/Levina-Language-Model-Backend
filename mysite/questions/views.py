@@ -63,7 +63,7 @@ class QuestionInstanceViewSet(viewsets.ModelViewSet):
                 "Cannot update question instance that has been submitted.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        serializer = self.get_serializer(instance, data=request.data)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
         return Response(
