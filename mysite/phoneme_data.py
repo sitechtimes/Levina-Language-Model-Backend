@@ -1,10 +1,10 @@
 import pandas as pd
-
 import os
 import subprocess
+import shutil
+import dotenv
 
-
-
+dotenv.load_dotenv()
 mfa_info = {
     "corpus_dir": "training_data/corpus",
     "output_dir": "training_data/aligned_output",
@@ -13,8 +13,17 @@ mfa_info = {
 }
 
 
-def load_dataset(path):
-    pass
+def formulate_data():
+    tsv_file_path = os.getenv("TSV_FILE_TRAIN_PATH")
+    print(tsv_file_path)
+    df = pd.read_csv(tsv_file_path, sep='\t')
+    # print(df.head())
+    df_train = df[df["age"].isin(["twenties", "teens"])]
+    print(df_train.head(20))
+    print(len(df_train))
+    wav_path = ""
+    transcriptoin_path = ""
+
 
 def align():
     conda_bat = os.getenv("CONDA_BAT")
@@ -27,3 +36,6 @@ def align():
     # cmd = f'"{conda_bat}" run -n aligner mfa version'
 
     subprocess.run(cmd, shell=True, check=True)
+
+
+formulate_data()
