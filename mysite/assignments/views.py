@@ -91,6 +91,8 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save(teacher=request.user)
+        questions = Question.objects.filter(id__in=request.data.get("questions", []))
+        assignment.questions.set(questions)
         return Response(
             AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED
         )

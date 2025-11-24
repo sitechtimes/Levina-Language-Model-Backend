@@ -21,6 +21,7 @@ def assign_assignment(assignment_template, course, due_date=None):
         teacher=assignment_template.teacher,
         date_assigned=timezone.now(),
     )
+    assignment.questions.set(assignment_template.questions.all())
     assignment_instances = [
         AssignmentInstance(
             assignment=assignment,
