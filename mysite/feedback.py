@@ -48,6 +48,10 @@ class model_gen:
     def fetch_prompt(self):
         with open("dynamic-prompt.txt", "r", encoding="utf-8") as f:
             return f.read().strip()
+        
+    def fetch_essay(self):
+        with open("essay-text.txt", "r", encoding="utf-8") as f:
+            return f.read().strip()
 
     def generate_response(self):
         torch.cuda.empty_cache()
@@ -57,9 +61,22 @@ class model_gen:
 
         print('test 1')
 
-        prompt = self.fetch_prompt()
-        if not prompt:
+        essay_text = self.fetch_essay()
+
+        system_prompt = self.fetch_prompt()
+        if not system_prompt:
             raise ValueError("Prompt is empty")
+        
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": essay_text},   # <- you must supply this externally
+        ]
+
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
 
         tokens = self.tokenizer(
             prompt,
@@ -86,12 +103,12 @@ class model_gen:
         generation_kwargs = dict(
             input_ids=input_tokens["input_ids"],
             attention_mask=tokens["attention_mask"],
-            max_new_tokens=512,
+            max_new_tokens=1024,
             do_sample=True,
             temperature=0.7,
             top_p=0.9,
-            repetition_penalty=1.5,
-            length_penalty=5.0,
+            repetition_penalty=1.1,
+            length_penalty=1.0,
             streamer=streamer,
             eos_token_id=self.tokenizer.eos_token_id,
             pad_token_id=self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
