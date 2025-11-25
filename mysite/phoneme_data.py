@@ -21,6 +21,10 @@ def formulate_data():
     df_train = df[df["age"].isin(["twenties", "teens"])]
     print(df_train.head(20))
     print(len(df_train))
+    small_df = df_train[:3]
+    for row in small_df.itertuples():
+        full_path = tsv_file_path.rsplit("/", 1)[0] + "/"
+        shutil.copy(full_path + row.path, "training_data/corpus/")
     wav_path = ""
     transcriptoin_path = ""
 
