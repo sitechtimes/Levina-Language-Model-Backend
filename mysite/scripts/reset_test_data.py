@@ -3,7 +3,7 @@ from questions.models import Question
 from assignments.models import AssignmentTemplate, AssignmentInstance
 from courses.models import Course
 from .utils import run_django_command
-from utils.create import assign_assignment
+from utils.create import assign_assignment, join_course
 
 
 def run():
@@ -68,6 +68,6 @@ def run():
         class_type="Freshman Russian",
         teacher=teacher,
     )
-    course.students.add(student1, student2, sam)
+    join_course(course, student1)
     assign_assignment(assignment_template, course, due_date="2025-12-15T23:59:00Z")
     print("Test data created successfully.")

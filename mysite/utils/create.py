@@ -53,3 +53,18 @@ def join_session(session, student_name):
     session_instance.token = token
     session_instance.save()
     return session_instance, token
+
+
+def join_course(course, student):
+    course.students.add(student)
+    course.save()
+    for assignment in course.assignments.all():
+        assignment_instance = AssignmentInstance.objects.create(
+            assignment=assignment,
+            student=student,
+        )
+        question_instances = [
+            QuestionInstance(assignment_instance=assignment_instance, question=question)
+            for question in assignment.questions.all()
+        ]
+        QuestionInstance.objects.bulk_create(question_instances)

@@ -16,7 +16,7 @@ from assignments.models import (
     SessionInstance,
 )
 from courses.models import Course
-from questions.models import Question
+from questions.models import Question, QuestionInstance
 from utils.random import random_alphanumeric
 from core.permissions import (
     IsStudent,
@@ -75,6 +75,24 @@ class AssignmentTemplateViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED,
         )
 
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if new_questions := request.data.get("questions"):
+            current_ids = set(instance.questions.values_list("id", flat=True))
+            new_ids = set(new_questions)
+            to_add = new_ids - current_ids
+            to_remove = current_ids - new_ids
+            if to_add:
+                instance.questions.add(*to_add)
+            if to_remove:
+                instance.questions.remove(*to_remove)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        instance = serializer.save()
+        return Response(
+            AssignmentTemplateSerializer(instance).data, status=status.HTTP_200_OK
+        )
+
 
 class AssignmentViewSet(viewsets.ModelViewSet):
     queryset = Assignment.objects.all()
@@ -93,20 +111,54 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         assignment = serializer.save(teacher=request.user)
         questions = Question.objects.filter(id__in=request.data.get("questions", []))
         assignment.questions.set(questions)
+        assignment_instances = [
+            AssignmentInstance(
+                assignment=assignment,
+                student=student,
+            )
+            for student in assignment.course.students.all()
+        ]
+        AssignmentInstance.objects.bulk_create(assignment_instances)
+        question_instances = [
+            QuestionInstance(assignment_instance=assignment_instance, question=question)
+            for question in assignment.questions.all()
+            for assignment_instance in assignment_instances
+        ]
+        QuestionInstance.objects.bulk_create(question_instances)
+
         return Response(
             AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED
         )
 
     def update(self, request, *args, **kwargs):
-        instance = self.get_object()
+        assignment = self.get_object()
         if new_questions := request.data.get("questions"):
-            current_ids = set(instance.questions.values_list("id", flat=True))
-            new_ids = set(new_questions.values_list("id", flat=True))
+            current_ids = set(assignment.questions.values_list("id", flat=True))
+            new_ids = set(new_questions)
             to_add = new_ids - current_ids
             to_remove = current_ids - new_ids
-            instance.questions.add(*to_add)
-            instance.questions.remove(*to_remove)
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+            if to_add:
+                assignment.questions.add(*to_add)
+                assignment_instances = assignment.assignment_instances.all()
+
+                new_question_instances = [
+                    QuestionInstance(
+                        assignment_instance=assignment_instance,
+                        question_id=question_id,
+                    )
+                    for assignment_instance in assignment_instances
+                    for question_id in to_add
+                ]
+
+                QuestionInstance.objects.bulk_create(new_question_instances)
+            if to_remove:
+                assignment.questions.remove(*to_remove)
+                QuestionInstance.objects.filter(
+                    assignment_instance__assignment=assignment,
+                    question_id__in=to_remove,
+                ).delete()
+
+        serializer = self.get_serializer(assignment, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save()
         return Response(

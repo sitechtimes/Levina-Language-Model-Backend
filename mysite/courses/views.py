@@ -7,6 +7,7 @@ from users.serializers import UserSerializer
 from .models import Course
 from assignments.models import Assignment
 from utils.random import random_alphanumeric
+from utils.create import join_course
 from core.permissions import (
     IsStudent,
     IsTeacher,
@@ -51,7 +52,7 @@ class CourseViewSet(
             )
         if request.data.get("join_code") != course.join_code:
             return Response("Invalid join code", status=status.HTTP_400_BAD_REQUEST)
-        course.students.add(request.user)
+        join_course(course, request.user)
         return Response(
             CourseSerializer(course).data,
             status=status.HTTP_201_CREATED,
@@ -86,9 +87,9 @@ class CourseViewSet(
     def assignment(self, request, pk=None, assignment_id=None):
         course = self.get_object()
         try:
-            assignment = Assignment.objects.select_related(
-                "assignment"
-            ).get(course=course, assignment_id=assignment_id)
+            assignment = Assignment.objects.select_related("assignment").get(
+                course=course, assignment_id=assignment_id
+            )
         except Assignment.DoesNotExist:
             return Response(
                 {"detail": "Assignment not found for this course."},
