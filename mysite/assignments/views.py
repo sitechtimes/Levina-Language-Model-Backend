@@ -167,11 +167,6 @@ class AssignmentViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.assignment_instances.exists():
-            return Response(
-                "Cannot delete assignment that has been assigned to students.",
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
