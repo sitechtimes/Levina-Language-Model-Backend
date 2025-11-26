@@ -25,6 +25,7 @@ class CourseViewSet(
     serializer_class = CourseSerializer
 
     def get_permissions(self):
+        
         if self.action in [*UNSAFE_ACTIONS, "new_join_code", "join_code"]:
             permission_classes = [IsTeacherAndOwnsObject | IsAdmin]
         elif self.action in [
@@ -38,6 +39,8 @@ class CourseViewSet(
             ]
         elif self.action == "join":
             permission_classes = [IsStudent]
+        elif self.action == "remove_student"| self.action == "update_teachers":
+            permission_classes = [IsAdmin]
         else:
             permission_classes = []
         return [p() for p in permission_classes]
@@ -56,7 +59,32 @@ class CourseViewSet(
             CourseSerializer(course).data,
             status=status.HTTP_201_CREATED,
         )
-
+    @action(detail=True, methods=["post"])
+    def update_teachers(self,action,request,pk=None):
+        course = self.get_object()
+        teachers_ids = request.data.get("teachers", [])
+        teachers = course.teacher.filter(id__in=teachers_ids)
+        course.teacher.set(teachers)
+        course.save()
+        return Response(
+            CourseSerializer(course).data,
+            status=status.HTTP_200_OK,
+        ) 
+    @action(detail=True, methods=["post"])
+    def remove_student(self, request, pk=None):
+        course = self.get_object()
+        student_id = request.data.get("student_id")
+        try:
+            student = course.students.get(id=student_id)
+        except Course.students.model.DoesNotExist:
+            return Response(
+                "Student not found in course", status=status.HTTP_404_NOT_FOUND
+            )
+        course.students.remove(student)
+        return Response(
+            CourseSerializer(course).data,
+            status=status.HTTP_200_OK,
+            )
     @action(detail=True, methods=["post"])
     def new_join_code(self, request, pk=None):
         course = self.get_object()
