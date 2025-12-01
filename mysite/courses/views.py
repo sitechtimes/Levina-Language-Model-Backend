@@ -5,6 +5,7 @@ from .serializers import CourseSerializer
 from assignments.serializers import AssignmentTemplateSerializer, AssignmentSerializer
 from users.serializers import UserSerializer
 from .models import Course
+from users.models import CustomUser
 from assignments.models import Assignment
 from utils.random import random_alphanumeric
 from core.permissions import (
@@ -39,7 +40,7 @@ class CourseViewSet(
             ]
         elif self.action == "join":
             permission_classes = [IsStudent]
-        elif self.action == "remove_student"| self.action == "update_teachers":
+        elif self.action in ["update_teachers", "remove_student"]:
             permission_classes = [IsAdmin]
         else:
             permission_classes = []
@@ -60,11 +61,11 @@ class CourseViewSet(
             status=status.HTTP_201_CREATED,
         )
     @action(detail=True, methods=["post"])
-    def update_teachers(self,action,request,pk=None):
+    def update_teachers(self,request,pk=None):
         course = self.get_object()
         teachers_ids = request.data.get("teachers", [])
-        teachers = course.teacher.filter(id__in=teachers_ids)
-        course.teacher.set(teachers)
+        teachers = CustomUser.objects.filter(id__in=teachers_ids)
+        course.teachers.set(teachers)
         course.save()
         return Response(
             CourseSerializer(course).data,
@@ -76,7 +77,7 @@ class CourseViewSet(
         student_id = request.data.get("student_id")
         try:
             student = course.students.get(id=student_id)
-        except Course.students.model.DoesNotExist:
+        except student.DoesNotExist:
             return Response(
                 "Student not found in course", status=status.HTTP_404_NOT_FOUND
             )
