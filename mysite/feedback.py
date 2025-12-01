@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 import json
 from Config.config import config
-from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, GPTQConfig, BitsAndBytesConfig
-# from gptqmodel import GPTQModel
+from transformers import LlamaTokenizer, AutoTokenizer, AutoModelForCausalLM, GenerationConfig, TextIteratorStreamer, BitsAndBytesConfig
+from threading import Thread
 
 print('Loading feedback.py')
 print(torch.__version__)
@@ -27,27 +27,30 @@ class model_gen:
         self.max_length = 16000
         # load model once; adjust device_map/quantization as needed for your setup
         try:
-            gptq_config = GPTQConfig(
-                bits=env.bits,
-                dataset="c4",
-                group_size=env.group_size,
-                model_basename=env.model_basename,
-                tokenizer=self.tokenizer
-            )
+            """ generative_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_quant_type="nf4",
+            ) """
             print("Loading quantized model...")
             self.model = AutoModelForCausalLM.from_pretrained(
                 env.quantized_model_directory,
-                quantization_config=gptq_config,
-                device_map="auto" if torch.cuda.is_available() else None,
+                device_map={"":"cuda:0"},
                 low_cpu_mem_usage=True,
                 trust_remote_code=True,
             )
+            self.model.eval()
         except Exception as e:
             print("Model load failed:", e)
             self.model = None
 
     def fetch_prompt(self):
         with open("dynamic-prompt.txt", "r", encoding="utf-8") as f:
+            return f.read().strip()
+        
+    def fetch_essay(self):
+        with open("essay-text.txt", "r", encoding="utf-8") as f:
             return f.read().strip()
 
     def generate_response(self):
@@ -58,9 +61,22 @@ class model_gen:
 
         print('test 1')
 
-        prompt = self.fetch_prompt()
-        if not prompt:
+        essay_text = self.fetch_essay()
+
+        system_prompt = self.fetch_prompt()
+        if not system_prompt:
             raise ValueError("Prompt is empty")
+        
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": essay_text},   # <- you must supply this externally
+        ]
+
+        prompt = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
 
         tokens = self.tokenizer(
             prompt,
@@ -71,31 +87,44 @@ class model_gen:
 
         input_tokens = tokens.to(self.device)
 
-        simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
-        print('1 - Simple Generative Output: ', simple_gen)
+        # simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
+        # print('1 - Simple Generative Output: ', simple_gen)
 
         print('test 2')
 
-        # IMPORTANT: set a generation limit
-        output_ids = self.model.generate(
-            input_ids=input_tokens.get("input_ids"),
-            attention_mask=input_tokens.get("attention_mask"),
-            max_new_tokens=256,      # limit generated tokens
-            do_sample=False,          # deterministic; set True to sample
-            num_beams=1,
-            early_stopping=True,
+        # pad_id = self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
+        # eos_id = self.tokenizer.eos_token_id
+
+        streamer = TextIteratorStreamer(
+            self.tokenizer, skip_prompt=True, skip_special_tokens=True
         )
 
-        simple_gen = self.model.generate(**self.tokenizer("Hello", return_tensors="pt").to(self.device), max_new_tokens=256)
-        print('2 - Simple Generative Output: ', simple_gen)
+        # IMPORTANT: set a generation limit
+        generation_kwargs = dict(
+            input_ids=input_tokens["input_ids"],
+            attention_mask=tokens["attention_mask"],
+            max_new_tokens=1024,
+            do_sample=True,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.1,
+            length_penalty=1.0,
+            streamer=streamer,
+            eos_token_id=self.tokenizer.eos_token_id,
+            pad_token_id=self.tokenizer.pad_token_id or self.tokenizer.eos_token_id
+        )
 
-        print('test 3')
+        thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
+        thread.start()
 
-        response = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
-        return response
+        return streamer, thread
     
 if __name__ == "__main__":
     model_instance = model_gen()
-    response = model_instance.generate_response()
-    dynamic_prompt = model_instance.fetch_prompt()
-    print(response)
+    streamer, thread = model_instance.generate_response()
+
+    # Read tokens as they stream
+    for new_text in streamer:
+        print(new_text, end="", flush=True)
+
+    thread.join()
