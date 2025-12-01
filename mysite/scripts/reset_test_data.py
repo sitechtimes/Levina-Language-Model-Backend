@@ -66,8 +66,8 @@ def run():
         name="Test Course",
         period=1,
         class_type="Freshman Russian",
-        teacher=teacher,
     )
     course.students.add(student1, student2, sam)
+    course.teachers.add(teacher)
     assign_assignment(assignment_template, course, due_date="2025-12-15T23:59:00Z")
     print("Test data created successfully.")
