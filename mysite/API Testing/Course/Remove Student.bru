@@ -1,0 +1,15 @@
+meta {
+  name: Remove Student
+  type: http
+  seq: 12
+}
+
+delete {
+  url: {{base_url}}/remove_student
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

@@ -1,0 +1,26 @@
+meta {
+  name: update teachers
+  type: http
+  seq: 11
+}
+
+patch {
+  url: {{base_url}}/courses/update_teachers/1
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NjkzMDYxLCJpYXQiOjE3NjQ2ODk0NjEsImp0aSI6IjJiMmVlMGQ5OGM0ZTQzOThiODMzMDJkZDEyN2Y1NTdjIiwidXNlcl9pZCI6IjYifQ.LU3NMqWBOYWnrSF1FDNqN7OtdiFQMXSrHvr8wFvSe-s
+}
+
+body:json {
+  {
+    "teachers":[7]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

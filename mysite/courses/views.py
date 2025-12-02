@@ -26,7 +26,7 @@ class CourseViewSet(
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-        
+
         if self.action in [*UNSAFE_ACTIONS, "new_join_code", "join_code"]:
             permission_classes = [IsTeacherAndOwnsObject | IsAdmin]
         elif self.action in [
@@ -60,8 +60,9 @@ class CourseViewSet(
             CourseSerializer(course).data,
             status=status.HTTP_201_CREATED,
         )
-    @action(detail=True, methods=["post"])
-    def update_teachers(self,request,pk=None):
+
+    @action(detail=True, methods=["patch"])
+    def update_teachers(self, request, pk):
         course = self.get_object()
         teachers_ids = request.data.get("teachers", [])
         teachers = CustomUser.objects.filter(id__in=teachers_ids)
@@ -70,22 +71,26 @@ class CourseViewSet(
         return Response(
             CourseSerializer(course).data,
             status=status.HTTP_200_OK,
-        ) 
-    @action(detail=True, methods=["post"])
+        )
+
+    @action(detail=True, methods=["patch"])
     def remove_student(self, request, pk=None):
         course = self.get_object()
-        student_id = request.data.get("student_id")
+        student_id = request.data.get("student")
+
         try:
             student = course.students.get(id=student_id)
+            course.students.remove(student)
+
         except student.DoesNotExist:
             return Response(
                 "Student not found in course", status=status.HTTP_404_NOT_FOUND
             )
-        course.students.remove(student)
         return Response(
             CourseSerializer(course).data,
             status=status.HTTP_200_OK,
-            )
+        )
+
     @action(detail=True, methods=["post"])
     def new_join_code(self, request, pk=None):
         course = self.get_object()
@@ -115,9 +120,9 @@ class CourseViewSet(
     def assignment(self, request, pk=None, assignment_id=None):
         course = self.get_object()
         try:
-            assignment = Assignment.objects.select_related(
-                "assignment"
-            ).get(course=course, assignment_id=assignment_id)
+            assignment = Assignment.objects.select_related("assignment").get(
+                course=course, assignment_id=assignment_id
+            )
         except Assignment.DoesNotExist:
             return Response(
                 {"detail": "Assignment not found for this course."},
