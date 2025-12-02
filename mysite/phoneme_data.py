@@ -80,24 +80,46 @@ def extract_phonemes(text_grid_content):
 
 def organize_phonemes():
     full_data = []
+    full_data_separated = []
     for path in os.listdir("training_data/aligned_output/"):
         if path.endswith(".TextGrid"):
             with open(os.path.join("training_data/aligned_output/", path), "r", encoding="utf-8") as f:
                 content = f.read()
             single_file_data = extract_phonemes(content)
             full_data = full_data + single_file_data
+            full_data_separated.append(single_file_data)
     full_data_no_whitespace = copy.deepcopy(full_data)
     for phoneme, duration in full_data:
         if phoneme == '':
             full_data_no_whitespace.remove((phoneme, duration))
     phoneme_df = pd.DataFrame(full_data_no_whitespace, columns=["phoneme", "duration"])
+    return phoneme_df,full_data_separated
+
+
+def run_phoneme_stats():
+    phoneme_df,separated_data = organize_phonemes()
+    print(phoneme_df)
     phoneme_counts = phoneme_df['phoneme'].value_counts().reset_index()
     phoneme_counts.columns = ['phoneme', 'count']
     phoneme_avg_durations = phoneme_df.groupby('phoneme')['duration'].mean().reset_index()
     phoneme_avg_durations.columns = ['phoneme', 'avg_duration']
-    phoneme_stats = pd.merge(phoneme_counts, phoneme_avg_durations, on='phoneme')
+    phoneme_std_deviations = phoneme_df.groupby('phoneme')['duration'].std().reset_index()
+    phoneme_std_deviations.columns = ['phoneme', 'std_deviation']
+    phoneme_stats = pd.merge(phoneme_counts, phoneme_avg_durations, on='phoneme').merge(phoneme_std_deviations, on='phoneme')
     print(phoneme_stats)
+
+
+    #Next I will make the normalized durations
+    clip_means = []
+    for clip in separated_data:
+        clip_df = pd.DataFrame(clip, columns=["phoneme", "duration"])
+        clip_mean = clip_df['duration'].mean()
+        clip_means.append(clip_mean)
+    print(clip_means)
+    total_mean = sum(clip_means) / len(clip_means)
+    print("Total Mean Duration: ", total_mean)
+
 
 # formulate_data(5)
 # align()
-organize_phonemes()
+run_phoneme_stats()
