@@ -111,6 +111,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get("name", instance.name)
         instance.due_date = validated_data.get("due_date", instance.due_date)
+        instance.timed = validated_data.get("timed", instance.timed)
+        instance.time_limit = validated_data.get("time_limit", instance.time_limit)
         instance.save()
         return instance
 

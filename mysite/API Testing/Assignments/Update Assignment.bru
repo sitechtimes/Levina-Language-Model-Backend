@@ -5,7 +5,7 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/assignments/5/
+  url: {{base_url}}/assignments/1/
   body: json
   auth: inherit
 }
@@ -13,7 +13,8 @@ patch {
 body:json {
   {
       "name": "the name but updated",
-      "questions": [1, 3]
+      "questions": [1, 3],
+      "time_limit": 100
   }
 }
 
