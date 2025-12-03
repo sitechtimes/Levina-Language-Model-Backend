@@ -98,7 +98,6 @@ def organize_phonemes():
 
 def run_phoneme_stats():
     phoneme_df,separated_data = organize_phonemes()
-    print(phoneme_df)
     phoneme_counts = phoneme_df['phoneme'].value_counts().reset_index()
     phoneme_counts.columns = ['phoneme', 'count']
     phoneme_avg_durations = phoneme_df.groupby('phoneme')['duration'].mean().reset_index()
@@ -106,19 +105,51 @@ def run_phoneme_stats():
     phoneme_std_deviations = phoneme_df.groupby('phoneme')['duration'].std().reset_index()
     phoneme_std_deviations.columns = ['phoneme', 'std_deviation']
     phoneme_stats = pd.merge(phoneme_counts, phoneme_avg_durations, on='phoneme').merge(phoneme_std_deviations, on='phoneme')
-    print(phoneme_stats)
+    # print(phoneme_stats)
 
 
-    #Next I will make the normalized durations
+    # make the normalized durations
     clip_means = []
     for clip in separated_data:
         clip_df = pd.DataFrame(clip, columns=["phoneme", "duration"])
         clip_mean = clip_df['duration'].mean()
         clip_means.append(clip_mean)
-    print(clip_means)
     total_mean = sum(clip_means) / len(clip_means)
-    print("Total Mean Duration: ", total_mean)
-
+    separated_data_normalized = []
+    for clip_phonemes in separated_data:
+        separated_data_normalized_clip = []
+        for phoneme, duration in clip_phonemes:
+            normalization_factor = clip_means[separated_data.index(clip_phonemes)] / total_mean
+            normalized_duration = duration / normalization_factor
+            separated_data_normalized_clip.append((phoneme, float(normalized_duration)))
+        separated_data_normalized.append(separated_data_normalized_clip)
+    #add the rest of that data to the pandas dataframe
+    # print(separated_data_normalized)
+    normalized_phonemes_dict = {}
+    for clip in separated_data_normalized:
+        for phoneme, duration in clip:
+            if phoneme not in normalized_phonemes_dict:
+                normalized_phonemes_dict[phoneme] = []
+            normalized_phonemes_dict[phoneme].append(duration)
+    normalized_averages = {}
+    normalized_stddevs = {}
+    # counts = {}
+    for phoneme,durations in normalized_phonemes_dict.items():
+        normalized_averages[phoneme] = sum(durations) / len(durations)
+        mean = normalized_averages[phoneme]
+        variance = sum((x - mean) ** 2 for x in durations) / len(durations)
+        normalized_stddevs[phoneme] = variance ** 0.5
+        # counts[phoneme] = len(durations)
+    print(normalized_averages)
+    print(normalized_stddevs)
+    # print(counts)
+    normalized_averages = pd.DataFrame(list(normalized_averages.items()), columns=['phoneme', 'normalized_avg_duration'])
+    normalized_stddevs = pd.DataFrame(list(normalized_stddevs.items()), columns=['phoneme', 'normalized_std_deviation'])
+    # counts = pd.DataFrame(list(counts.items()), columns=['phoneme', 'normalized_count'])
+    normalized_phoneme_stats = pd.merge(normalized_averages, normalized_stddevs, on='phoneme')
+    normalized_phoneme_stats = normalized_phoneme_stats.merge(phoneme_stats, on='phoneme')
+    print(normalized_phoneme_stats)
+        
 
 # formulate_data(5)
 # align()
