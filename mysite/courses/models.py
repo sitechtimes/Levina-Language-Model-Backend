@@ -22,6 +22,6 @@ class Course(models.Model):
     name = models.CharField(max_length=100)
     period = models.IntegerField()
     class_type = models.CharField(choices=ClassTypes.choices)
-    teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    students = models.ManyToManyField(CustomUser, related_name="courses")
+    teachers = models.ManyToManyField(CustomUser, related_name="courses_teachers")
+    students = models.ManyToManyField(CustomUser, related_name="courses_students")
     join_code = models.CharField(max_length=6)
