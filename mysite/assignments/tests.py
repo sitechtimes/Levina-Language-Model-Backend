@@ -4,6 +4,7 @@ from users.models import CustomUser
 from courses.models import Course
 from questions.models import Question
 from assignments.models import Assignment, AssignmentTemplate
+from utils.create import assign_assignment
 
 
 class AssignmentTestCase(APITestCase):
