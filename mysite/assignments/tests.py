@@ -71,6 +71,7 @@ class AssignmentTestCase(APITestCase):
             self.assertIn("is_active", assignment)
             self.assertIn("questions", assignment)
 
+    # test 2
     def test_create_assignment(self):
         course = Course.objects.create(
             name="Sample Course",
