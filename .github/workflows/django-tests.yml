@@ -11,9 +11,6 @@ jobs:
         name: Django CI
         runs-on: ubuntu-latest
 
-        container:
-            image: ghcr.io/catthehacker/ubuntu:full-latest
-
         steps:
             - name: Free up space
               run: |
