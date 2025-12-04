@@ -1,6 +1,6 @@
 from users.models import CustomUser
 from questions.models import Question
-from assignments.models import AssignmentTemplate, AssignmentInstance
+from assignments.models import AssignmentTemplate
 from courses.models import Course
 from .utils import run_django_command
 from utils.create import assign_assignment, join_course
@@ -37,14 +37,14 @@ def run():
         first_name="Teacher",
         last_name="User",
     )
-    admin = CustomUser.objects.create_user(
+    CustomUser.objects.create_user(
         email="admin@example.com",
         password="admin",
         user_type=2,
         first_name="Admin",
         last_name="User",
     )
-    superuser = CustomUser.objects.create_superuser(
+    CustomUser.objects.create_superuser(
         email="superuser@example.com",
         password="superuser",
         first_name="Super",

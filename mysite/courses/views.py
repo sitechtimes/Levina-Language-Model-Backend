@@ -1,8 +1,8 @@
-from rest_framework import mixins, viewsets, status
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .serializers import CourseSerializer
-from assignments.serializers import AssignmentTemplateSerializer, AssignmentSerializer
+from assignments.serializers import AssignmentSerializer
 from users.serializers import UserSerializer
 from .models import Course
 from users.models import CustomUser
@@ -11,10 +11,8 @@ from utils.random import random_alphanumeric
 from utils.create import join_course
 from core.permissions import (
     IsStudent,
-    IsTeacher,
     IsTeacherAndOwnsObject,
     IsAdmin,
-    IsStudentAndOwnsObject,
     IsStudentAndIsInCourse,
 )
 from utils.permissions import UNSAFE_ACTIONS
@@ -27,7 +25,6 @@ class CourseViewSet(
     serializer_class = CourseSerializer
 
     def get_permissions(self):
-
         if self.action in [*UNSAFE_ACTIONS, "new_join_code", "join_code"]:
             permission_classes = [IsTeacherAndOwnsObject | IsAdmin]
         elif self.action in [

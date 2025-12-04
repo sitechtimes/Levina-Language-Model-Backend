@@ -19,9 +19,7 @@ from courses.models import Course
 from questions.models import Question, QuestionInstance
 from utils.random import random_alphanumeric
 from core.permissions import (
-    IsStudent,
     IsTeacher,
-    IsTeacherAndOwnsObject,
     IsAdmin,
     IsStudentAndOwnsObject,
 )

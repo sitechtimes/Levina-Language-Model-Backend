@@ -1,8 +1,6 @@
 from rest_framework.test import APITestCase
-from django.urls import reverse
 from users.models import CustomUser
 from courses.models import Course
-from questions.models import Question
 from assignments.models import Assignment
 
 
@@ -142,7 +140,7 @@ class CourseTestCase(APITestCase):
             class_type="Freshman Russian",
         )
         course.teachers.add(self.user)
-        assignment1 = Assignment.objects.create(
+        Assignment.objects.create(
             name="Assignment One",
             due_date="2025-12-01T23:59:00Z",
             timed=True,
@@ -150,7 +148,7 @@ class CourseTestCase(APITestCase):
             teacher=self.user,
             course=course,
         )
-        assignment2 = Assignment.objects.create(
+        Assignment.objects.create(
             name="Assignment Two",
             due_date="2025-12-15T23:59:00Z",
             timed=False,

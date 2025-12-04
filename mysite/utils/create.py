@@ -1,7 +1,5 @@
 from assignments.models import (
-    AssignmentTemplate,
     AssignmentInstance,
-    Session,
     SessionInstance,
     Assignment,
 )

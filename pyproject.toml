@@ -1,0 +1,33 @@
+[tool.ruff]
+# General
+line-length = 88
+target-version = "py311"
+exclude = [
+    "migrations",
+    "venv",
+    ".venv",
+    "env",
+    "__pycache__",
+    "node_modules",
+    "static",
+    "media"
+]
+
+# What to check
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "W",  # pycodestyle warnings
+    "I",  # isort (import sorting)
+    "B",  # flake8-bugbear
+    "DJ", # flake8-django
+    "UP", # pyupgrade
+]
+
+# What to ignore (Django-friendly)
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # function calls in default arguments (Django uses these)
+    "DJ001",  # avoid null=True on string fields (sometimes okay)
+    "DJ008",  # model __str__ not defined
+]

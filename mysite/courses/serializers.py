@@ -3,9 +3,11 @@ from rest_framework import serializers
 from assignments.serializers import AssignmentSerializer
 from users.serializers import UserSerializer
 
+
 class CourseSerializer(serializers.ModelSerializer):
     assignments = AssignmentSerializer(many=True, read_only=True)
     teachers = UserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Course
         fields = [
@@ -27,7 +29,7 @@ class CourseSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        course= Course.objects.create(
+        course = Course.objects.create(
             name=validated_data["name"],
             period=validated_data["period"],
             class_type=validated_data["class_type"],

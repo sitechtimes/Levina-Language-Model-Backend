@@ -10,12 +10,6 @@ from .models import CustomUser, PasswordResetCode
 from utils.random import random_alphanumeric
 from django.core.mail import send_mail
 import os
-from .permissions import (
-    StudentPermission,
-    TeacherPermission,
-    AdminPermission,
-    SuperuserPermission,
-)
 from rest_framework.permissions import AllowAny
 
 
@@ -31,7 +25,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             return Response({"error": "No account found with this email."}, status=404)
         code = random_alphanumeric(20)
         PasswordResetCode.objects.create(user=requested_user, code=code)
-        url = f'{os.getenv("FRONTEND_URL")}/reset-password/confirm?code={code}'
+        url = f"{os.getenv('FRONTEND_URL')}/reset-password/confirm?code={code}"
         send_mail(
             subject="Your Password Reset Code",
             message=f"Click this link to reset your password: {url}\nIt expires in 10 minutes.",

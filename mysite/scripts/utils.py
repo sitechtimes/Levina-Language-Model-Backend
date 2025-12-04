@@ -1,4 +1,8 @@
-import subprocess, random, string, sys, os
+import subprocess
+import random
+import string
+import sys
+import os
 
 
 def run_django_command(command):
