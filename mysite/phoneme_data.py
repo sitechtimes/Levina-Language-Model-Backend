@@ -88,10 +88,8 @@ def organize_phonemes():
             single_file_data = extract_phonemes(content)
             full_data = full_data + single_file_data
             full_data_separated.append(single_file_data)
-    full_data_no_whitespace = copy.deepcopy(full_data)
-    for phoneme, duration in full_data:
-        if phoneme == '':
-            full_data_no_whitespace.remove((phoneme, duration))
+    full_data_no_whitespace = [(p, d) for p, d in full_data if p != '']
+
     phoneme_df = pd.DataFrame(full_data_no_whitespace, columns=["phoneme", "duration"])
     return phoneme_df,full_data_separated
 
@@ -104,6 +102,7 @@ def run_phoneme_stats():
     phoneme_avg_durations.columns = ['phoneme', 'avg_duration']
     phoneme_std_deviations = phoneme_df.groupby('phoneme')['duration'].std().reset_index()
     phoneme_std_deviations.columns = ['phoneme', 'std_deviation']
+    phoneme_std_deviations = phoneme_std_deviations.round(6)
     phoneme_stats = pd.merge(phoneme_counts, phoneme_avg_durations, on='phoneme').merge(phoneme_std_deviations, on='phoneme')
     # print(phoneme_stats)
 
@@ -115,14 +114,22 @@ def run_phoneme_stats():
         clip_mean = clip_df['duration'].mean()
         clip_means.append(clip_mean)
     total_mean = sum(clip_means) / len(clip_means)
+
     separated_data_normalized = []
-    for clip_phonemes in separated_data:
-        separated_data_normalized_clip = []
+
+    for i, clip_phonemes in enumerate(separated_data):
+        clip_mean = clip_means[i]
+        normalization_factor = total_mean / clip_mean
+        normalized_clip = []
+        
         for phoneme, duration in clip_phonemes:
-            normalization_factor = clip_means[separated_data.index(clip_phonemes)] / total_mean
-            normalized_duration = duration / normalization_factor
-            separated_data_normalized_clip.append((phoneme, float(normalized_duration)))
-        separated_data_normalized.append(separated_data_normalized_clip)
+            if phoneme == "":
+                continue
+            normalized_duration = duration * normalization_factor
+            normalized_clip.append((phoneme, normalized_duration))
+        
+        separated_data_normalized.append(normalized_clip)
+
     #add the rest of that data to the pandas dataframe
     # print(separated_data_normalized)
     normalized_phonemes_dict = {}
