@@ -45,7 +45,7 @@ def run():
         first_name="Admin",
         last_name="User",
     )
-    superuser = CustomUser.objects.create_superuser(
+    CustomUser.objects.create_superuser(
         email="superuser@example.com",
         password="superuser",
         first_name="Super",
