@@ -6,7 +6,8 @@ on:
             - main
 
 jobs:
-    test:
+    django-tests:
+        name: Django CI
         runs-on: ubuntu-latest
 
         container:
