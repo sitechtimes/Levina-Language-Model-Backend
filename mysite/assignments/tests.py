@@ -1,15 +1,14 @@
-from rest_framework.test import APITestCase
-from users.models import CustomUser
 from courses.models import Course
 from questions.models import Question
+from rest_framework.test import APITestCase
+from users.models import CustomUser
+
 from assignments.models import Assignment, AssignmentTemplate
 
 
 class AssignmentTestCase(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", user_type=2
-        )
+        self.user = CustomUser.objects.create_user(email="test@example.com", password="testpass123", user_type=2)
         self.client.force_authenticate(user=self.user)
 
     def test_get_assignment_detail(self):
@@ -153,9 +152,7 @@ class AssignmentTestCase(APITestCase):
 
 class AssignmentTemplateTestCase(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", user_type=2
-        )
+        self.user = CustomUser.objects.create_user(email="test@example.com", password="testpass123", user_type=2)
         self.client.force_authenticate(user=self.user)
 
     def test_get_assignment_template_detail(self):

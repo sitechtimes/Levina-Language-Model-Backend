@@ -1,11 +1,12 @@
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from django.urls import path, include
+
 from .views import (
+    AssignmentInstanceViewSet,
     AssignmentTemplateViewSet,
     AssignmentViewSet,
-    AssignmentInstanceViewSet,
-    SessionViewSet,
     SessionInstanceViewSet,
+    SessionViewSet,
 )
 
 router = DefaultRouter()

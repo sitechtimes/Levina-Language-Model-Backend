@@ -17,9 +17,7 @@ class Assignment(models.Model):
     timed = models.BooleanField(default=False)
     time_limit = models.IntegerField()
     teacher = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
-    course = models.ForeignKey(
-        "courses.Course", related_name="assignments", on_delete=models.CASCADE
-    )
+    course = models.ForeignKey("courses.Course", related_name="assignments", on_delete=models.CASCADE)
     date_assigned = models.DateTimeField(default=timezone.now)
     assignment_template = models.ForeignKey(
         "assignments.AssignmentTemplate",
@@ -40,9 +38,7 @@ class AssignmentInstance(models.Model):
         on_delete=models.CASCADE,
         related_name="assignment_instances",
     )
-    student = models.ForeignKey(
-        "users.CustomUser", on_delete=models.CASCADE, null=True, blank=True
-    )
+    student = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, null=True, blank=True)
     submitted = models.BooleanField(default=False)
     time_used = models.IntegerField(default=0)
 

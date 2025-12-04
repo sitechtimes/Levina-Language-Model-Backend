@@ -1,11 +1,12 @@
+import hashlib
+
 from assignments.models import (
+    Assignment,
     AssignmentInstance,
     SessionInstance,
-    Assignment,
 )
-from questions.models import QuestionInstance, SessionQuestionInstance
 from django.utils import timezone
-import hashlib
+from questions.models import QuestionInstance, SessionQuestionInstance
 
 
 def assign_assignment(assignment_template, course, due_date=None):
@@ -38,9 +39,7 @@ def assign_assignment(assignment_template, course, due_date=None):
 
 
 def join_session(session, student_name):
-    session_instance = SessionInstance.objects.create(
-        session=session, student_name=student_name
-    )
+    session_instance = SessionInstance.objects.create(session=session, student_name=student_name)
     session_question_instances = [
         SessionQuestionInstance(session_instance=session_instance, question=question)
         for question in session.assignment_template.questions.all()

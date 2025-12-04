@@ -1,14 +1,13 @@
+from assignments.models import Assignment
 from rest_framework.test import APITestCase
 from users.models import CustomUser
+
 from courses.models import Course
-from assignments.models import Assignment
 
 
 class CourseTestCase(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(
-            email="test@example.com", password="testpass123", user_type=2
-        )
+        self.user = CustomUser.objects.create_user(email="test@example.com", password="testpass123", user_type=2)
         self.client.force_authenticate(user=self.user)
 
     def test_get_course_detail(self):
@@ -116,9 +115,7 @@ class CourseTestCase(APITestCase):
         self.assertEqual(len(response.data), 6)
 
     def test_join_course(self):
-        student = CustomUser.objects.create_user(
-            email="test2@example.com", password="testpass123", user_type=0
-        )
+        student = CustomUser.objects.create_user(email="test2@example.com", password="testpass123", user_type=0)
         self.client.force_authenticate(user=student)
         course = Course.objects.create(
             name="Joinable Course",
@@ -175,12 +172,8 @@ class CourseTestCase(APITestCase):
             class_type="Freshman Russian",
         )
         course.teachers.add(self.user)
-        student1 = CustomUser.objects.create_user(
-            email="student1@example.com", password="student", user_type=0
-        )
-        student2 = CustomUser.objects.create_user(
-            email="student2@example.com", password="student", user_type=0
-        )
+        student1 = CustomUser.objects.create_user(email="student1@example.com", password="student", user_type=0)
+        student2 = CustomUser.objects.create_user(email="student2@example.com", password="student", user_type=0)
         course.students.add(student1)
         course.students.add(student2)
         url = f"/courses/{course.id}/students/"
@@ -195,9 +188,7 @@ class CourseTestCase(APITestCase):
             class_type="Freshman Russian",
         )
         course.teachers.add(self.user)
-        new_teacher = CustomUser.objects.create_user(
-            email="new_teacher@example.com", password="teacher", user_type=1
-        )
+        new_teacher = CustomUser.objects.create_user(email="new_teacher@example.com", password="teacher", user_type=1)
         url = f"/courses/{course.id}/update_teachers/"
         data = {"teachers": [new_teacher.id]}
         response = self.client.patch(url, data, format="json")
@@ -212,9 +203,7 @@ class CourseTestCase(APITestCase):
             class_type="Freshman Russian",
         )
         course.teachers.add(self.user)
-        student = CustomUser.objects.create_user(
-            email="student@example.com", password="student", user_type=0
-        )
+        student = CustomUser.objects.create_user(email="student@example.com", password="student", user_type=0)
         course.students.add(student)
         url = f"/courses/{course.id}/remove_student/"
         data = {"student": student.id}

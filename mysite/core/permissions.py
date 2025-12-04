@@ -17,10 +17,7 @@ class IsStudentAndOwnsObject(BasePermission):
 
 class IsStudentAndOwnsAssignmentInstance(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return (
-            has_user_type(request.user, 0)
-            and obj.assignment_instance.student == request.user
-        )
+        return has_user_type(request.user, 0) and obj.assignment_instance.student == request.user
 
 
 class IsStudentAndIsInCourse(BasePermission):

@@ -1,8 +1,9 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
 from datetime import timedelta
+
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
@@ -43,9 +44,7 @@ class CustomUser(AbstractUser):
 
 
 class PasswordResetCode(models.Model):
-    user = models.ForeignKey(
-        "users.CustomUser", on_delete=models.CASCADE, related_name="reset_codes"
-    )
+    user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, related_name="reset_codes")
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)

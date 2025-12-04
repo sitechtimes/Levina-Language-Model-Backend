@@ -1,7 +1,8 @@
-from .models import Course
-from rest_framework import serializers
 from assignments.serializers import AssignmentSerializer
+from rest_framework import serializers
 from users.serializers import UserSerializer
+
+from .models import Course
 
 
 class CourseSerializer(serializers.ModelSerializer):

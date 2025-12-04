@@ -1,33 +1,39 @@
 [tool.ruff]
-# General
-line-length = 88
+# Python version
 target-version = "py311"
-exclude = [
-    "migrations",
-    "venv",
-    ".venv",
-    "env",
-    "__pycache__",
-    "node_modules",
-    "static",
-    "media"
-]
 
-# What to check
+# Match Black’s line-length (or change to 100 if you prefer)
+line-length = 120
+
+# What files Ruff should check
+extend-include = ["*.py", "*.pyi"]
+
+# Ignore typical generated or noisy folders
+exclude = [".git", ".venv", "venv", "__pycache__", "migrations"]
+
+[tool.ruff.lint]
+# Good default rule sets for Django/DRF
 select = [
-    "E",  # pycodestyle errors
+    "E",  # pycodestyle
     "F",  # pyflakes
-    "W",  # pycodestyle warnings
-    "I",  # isort (import sorting)
-    "B",  # flake8-bugbear
-    "DJ", # flake8-django
+    "B",  # bugbear
+    "I",  # isort
     "UP", # pyupgrade
+    "C4", # flake8-comprehensions
+    "DJ", # django-specific checks
 ]
 
-# What to ignore (Django-friendly)
+# Common safe ignores for Django projects
 ignore = [
-    "E501",   # line too long (handled by formatter)
-    "B008",   # function calls in default arguments (Django uses these)
-    "DJ001",  # avoid null=True on string fields (sometimes okay)
-    "DJ008",  # model __str__ not defined
+    "DJ001", # Allow model.__str__ not using f-string
+    "DJ008", # Nullable foreign key
+    "DJ012", # Model ordering
+    "B007",
 ]
+
+[tool.ruff.format]
+# Use Ruff as your formatter (Black replacement)
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
