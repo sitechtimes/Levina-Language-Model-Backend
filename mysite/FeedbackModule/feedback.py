@@ -1,4 +1,5 @@
 import torch
+import os
 from dataclasses import dataclass
 from dotenv import load_dotenv
 import json
@@ -25,6 +26,7 @@ class model_gen:
         self.tokenizer = AutoTokenizer.from_pretrained(env.model_name, use_fast=True)
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.max_length = 16000
+        self.base_dir = os.path.dirname(os.path.abspath(__file__))
         # load model once; adjust device_map/quantization as needed for your setup
         try:
             """ generative_config = BitsAndBytesConfig(
@@ -41,39 +43,47 @@ class model_gen:
                 trust_remote_code=True,
             )
             self.model.eval()
+
+            self.messages = [
+                {"role": "system", "content": self.fetch_prompt()},
+                {"role": "user", "content": self.fetch_essay()}
+            ]
+
         except Exception as e:
             print("Model load failed:", e)
             self.model = None
 
     def fetch_prompt(self):
-        with open("dynamic-prompt.txt", "r", encoding="utf-8") as f:
+        prompt_path = os.path.join(self.base_dir, "dynamic-prompt.txt")
+        with open(prompt_path, "r", encoding="utf-8") as f:
             return f.read().strip()
         
     def fetch_essay(self):
-        with open("essay-text.txt", "r", encoding="utf-8") as f:
+        essay_path = os.path.join(self.base_dir, "essay-text.txt")
+        with open(essay_path, "r", encoding="utf-8") as f:
             return f.read().strip()
 
-    def generate_response(self):
+    def generate_response(self, user_message: str):
         torch.cuda.empty_cache()
 
         if self.model is None:
             raise RuntimeError("Model not loaded")
+            
+        print(user_message)
+            
+        self.messages.append({"role": "user", "content": user_message})
 
         print('test 1')
-
-        essay_text = self.fetch_essay()
 
         system_prompt = self.fetch_prompt()
         if not system_prompt:
             raise ValueError("Prompt is empty")
         
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": essay_text},   # <- you must supply this externally
-        ]
+
+        print(self.messages)
 
         prompt = self.tokenizer.apply_chat_template(
-            messages,
+            self.messages,
             tokenize=False,
             add_generation_prompt=True
         )
@@ -103,7 +113,7 @@ class model_gen:
         generation_kwargs = dict(
             input_ids=input_tokens["input_ids"],
             attention_mask=tokens["attention_mask"],
-            max_new_tokens=1024,
+            max_new_tokens=100,
             do_sample=True,
             temperature=0.7,
             top_p=0.9,
@@ -119,12 +129,5 @@ class model_gen:
 
         return streamer, thread
     
-if __name__ == "__main__":
-    model_instance = model_gen()
-    streamer, thread = model_instance.generate_response()
-
-    # Read tokens as they stream
-    for new_text in streamer:
-        print(new_text, end="", flush=True)
-
-    thread.join()
+    def save_ai_response(self, bot_reply: str):
+        self.messages.append({"role": "assistant", "content": bot_reply})
