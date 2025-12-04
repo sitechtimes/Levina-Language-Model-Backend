@@ -4,10 +4,16 @@ on:
     pull_request:
         branches:
             - main
+    push:
+        branches:
+            - main
 
 jobs:
     test:
         runs-on: ubuntu-latest
+
+        container:
+            image: ghcr.io/catthehacker/ubuntu:full-latest
 
         steps:
             - name: Checkout repository
@@ -18,7 +24,6 @@ jobs:
               with:
                   python-version: '3.11'
 
-            # Only run caching on GitHub, skip when using act locally
             - name: Cache pip
               if: ${{ !env.ACT }}
               uses: actions/cache@v3
