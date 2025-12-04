@@ -20,7 +20,7 @@ jobs:
 
             # Only run caching on GitHub, skip when using act locally
             - name: Cache pip
-              if: ${{ contains(github.event_name, 'act') }}
+              if: ${{ !env.ACT }}
               uses: actions/cache@v3
               with:
                   path: ~/.cache/pip

@@ -5,11 +5,18 @@ meta {
 }
 
 delete {
-  url: {{base_url}}/remove_student
-  body: none
+  url: {{base_url}}/courses/1/remove_student/
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "student": 1
+  }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

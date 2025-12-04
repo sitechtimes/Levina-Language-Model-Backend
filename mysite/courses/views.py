@@ -74,7 +74,7 @@ class CourseViewSet(
             status=status.HTTP_200_OK,
         )
 
-    @action(detail=True, methods=["patch"])
+    @action(detail=True, methods=["delete"])
     def remove_student(self, request, pk=None):
         course = self.get_object()
         student_id = request.data.get("student")
