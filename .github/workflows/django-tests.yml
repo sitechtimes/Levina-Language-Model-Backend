@@ -11,9 +11,15 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ubuntu-latest=ghcr.io/catthehacker/ubuntu:22.04
+            image: ghcr.io/catthehacker/ubuntu:full-latest
 
         steps:
+            - name: Free up space
+              run: |
+                  echo "Cleaning up temporary files to free up space..."
+                  sudo rm -rf /tmp/* /var/tmp/*
+                  sudo apt-get clean
+                  df -h  # optional: check disk usage
             - name: Checkout repository
               uses: actions/checkout@v3
 
