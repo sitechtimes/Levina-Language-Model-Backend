@@ -8,7 +8,7 @@ on:
 
 jobs:
     django-tests:
-        name: Django CI
+        name: Test Endpoints
         runs-on: ubuntu-latest
 
         steps:
