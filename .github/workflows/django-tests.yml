@@ -3,7 +3,7 @@ name: django-tests
 on:
     pull_request:
         branches:
-            - main # or develop, staging, etc
+            - main
 
 jobs:
     test:
