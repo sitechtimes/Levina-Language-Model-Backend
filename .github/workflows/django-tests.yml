@@ -11,7 +11,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/catthehacker/ubuntu:full-latest
+            image: ubuntu-latest=ghcr.io/catthehacker/ubuntu:22.04
 
         steps:
             - name: Checkout repository
