@@ -31,13 +31,13 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install ruff
 
-            - name: Ruff auto-fix
-              run: |
-                  ruff check . --fix --output-format=github
-
             - name: Ruff format
               run: |
                   ruff format . --output-format=github
+
+            - name: Ruff auto-fix
+              run: |
+                  ruff check . --fix --output-format=github
 
             - name: Commit and push if changed
               run: |
