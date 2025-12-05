@@ -5,6 +5,9 @@ import shutil
 import dotenv
 import copy
 from pydub import AudioSegment
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
 
 dotenv.load_dotenv()
 mfa_info = {
@@ -155,9 +158,27 @@ def run_phoneme_stats():
     # counts = pd.DataFrame(list(counts.items()), columns=['phoneme', 'normalized_count'])
     normalized_phoneme_stats = pd.merge(normalized_averages, normalized_stddevs, on='phoneme')
     normalized_phoneme_stats = normalized_phoneme_stats.merge(phoneme_stats, on='phoneme')
+    normalized_phoneme_stats.to_csv("phoneme_stats_normalized.csv", index=False)
     print(normalized_phoneme_stats)
-        
 
-# formulate_data(5)
+
+def plot_phoneme_durations(phoneme_stats):
+    plt.figure(figsize=(12, 6))
+    mean_counts = phoneme_stats['count'].mean()
+    for i, row in phoneme_stats.sort_values('count').iterrows():
+        count = row['count']
+        color_intensity = count/mean_counts
+        plt.bar(row['phoneme'], row['avg_duration'], color=cm.Reds(color_intensity), edgecolor = "black", linewidth = 0.8, yerr=row['std_deviation'], capsize=2)
+
+    # plt.bar(phoneme_stats['phoneme'], phoneme_stats['avg_duration'], yerr=phoneme_stats['std_deviation'], capsize=5)
+    plt.xlabel('Phoneme')
+    plt.ylabel('Average Duration (s)')
+    plt.title('Average Phoneme Durations with Standard Deviation')
+    plt.xticks(rotation=90)
+    plt.tight_layout()
+    plt.show()
+
+# formulate_data(500)
 # align()
 run_phoneme_stats()
+plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
