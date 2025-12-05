@@ -2,7 +2,6 @@
 # Python version
 target-version = "py311"
 
-# Match Black’s line-length (or change to 100 if you prefer)
 line-length = 120
 
 # What files Ruff should check
