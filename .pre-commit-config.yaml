@@ -6,5 +6,5 @@ repos:
       - id: ruff
         args: [--fix]
 
-      # Formatter (Black replacement)
+      # Formatter
       - id: ruff-format
