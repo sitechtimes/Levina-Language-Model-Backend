@@ -1,4 +1,4 @@
-name: Django Tests
+name: Django Tests + Ruff
 
 on:
     pull_request:
@@ -6,9 +6,54 @@ on:
         branches:
             - main
 
+permissions:
+    contents: write
+    pull-requests: write
+
 jobs:
+    ruff:
+        name: Ruff Auto Fix + Format
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.head_ref }}
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: '3.11'
+
+            - name: Install Ruff
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install ruff
+
+            - name: Ruff auto-fix
+              run: |
+                  ruff check . --fix
+
+            - name: Ruff format
+              run: |
+                  ruff format .
+
+            - name: Commit and push if changed
+              run: |
+                  if [[ -n $(git status --porcelain) ]]; then
+                    git config --global user.name "github-actions"
+                    git config --global user.email "github-actions@github.com"
+                    git add .
+                    git commit -m "style: auto-fix + format via ruff"
+                    git push
+                  else
+                    echo "No changes to commit"
+                  fi
+
     django-tests:
         name: Test Endpoints
+        needs: ruff
         runs-on: ubuntu-latest
 
         steps:
@@ -17,12 +62,13 @@ jobs:
                   echo "Cleaning up temporary files to free up space..."
                   sudo rm -rf /tmp/* /var/tmp/*
                   sudo apt-get clean
-                  df -h  # optional: check disk usage
+                  df -h
+
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Set up Python
-              uses: actions/setup-python@v4
+              uses: actions/setup-python@v5
               with:
                   python-version: '3.11'
 
