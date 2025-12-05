@@ -33,11 +33,11 @@ jobs:
 
             - name: Ruff auto-fix
               run: |
-                  ruff check . --fix
+                  ruff check . --fix --format=github
 
             - name: Ruff format
               run: |
-                  ruff format .
+                  ruff format . --format=github
 
             - name: Commit and push if changed
               run: |
