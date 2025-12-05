@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
-from datetime import timedelta
 import os
+from datetime import timedelta
+from pathlib import Path
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,11 +38,7 @@ SECRET_KEY = "django-insecure-&)ysm+)hy77ekhrr^5^_qjdnn5_7r3s2#0%tjme20u_7a@6!+q
 DEBUG = True
 
 ALLOWED_HOSTS = []
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
-}
+REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",)}
 
 # Application definition
 

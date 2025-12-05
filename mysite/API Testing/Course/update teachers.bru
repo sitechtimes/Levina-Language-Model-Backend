@@ -1,0 +1,22 @@
+meta {
+  name: update teachers
+  type: http
+  seq: 11
+}
+
+patch {
+  url: {{base_url}}/courses/1/update_teachers/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "teachers":[1,2]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,6 +1,6 @@
-from rest_framework.routers import DefaultRouter
-from django.urls import path, include
-from .views import PasswordResetConfirmView, PasswordResetRequestView, GetUserView
+from django.urls import path
+
+from .views import GetUserView, PasswordResetConfirmView, PasswordResetRequestView
 
 urlpatterns = [
     path(

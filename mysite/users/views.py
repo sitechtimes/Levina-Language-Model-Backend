@@ -1,22 +1,18 @@
 # views.py
+import os
+
+from django.core.mail import send_mail
 from rest_framework import generics
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from utils.random import random_alphanumeric
+
+from .models import CustomUser, PasswordResetCode
 from .serializers import (
-    PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
+    PasswordResetRequestSerializer,
     UserSerializer,
 )
-from .models import CustomUser, PasswordResetCode
-from utils.random import random_alphanumeric
-from django.core.mail import send_mail
-import os
-from .permissions import (
-    StudentPermission,
-    TeacherPermission,
-    AdminPermission,
-    SuperuserPermission,
-)
-from rest_framework.permissions import AllowAny
 
 
 class PasswordResetRequestView(generics.GenericAPIView):
@@ -31,7 +27,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             return Response({"error": "No account found with this email."}, status=404)
         code = random_alphanumeric(20)
         PasswordResetCode.objects.create(user=requested_user, code=code)
-        url = f'{os.getenv("FRONTEND_URL")}/reset-password/confirm?code={code}'
+        url = f"{os.getenv('FRONTEND_URL')}/reset-password/confirm?code={code}"
         send_mail(
             subject="Your Password Reset Code",
             message=f"Click this link to reset your password: {url}\nIt expires in 10 minutes.",
@@ -49,9 +45,7 @@ class PasswordResetConfirmView(generics.GenericAPIView):
 
     def post(self, request):
         try:
-            reset_code = PasswordResetCode.objects.filter(
-                code=request.data.get("code")
-            ).latest("created_at")
+            reset_code = PasswordResetCode.objects.filter(code=request.data.get("code")).latest("created_at")
         except PasswordResetCode.DoesNotExist:
             return Response({"error": "Invalid code."}, status=400)
         if reset_code.is_used:
@@ -62,9 +56,7 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         reset_code.is_used = True
         reset_code.user.save()
         reset_code.save()
-        return Response(
-            {"message": "Password has been reset successfully."}, status=200
-        )
+        return Response({"message": "Password has been reset successfully."}, status=200)
 
 
 class GetUserView(generics.GenericAPIView):

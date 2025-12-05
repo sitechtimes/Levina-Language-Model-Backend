@@ -26,5 +26,6 @@ def run():
 
     print("Cleanup completed.")
 
+
 if __name__ == "__main__":
     run()

@@ -1,10 +1,10 @@
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import generics
 from rest_framework.response import Response
-from django.contrib.auth.models import User
-from django.core.mail import send_mail
-from django.utils.http import urlsafe_base64_encode
-from django.utils.encoding import force_bytes
-from django.contrib.auth.tokens import default_token_generator
 
 
 class PasswordResetView(generics.GenericAPIView):
@@ -15,9 +15,7 @@ class PasswordResetView(generics.GenericAPIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response(
-                {"error": "User with this email does not exist"}, status=404
-            )
+            return Response({"error": "User with this email does not exist"}, status=404)
 
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))

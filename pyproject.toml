@@ -1,0 +1,39 @@
+[tool.ruff]
+# Python version
+target-version = "py311"
+
+# Match Black’s line-length (or change to 100 if you prefer)
+line-length = 120
+
+# What files Ruff should check
+extend-include = ["*.py", "*.pyi"]
+
+# Ignore typical generated or noisy folders
+exclude = [".git", ".venv", "venv", "__pycache__", "migrations"]
+
+[tool.ruff.lint]
+# Good default rule sets for Django/DRF
+select = [
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "B",  # bugbear
+    "I",  # isort
+    "UP", # pyupgrade
+    "C4", # flake8-comprehensions
+    "DJ", # django-specific checks
+]
+
+# Common safe ignores for Django projects
+ignore = [
+    "DJ001", # Allow model.__str__ not using f-string
+    "DJ008", # Nullable foreign key
+    "DJ012", # Model ordering
+    "B007",
+]
+
+[tool.ruff.format]
+# Use Ruff as your formatter (Black replacement)
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
