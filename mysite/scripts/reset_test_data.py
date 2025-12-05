@@ -2,10 +2,9 @@ from assignments.models import AssignmentTemplate
 from courses.models import Course
 from questions.models import Question
 from users.models import CustomUser
+from utils.create import assign_assignment, join_course
 
 from .utils import run_django_command
-
-from utils.create import assign_assignment, join_course
 
 
 def run():
