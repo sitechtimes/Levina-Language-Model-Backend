@@ -38,7 +38,7 @@ def run():
         first_name="Teacher",
         last_name="User",
     )
-    CustomUser.objects.create_user(
+    admin = CustomUser.objects.create_user(
         email="admin@example.com",
         password="admin",
         user_type=2,
