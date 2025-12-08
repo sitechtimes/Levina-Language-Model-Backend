@@ -6,7 +6,7 @@ if __name__ == "__main__":
     streamer, thread = gen.generate_response("")
 
     bot_reply = ""
-    print("\nMrs. Natalya Levina: ", end="", flush=True)
+    print("Mrs. Natalya Levina: \n", end="", flush=True)
 
     for text in streamer:
         bot_reply += text
@@ -23,7 +23,7 @@ if __name__ == "__main__":
         streamer, thread = gen.generate_response(user_message)
 
         bot_reply = ""
-        print("\nMrs. Natalya Levina: ", end="", flush=True)
+        print("Mrs. Natalya Levina: \n", end="", flush=True)
 
         for text in streamer:
             bot_reply += text

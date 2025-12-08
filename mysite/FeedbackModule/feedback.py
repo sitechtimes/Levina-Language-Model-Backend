@@ -10,7 +10,7 @@ from threading import Thread
 print('Loading feedback.py')
 print(torch.__version__)
 print(torch.cuda.is_available())
-print(torch.cuda.get_device_name(0))
+print(torch.cuda.get_device_name(0))  
 
 @dataclass
 class env:
@@ -78,7 +78,6 @@ class model_gen:
         system_prompt = self.fetch_prompt()
         if not system_prompt:
             raise ValueError("Prompt is empty")
-        
 
         print(self.messages)
 
@@ -113,7 +112,7 @@ class model_gen:
         generation_kwargs = dict(
             input_ids=input_tokens["input_ids"],
             attention_mask=tokens["attention_mask"],
-            max_new_tokens=100,
+            max_new_tokens=512,
             do_sample=True,
             temperature=0.7,
             top_p=0.9,
