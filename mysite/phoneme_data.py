@@ -178,7 +178,32 @@ def plot_phoneme_durations(phoneme_stats):
     plt.tight_layout()
     plt.show()
 
+
+def create_stress_dictionary():
+    json_file_path = r"C:\Users\simon.saffayeh\Downloads\kaikki.org-dictionary-Russian.jsonl"
+    #read jsonl file line by line and create a dictionary of words and their stress positions
+    stress_dict = {}
+    total_forms = []
+    with open(json_file_path, "r", encoding="utf-8") as f:
+        count = 1
+        for line in f:
+            line = eval(line)
+
+            print(type(line))
+            forms = line["forms"]
+            print(type(forms))
+            for form in forms:
+                form_text = form["form"]
+                stress_position = find_str(form_text,"")
+                
+                # total_forms.append(zip(form_text,stress_position))
+            break
+    print(total_forms)
+
+
+
 # formulate_data(500)
 # align()
-run_phoneme_stats()
-plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
+# run_phoneme_stats()
+# plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
+create_stress_dictionary()
