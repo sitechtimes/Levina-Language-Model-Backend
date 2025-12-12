@@ -7,7 +7,8 @@ import copy
 from pydub import AudioSegment
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-
+import unicodedata
+import json
 
 dotenv.load_dotenv()
 mfa_info = {
@@ -178,6 +179,16 @@ def plot_phoneme_durations(phoneme_stats):
     plt.tight_layout()
     plt.show()
 
+def stressed_positions(word: str):
+    positions = []
+    base_index = -1
+
+    for char in word:
+        if not unicodedata.combining(char):
+            base_index += 1  
+        if char == "\u0301":
+            positions.append(base_index)
+    return positions
 
 def create_stress_dictionary():
     json_file_path = r"C:\Users\simon.saffayeh\Downloads\kaikki.org-dictionary-Russian.jsonl"
@@ -188,17 +199,18 @@ def create_stress_dictionary():
         count = 1
         for line in f:
             line = eval(line)
-
-            print(type(line))
             forms = line["forms"]
-            print(type(forms))
             for form in forms:
                 form_text = form["form"]
-                stress_position = find_str(form_text,"")
-                
-                # total_forms.append(zip(form_text,stress_position))
-            break
-    print(total_forms)
+                stress_position = stressed_positions(form_text)
+                if [form_text,stress_position] not in total_forms:
+                    total_forms.append([form_text,stress_position])
+            count += 1
+            if count > 20:
+                break
+    print(len(total_forms))
+    with open("stress_data.json", "w", encoding="utf-8") as f:
+        json.dump(total_forms, f, ensure_ascii=False)
 
 
 
