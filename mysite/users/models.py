@@ -32,6 +32,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
+    meets_gpa_req = models.BooleanField(default=False)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
     USER_TYPE_CHOICES = [(0, "Student"), (1, "Teacher"), (2, "Admin"), (3, "Superuser")]
