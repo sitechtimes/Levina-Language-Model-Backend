@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import unicodedata
 import json
-
 dotenv.load_dotenv()
 mfa_info = {
     "corpus_dir": "training_data/corpus",
@@ -192,27 +191,41 @@ def stressed_positions(word: str):
 
 def create_stress_dictionary():
     json_file_path = r"C:\Users\simon.saffayeh\Downloads\kaikki.org-dictionary-Russian.jsonl"
-    #read jsonl file line by line and create a dictionary of words and their stress positions
     stress_dict = {}
     total_forms = []
+    with open(json_file_path, "r", encoding="utf-8") as f:
+        json_length = len(f.readlines())
     with open(json_file_path, "r", encoding="utf-8") as f:
         count = 1
         for line in f:
             line = eval(line)
-            forms = line["forms"]
-            for form in forms:
-                form_text = form["form"]
-                stress_position = stressed_positions(form_text)
-                if [form_text,stress_position] not in total_forms:
-                    total_forms.append([form_text,stress_position])
-            count += 1
-            if count > 20:
-                break
+            try:
+                forms = line["forms"]
+                for form in forms:
+                    form_text = form["form"]
+                    if " " in form_text:
+                        continue
+                    stress_position = stressed_positions(form_text)
+                    if [form_text,stress_position] not in total_forms:
+                        total_forms.append([form_text,stress_position])
+                count += 1
+            except:
+                continue
+            if count % 1000 == 0:
+                print("Processsed: ", count, "out of ", json_length, " lines.")
+                loading_bar(count, json_length)
     print(len(total_forms))
     with open("stress_data.json", "w", encoding="utf-8") as f:
         json.dump(total_forms, f, ensure_ascii=False)
 
-
+def loading_bar(current,total):
+    bar_length = 40
+    filled_length = int(bar_length * current // total)
+    bar = '█' * filled_length + '-' * (bar_length - filled_length)
+    percent = (current / total) * 100
+    print(f'\r|{bar}| {percent:.2f}% Complete', end='\r')
+    if current == total:
+        print()
 
 # formulate_data(500)
 # align()
