@@ -191,39 +191,40 @@ def stressed_positions(word: str):
 
 def create_stress_dictionary():
     json_file_path = r"C:\Users\simon.saffayeh\Downloads\kaikki.org-dictionary-Russian.jsonl"
+    out_path = r"C:\Users\simon.saffayeh\Downloads\stress_data.jsonl"
+    seen = set()
+    total_bytes = os.path.getsize(json_file_path)
+    written = 0
+    bytes_read = 0
     stress_dict = {}
     total_forms = []
-    with open(json_file_path, "r", encoding="utf-8") as f:
-        json_length = len(f.readlines())
-    with open(json_file_path, "r", encoding="utf-8") as f:
-        count = 1
-        for line in f:
-            line = eval(line)
-            try:
-                forms = line["forms"]
-                for form in forms:
-                    form_text = form["form"]
-                    if " " in form_text:
-                        continue
-                    stress_position = stressed_positions(form_text)
-                    if [form_text,stress_position] not in total_forms:
-                        total_forms.append([form_text,stress_position])
-                count += 1
-            except:
+    with open(json_file_path, "r", encoding="utf-8") as inf, open(out_path, "w", encoding="utf-8") as outf:
+        for lineno,line in enumerate(inf,start=1):
+            obj = json.loads(line)
+            forms = obj.get("forms")
+            if not forms:
+                bytes_read += len(line.encode("utf-8"))
                 continue
-            if count % 1000 == 0:
-                print("Processsed: ", count, "out of ", json_length, " lines.")
-                loading_bar(count, json_length)
-    print(len(total_forms))
-    with open("stress_data.json", "w", encoding="utf-8") as f:
-        json.dump(total_forms, f, ensure_ascii=False)
+            for form in forms:
+                form_text = form.get("form")
+                if not form_text or " " in form_text:
+                    continue
+                stress_position = stressed_positions(form_text)
+                if [form_text,stress_position] not in total_forms:
+                    total_forms.append([form_text,stress_position])
+                    outf.write(json.dumps({"form": form_text, "stress_positions": stress_position}, ensure_ascii=False) + "\n")
+                    written += 1
+            bytes_read += len(line.encode("utf-8"))
+            if lineno % 1000 == 0:
+                loading_bar(bytes_read, total_bytes)
+    print("wrote total forms: ", written)
 
 def loading_bar(current,total):
     bar_length = 40
     filled_length = int(bar_length * current // total)
     bar = '█' * filled_length + '-' * (bar_length - filled_length)
     percent = (current / total) * 100
-    print(f'\r|{bar}| {percent:.2f}% Complete', end='\r')
+    print(f'\r|{bar}| {percent:.2f}% Complete ({current/1000000} megabytes out of {total/1000000} megabytes)', end='\r')
     if current == total:
         print()
 
