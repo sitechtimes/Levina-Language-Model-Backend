@@ -190,8 +190,9 @@ def stressed_positions(word: str):
     return positions
 
 def create_stress_dictionary():
-    json_file_path = r"C:\Users\simon.saffayeh\Downloads\kaikki.org-dictionary-Russian.jsonl"
-    out_path = r"C:\Users\simon.saffayeh\Downloads\stress_data.jsonl"
+    json_file_path = "russian_dictionary.jsonl"
+    out_path = os.getenv("OUTPUT_JSONL_PATH")
+
     seen = set()
     total_bytes = os.path.getsize(json_file_path)
     written = 0
@@ -217,6 +218,8 @@ def create_stress_dictionary():
             bytes_read += len(line.encode("utf-8"))
             if lineno % 1000 == 0:
                 loading_bar(bytes_read, total_bytes)
+            if written > 1000:
+                break
     print("wrote total forms: ", written)
 
 def loading_bar(current,total):

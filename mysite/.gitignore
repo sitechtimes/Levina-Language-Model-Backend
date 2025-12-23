@@ -211,3 +211,6 @@ __marimo__/
 # Local corpus and MFA output directories
 training_data/corpus/
 training_data/aligned_output/
+
+#large files
+russian_dictionary.jsonl
