@@ -1,4 +1,4 @@
-json_path = "stress_data.json"
+json_path = "stress_data.jsonl"
 dict_path = "C:\Users\simon.saffayeh\Documents\MFA\pretrained_models\dictionary\russian_mfa_stressed.dict"
 
 with open(json_path, "r", encoding="utf-8") as f:
