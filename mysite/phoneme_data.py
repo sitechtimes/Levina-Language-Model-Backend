@@ -198,7 +198,6 @@ def create_stress_dictionary():
     written = 0
     bytes_read = 0
     stress_dict = {}
-    total_forms = []
     with open(json_file_path, "r", encoding="utf-8") as inf, open(out_path, "w", encoding="utf-8") as outf:
         for lineno,line in enumerate(inf,start=1):
             obj = json.loads(line)
@@ -211,15 +210,17 @@ def create_stress_dictionary():
                 if not form_text or " " in form_text:
                     continue
                 stress_position = stressed_positions(form_text)
-                if [form_text,stress_position] not in total_forms:
-                    total_forms.append([form_text,stress_position])
+                key = (form_text, tuple(stress_position))
+                if key not in seen:
+                    seen.add(key)
                     outf.write(json.dumps({"form": form_text, "stress_positions": stress_position}, ensure_ascii=False) + "\n")
                     written += 1
+
             bytes_read += len(line.encode("utf-8"))
             if lineno % 1000 == 0:
                 loading_bar(bytes_read, total_bytes)
-            if written > 1000:
-                break
+            # if written > 1000:
+            #     break
     print("wrote total forms: ", written)
 
 def loading_bar(current,total):
