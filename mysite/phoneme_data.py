@@ -199,6 +199,8 @@ def create_stress_dictionary():
     bytes_read = 0
     stress_dict = {}
     with open(json_file_path, "r", encoding="utf-8") as inf, open(out_path, "w", encoding="utf-8") as outf:
+        english_characters = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z",
+                                 "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"}
         for lineno,line in enumerate(inf,start=1):
             obj = json.loads(line)
             forms = obj.get("forms")
@@ -207,6 +209,8 @@ def create_stress_dictionary():
                 continue
             for form in forms:
                 form_text = form.get("form")
+                if any(char in english_characters for char in form_text):
+                    continue
                 if not form_text or " " in form_text:
                     continue
                 stress_position = stressed_positions(form_text)
