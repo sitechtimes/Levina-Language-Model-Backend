@@ -214,10 +214,11 @@ def create_stress_dictionary():
                 if not form_text or " " in form_text:
                     continue
                 stress_position = stressed_positions(form_text)
-                key = (form_text, tuple(stress_position))
+                decomposed = unicodedata.normalize('NFD', form_text)
+                unstressed_form_text = unicodedata.normalize('NFC', decomposed.replace('\u0301', ''))
+                key = (unstressed_form_text, tuple(stress_position))
                 if key not in seen:
                     seen.add(key)
-                    outf.write(json.dumps({"form": form_text, "stress_positions": stress_position}, ensure_ascii=False) + "\n")
                     written += 1
 
             bytes_read += len(line.encode("utf-8"))
@@ -225,6 +226,10 @@ def create_stress_dictionary():
                 loading_bar(bytes_read, total_bytes)
             # if written > 1000:
             #     break
+    with open(out_path, "w", encoding="utf-8") as outf:
+        for line in seen:
+            unstressed_form_text, stress_position = line
+            outf.write(json.dumps({"form": unstressed_form_text, "stress_positions": stress_position}, ensure_ascii=False) + "\n")
     print("wrote total forms: ", written)
 
 def loading_bar(current,total):
