@@ -1,6 +1,7 @@
+import os
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-# from datasets import load_dataset
+from datasets import load_dataset
 
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -23,12 +24,12 @@ pipe = pipeline(
     feature_extractor=processor.feature_extractor,
     torch_dtype=torch_dtype,
     device=device,
+    return_timestamps=True
 )
 
-load_dataset = None
+print('CWD: ', os.getcwd())
+audio_file = "DialogueModule/RURU/RURU008.mp3"
 
-dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
-sample = dataset[0]["audio"]
-
-result = pipe(sample)
-print(result["text"])
+if os.path.exists("DialogueModule/RURU/RURU008.mp3"):
+    result = pipe(audio_file)
+    print(result["text"])
