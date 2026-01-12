@@ -241,8 +241,24 @@ def loading_bar(current,total):
     if current == total:
         print()
 
+
+
+def test():
+    conda_bat = os.getenv("CONDA_BAT")
+    print(conda_bat)
+
+    # cmd = f'"{conda_bat}" run -n aligner mfa --help'
+    # subprocess.run(cmd, shell=True, check=True)
+
+    # cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --verbose --single_speaker --output_per_utterance_log_likelihoods true --output_per_phone_log_likelihoods true"'
+    cmd = f"{conda_bat} run -n aligner mfa model inspect dictionary russian_mfa"
+    # cmd = f'"{conda_bat}" run -n aligner mfa version'
+
+    subprocess.run(cmd, shell=True, check=True)
+
 # formulate_data(500)
 # align()
 # run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
-create_stress_dictionary()
+# create_stress_dictionary()
+test()
