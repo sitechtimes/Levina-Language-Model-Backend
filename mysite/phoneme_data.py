@@ -282,7 +282,7 @@ def loading_bar(current,total):
     filled_length = int(bar_length * current // total)
     bar = '█' * filled_length + '-' * (bar_length - filled_length)
     percent = (current / total) * 100
-    print(f'\r|{bar}| {percent:.2f}% Complete ({current/1000000} megabytes out of {total/1000000} megabytes)', end='\r')
+    print(f'\r|{bar}| {percent:.2f}% Complete ({current/1000000:.2f} MB out of {total/1000000:.2f} MB)', end='\r', flush=True)
     if current == total:
         print()
 
@@ -315,10 +315,13 @@ def apply_stress(aligned, stress_positions):
 def apply_stress_to_dictionary():
     input_path = os.getenv("OUTPUT_JSONL_PATH")
     output_path = os.getenv("STRESSED_DICTIONARY_PATH")
+    total_bytes = os.path.getsize(input_path)
+    bytes_read = 0
     with open(input_path, "r", encoding="utf-8") as inf, open(output_path, "w", encoding="utf-8") as outf:
         unknown_characters = set()
+        count = 0
         for line in inf:
-            count = 0
+            bytes_read += len(line.encode("utf-8"))
             obj = json.loads(line)
             form = obj.get("form")
             stress_positions = obj.get("stress_positions", [])
@@ -327,8 +330,9 @@ def apply_stress_to_dictionary():
             stressed_phonemes = apply_stress(aligned, stress_positions)
             outf.write(f"{form} {' '.join(stressed_phonemes)}\n")
             count += 1
-            if count > 10:
-                break
+            loading_bar(bytes_read, total_bytes)
+            # if count > 1000:
+            #     break
     if unknown_characters:
         print("Unknown characters encountered during G2P conversion:", unknown_characters)
 
