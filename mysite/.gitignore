@@ -215,3 +215,4 @@ training_data/aligned_output/
 #large files
 russian_dictionary.jsonl
 stress_data.jsonl
+russian_mfa_stressed_output.dict

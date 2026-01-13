@@ -17,6 +17,51 @@ mfa_info = {
     "acoustic_model": "russian_mfa",
 }
 
+RUS_MFA_G2P = {
+    # vowels
+    "а": ["a"],
+    "о": ["o"],
+    "у": ["u"],
+    "ы": ["ɨ"],
+    "э": ["e"],
+    "и": ["i"],
+    "е": ["e"],
+    "ё": ["ɐ", "o"],
+    "ю": ["j", "u"],
+    "я": ["j", "a"],
+
+    "б": ["b"],
+    "в": ["v"],
+    "г": ["ɡ"],
+    "д": ["d̪"],
+    "ж": ["ʐ"],
+    "з": ["z̪"],
+    "й": ["j"],
+    "к": ["k"],
+    "л": ["l"],
+    "м": ["m"],
+    "н": ["n̪"],
+    "п": ["p"],
+    "р": ["r"],
+    "с": ["s̪"],
+    "т": ["t̪"],
+    "ф": ["f"],
+    "х": ["x"],
+    "ц": ["t̪s̪"],
+    "ч": ["tɕ"],
+    "ш": ["ʂ"],
+    "щ": ["ɕ"],
+    "ь": [],
+    "ъ": [],
+
+    #old letters
+
+    "ѣ": ["e"],
+    "ѵ": ["i"],
+    "ѳ": ["f"],
+    "ѝ": ["i"],
+}
+
 
 def convert_to_wav(file_name):
     print(file_name)
@@ -242,9 +287,57 @@ def loading_bar(current,total):
         print()
 
 
+def g2p_with_alignment(word):
+    aligned = []
+    unknown_characters = set()
+    for i, ch in enumerate(word):
+        phones = RUS_MFA_G2P.get(ch.lower())
+        if phones is None:
+            # raise ValueError(f"Unknown character: {ch}")
+            unknown_characters.add(ch)
+            continue
+        for p in phones:
+            aligned.append((p, [i]))
+    return aligned,unknown_characters
+
+VOWELS = set(["a","o","u","ɨ","e","i","ɐ"])
+
+def apply_stress(aligned, stress_positions):
+    stressed = []
+    for p, idxs in aligned:
+        if p in VOWELS and any(i in stress_positions for i in idxs):
+            stressed.append(p + "1")  # new stressed phoneme
+        else:
+            stressed.append(p)
+    return stressed
+
+
+def apply_stress_to_dictionary():
+    input_path = os.getenv("OUTPUT_JSONL_PATH")
+    output_path = os.getenv("STRESSED_DICTIONARY_PATH")
+    with open(input_path, "r", encoding="utf-8") as inf, open(output_path, "w", encoding="utf-8") as outf:
+        unknown_characters = set()
+        for line in inf:
+            count = 0
+            obj = json.loads(line)
+            form = obj.get("form")
+            stress_positions = obj.get("stress_positions", [])
+            aligned,unknown_characters_sample = g2p_with_alignment(form)
+            unknown_characters.update(unknown_characters_sample)
+            stressed_phonemes = apply_stress(aligned, stress_positions)
+            outf.write(f"{form} {' '.join(stressed_phonemes)}\n")
+            count += 1
+            if count > 10:
+                break
+    if unknown_characters:
+        print("Unknown characters encountered during G2P conversion:", unknown_characters)
+
+    print("Stressed dictionary created at:", output_path)
+
+
 # formulate_data(500)
 # align()
 # run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
 # create_stress_dictionary()
-test()
+apply_stress_to_dictionary()
