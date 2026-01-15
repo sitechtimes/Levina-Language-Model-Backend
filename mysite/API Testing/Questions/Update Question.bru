@@ -5,15 +5,18 @@ meta {
 }
 
 patch {
-  url: {{base_url}}/questions/2/
+  url: {{base_url}}/questions/1/
   body: json
   auth: inherit
 }
 
 body:json {
   {
-      "question_type": "MCQ",
-      "name": "What is 2 + 2"
+      "question_type": "AQ",
+      "question_content_type": "TEXT",
+      "answer_content_type": "AUDIO",
+      "text_question": "What is 3 + 5",
+      "text_answer": "Antidisestablishmentarianism 2" 
   }
 }
 

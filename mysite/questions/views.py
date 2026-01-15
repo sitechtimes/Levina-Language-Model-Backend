@@ -23,12 +23,10 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return [p() for p in permission_classes]
 
     def create(self, request, *args, **kwargs):
-        question = Question.objects.create(
-            name=request.data["name"],
-            question_type=request.data["question_type"],
-            author=self.request.user,
-        )
-        return Response(QuestionSerializer(question).data, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(author=self.request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -62,4 +60,6 @@ class QuestionInstanceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        return Response(QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK)
+        return Response(
+            QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK
+        )
