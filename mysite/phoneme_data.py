@@ -101,7 +101,10 @@ def align():
     # cmd = f'"{conda_bat}" run -n aligner mfa version'
 
     # cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --verbose --single_speaker --output_per_utterance_log_likelihoods true --output_per_phone_log_likelihoods true"'
-    cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa_stressed_output russian_mfa training_data/aligned_output --clean --verbose"
+    
+    
+    # cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa_stressed_output russian_mfa training_data/aligned_output --clean --verbose"
+    cmd = f'"{conda_bat}" run -n aligner mfa validate_dictionary russian_mfa'
 
     subprocess.run(cmd, shell=True, check=True)
 
