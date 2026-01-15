@@ -1,5 +1,5 @@
 meta {
-  name: Create Question
+  name: Create Question (Text)
   type: http
   seq: 3
 }
@@ -12,14 +12,16 @@ post {
 
 body:json {
   {
-      "question_type": "AQ",
+      "question_type": "MCQ",
       "question_content_type": "TEXT",
-      "answer_content_type": "AUDIO",
       "text_question": "What is 3 + 5",
-      "text_answer": "Antidisestablishmentarianism 2" 
+      "answer_content_type": "TEXT",
+      "text_answer": "13",
+      "false_answers": ["67", "41"]
   }
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
