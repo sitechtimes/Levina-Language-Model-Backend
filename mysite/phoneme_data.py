@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import unicodedata
 import json
+from pathlib import Path
+
 dotenv.load_dotenv()
 mfa_info = {
     "corpus_dir": "training_data/corpus",
@@ -341,10 +343,15 @@ def apply_stress_to_dictionary():
 
     print("Stressed dictionary created at:", output_path)
 
-
+def normalize_dictionary():
+    input_path = "russian_mfa_stressed_output.dict"
+    text = Path(input_path).read_text(encoding="utf-8")
+    text = unicodedata.normalize("NFC", text)
+    Path(input_path).write_text(text, encoding="utf-8")
 # formulate_data(5)
-align()
+# align()
 # run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
 # create_stress_dictionary()
 # apply_stress_to_dictionary()
+normalize_dictionary()
