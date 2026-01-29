@@ -8,7 +8,7 @@ torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
 print("Loading Whisper model...")
 
-model_id = "openai/whisper-large-v3"
+model_id = "openai/whisper-large-v3-turbo"
 
 model = AutoModelForSpeechSeq2Seq.from_pretrained(
     model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
@@ -30,7 +30,7 @@ pipe = pipeline(
 print('CWD: ', os.getcwd())
 audio_file = "DialogueModule/RURU/RURU008.mp3"
 
-if os.path.exists("DialogueModule/RURU/RURU008.mp3"):
+if os.path.exists("DialogueModule/RURU/RURU001.mp3"):
     result = pipe(audio_file)
     print(result["text"])
 
