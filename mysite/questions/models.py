@@ -20,7 +20,6 @@ class Question(models.Model):
     )
 
 
-
 class QuestionInstance(models.Model):
     question = models.ForeignKey("questions.Question", on_delete=models.CASCADE)
     assignment_instance = models.ForeignKey(
