@@ -12,6 +12,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "answer",
             "author",
             "name",
+            "audio_prompt",
         ]
         read_only_fields = ["id", "author"]
 

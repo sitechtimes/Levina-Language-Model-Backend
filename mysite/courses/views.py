@@ -38,7 +38,7 @@ class CourseViewSet(
         elif self.action == "join":
             permission_classes = [IsStudent]
         elif self.action in ["update_teachers", "remove_student"]:
-            permission_classes = [IsAdmin]
+            permission_classes = [IsAdmin| IsTeacherAndOwnsObject]
         else:
             permission_classes = []
         return [p() for p in permission_classes]

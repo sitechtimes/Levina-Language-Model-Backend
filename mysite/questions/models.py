@@ -10,6 +10,7 @@ class Question(models.Model):
         ("AQ", "Audio Question"),
     ]
     name = models.CharField(max_length=100)
+    audio_prompt = models.FileField(null=True, blank=True)
     question_type = models.CharField(choices=QUESTION_TYPES)
     author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
     answer = models.CharField(null=True, blank=True)
@@ -17,6 +18,7 @@ class Question(models.Model):
     assignment_templates = models.ManyToManyField(
         "assignments.AssignmentTemplate", related_name="questions", blank=True
     )
+
 
 
 class QuestionInstance(models.Model):
