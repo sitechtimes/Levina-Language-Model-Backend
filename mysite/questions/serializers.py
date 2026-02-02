@@ -94,6 +94,18 @@ class QuestionSerializer(serializers.ModelSerializer):
                         "false_answers": "False answers are required for Multiple Choice Questions"
                     }
                 )
+            if not type(data.get("false_answers")) == list:
+                raise serializers.ValidationError(
+                    {
+                        "false_answers": "False answers must be provided as a list for Multiple Choice Questions"
+                    }
+                )
+            if data.get("text_answer") in data.get("false_answers"):
+                raise serializers.ValidationError(
+                    {
+                        "false_answers": "False answers cannot contain the correct text answer"
+                    }
+                )
         if data.get("question_type") == "FRQ":
             if data.get("text_answer") or data.get("audio_answer"):
                 raise serializers.ValidationError(
