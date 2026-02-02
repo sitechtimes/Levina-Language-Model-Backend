@@ -1,0 +1,26 @@
+meta {
+  name: Update Question Instance (Audio)
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{base_url}}/question-instances/9/
+  body: multipartForm
+  auth: inherit
+}
+
+body:json {
+  {
+      "text_answer": "text3"
+  }
+}
+
+body:multipart-form {
+  audio_answer: @file()
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

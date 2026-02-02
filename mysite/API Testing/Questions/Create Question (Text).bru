@@ -1,0 +1,27 @@
+meta {
+  name: Create Question (Text)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/questions/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "description": "answer the question gng",
+      "question_type": "MCQ",
+      "question_content_type": "TEXT",
+      "text_question": "What is 3 + 5",
+      "answer_content_type": "TEXT",
+      "text_answer": "13",
+      "false_answers": ["67", "41"]
+  }
+}
+
+settings {
+  encodeUrl: true
+}

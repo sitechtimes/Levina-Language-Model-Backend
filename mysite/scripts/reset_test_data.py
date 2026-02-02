@@ -52,8 +52,11 @@ def run():
         last_name="User",
     )
     question = Question.objects.create(
-        name="Test Question",
         question_type="MCQ",
+        question_content_type="TEXT",
+        text_question="What is the capital of France?",
+        answer_content_type="TEXT",
+        text_answer="Paris",
         author=teacher,
     )
     assignment_template = AssignmentTemplate.objects.create(

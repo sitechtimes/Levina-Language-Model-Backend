@@ -1,5 +1,4 @@
 from questions.serializers import (
-    ExpandedQuestionInstanceSerializer,
     QuestionInstanceSerializer,
     QuestionSerializer,
 )
@@ -118,7 +117,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 
 class SessionInstanceSerializer(serializers.ModelSerializer):
-    session_question_instances = ExpandedQuestionInstanceSerializer(many=True, read_only=True)
+    session_question_instances = QuestionInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = SessionInstance
@@ -162,4 +161,6 @@ class SessionSerializer(serializers.ModelSerializer):
 
     def destroy(self, instance):
         if instance.session_instances.exists():
-            raise serializers.ValidationError("Cannot delete session with active session instances.")
+            raise serializers.ValidationError(
+                "Cannot delete session with active session instances."
+            )
