@@ -8,6 +8,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = [
             "id",
+            "description",
             "question_type",
             "author",
             "question_content_type",

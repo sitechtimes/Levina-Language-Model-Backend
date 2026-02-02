@@ -15,6 +15,8 @@ class Question(models.Model):
         ("FRQ", "Free Response Question"),
     ]
 
+    description = models.TextField(null=True, blank=True)
+
     question_type = models.CharField(choices=QUESTION_TYPES)
     author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
 
