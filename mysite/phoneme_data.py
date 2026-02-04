@@ -100,13 +100,19 @@ def align():
 
     # cmd = f'"{conda_bat}" run -n aligner mfa --help'
     # subprocess.run(cmd, shell=True, check=True)
-    # cmd = f'"{conda_bat}" run -n aligner mfa version'
 
     # cmd = f'"{conda_bat}" run -n aligner mfa align "{mfa_info["corpus_dir"]}" "{mfa_info["dictionary"]}" "{mfa_info["acoustic_model"]}" "{mfa_info["output_dir"]}" --verbose --single_speaker --output_per_utterance_log_likelihoods true --output_per_phone_log_likelihoods true"'
     
     
+    cmd = f'"{conda_bat}" run -n aligner mfa validate_dictionary russian_mfa_stressed_output'
+
+    #main production script below
     # cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa_stressed_output russian_mfa training_data/aligned_output --clean --verbose"
-    cmd = f'"{conda_bat}" run -n aligner mfa validate_dictionary russian_mfa'
+    
+    #working one below
+    # cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa russian_mfa training_data/aligned_output --clean --verbose"
+    
+    # cmd = f'"{conda_bat}" run -n aligner mfa version'
 
     subprocess.run(cmd, shell=True, check=True)
 
@@ -349,9 +355,10 @@ def normalize_dictionary():
     text = unicodedata.normalize("NFC", text)
     Path(input_path).write_text(text, encoding="utf-8")
 # formulate_data(5)
-# align()
 # run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
 # create_stress_dictionary()
 # apply_stress_to_dictionary()
 normalize_dictionary()
+print("Starting Alignment...")
+align()
