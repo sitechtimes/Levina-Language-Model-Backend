@@ -10,6 +10,7 @@ import matplotlib.cm as cm
 import unicodedata
 import json
 from pathlib import Path
+from pathlib import Path
 
 dotenv.load_dotenv()
 mfa_info = {
@@ -354,11 +355,32 @@ def normalize_dictionary():
     text = Path(input_path).read_text(encoding="utf-8")
     text = unicodedata.normalize("NFC", text)
     Path(input_path).write_text(text, encoding="utf-8")
+
+
+def test_dictionary():
+
+    # load dictionary words
+    dict_words = set()
+    with open("russian_mfa_stressed_output.dict", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                dict_words.add(line.split()[0])
+
+    # scan corpus
+    unknown = set()
+    for txt in Path("training_data/corpus").rglob("*.txt"):
+        for w in txt.read_text(encoding="utf-8").split():
+            if w not in dict_words:
+                unknown.add(w)
+
+    print("UNKNOWN WORD COUNT:", len(unknown))
+    print("SAMPLE:", list(unknown)[:40])
+
 # formulate_data(5)
 # run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
 # create_stress_dictionary()
 # apply_stress_to_dictionary()
-normalize_dictionary()
-print("Starting Alignment...")
-align()
+# normalize_dictionary()
+# align()
+test_dictionary()
