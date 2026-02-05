@@ -10,7 +10,8 @@ import matplotlib.cm as cm
 import unicodedata
 import json
 from pathlib import Path
-from pathlib import Path
+import re, unicodedata
+
 
 dotenv.load_dotenv()
 mfa_info = {
@@ -74,6 +75,20 @@ def convert_to_wav(file_name):
     audio = AudioSegment.from_mp3(input_mp3).set_frame_rate(16000).set_channels(1).set_sample_width(2)
     audio.export(output_wav, format="wav")
     os.remove(input_mp3)
+
+
+
+def clean(text):
+    #currently not used only if corpus needs to be cleaned
+    text = unicodedata.normalize("NFC", text)
+    text = text.lower()
+    text = text.replace("ё", "е")  # OR keep ё everywhere, choose one , even though in russian language they are different letters
+    text = re.sub(r"[^а-я\s]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+for txt in Path("training_data/corpus").rglob("*.txt"):
+    txt.write_text(clean(txt.read_text(encoding="utf-8")), encoding="utf-8")
 
 
 def formulate_data(files:int):
@@ -318,7 +333,7 @@ def apply_stress(aligned, stress_positions):
     stressed = []
     for p, idxs in aligned:
         if p in VOWELS and any(i in stress_positions for i in idxs):
-            stressed.append(p + "1")  # new stressed phoneme
+            stressed.append(p + "ˈ")  # new stressed phoneme
         else:
             stressed.append(p)
     return stressed
@@ -358,7 +373,7 @@ def normalize_dictionary():
 
 
 def test_dictionary():
-
+    #checked out to be fine so now not used in code
     # load dictionary words
     dict_words = set()
     with open("russian_mfa_stressed_output.dict", encoding="utf-8") as f:
@@ -376,11 +391,11 @@ def test_dictionary():
     print("UNKNOWN WORD COUNT:", len(unknown))
     print("SAMPLE:", list(unknown)[:40])
 
-# formulate_data(5)
+# formulate_data(1000)
 # run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
-# create_stress_dictionary()
-# apply_stress_to_dictionary()
+create_stress_dictionary()
+apply_stress_to_dictionary()
 # normalize_dictionary()
 # align()
-test_dictionary()
+# test_dictionary()
