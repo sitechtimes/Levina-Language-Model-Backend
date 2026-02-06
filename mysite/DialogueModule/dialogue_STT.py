@@ -8,32 +8,34 @@ torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
 print("Loading Whisper model...")
 
-model_id = "openai/whisper-large-v3-turbo"
+class STT:
+    def __init__(self):
+        self.model_id = "openai/whisper-large-v3-turbo"
 
-model = AutoModelForSpeechSeq2Seq.from_pretrained(
-    model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
-)
-model.to(device)
+        self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
+            self.model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
+        )
+        self.model.to(device)
 
-processor = AutoProcessor.from_pretrained(model_id)
+        self.processor = AutoProcessor.from_pretrained(self.model_id)
 
-pipe = pipeline(
-    "automatic-speech-recognition",
-    model=model,
-    tokenizer=processor.tokenizer,
-    feature_extractor=processor.feature_extractor,
-    torch_dtype=torch_dtype,
-    device=device,
-    return_timestamps=True
-)
+    def generate_sst(self):
+        pipe = pipeline(
+            "automatic-speech-recognition",
+            model=self.model,
+            tokenizer=self.processor.tokenizer,
+            feature_extractor=self.processor.feature_extractor,
+            torch_dtype=torch_dtype,
+            device=device,
+            return_timestamps=True
+        )
 
-print('CWD: ', os.getcwd())
-audio_file = "DialogueModule/RURU/RURU008.mp3"
+        print('CWD: ', os.getcwd())
 
-if os.path.exists("DialogueModule/RURU/RURU001.mp3"):
-    result = pipe(audio_file)
-    print(result["text"])
+        audio_file1 = "DialogueModule/RURU/RURU001.mp3"
+        result = pipe(audio_file1)
+        print('001: ', result["text"])
 
-if os.path.exists("DialogueModule/RURU/RURU091.mp3"):
-    result1 = pipe(audio_file)
-    print(result1["text"])
+        audio_file2 = "DialogueModule/RURU/RURU091.mp3"
+        result1 = pipe(audio_file2)
+        print('091: ', result1["text"])

@@ -2,32 +2,35 @@ import torch
 import numpy as np
 import soundfile as sf
 
-language='ru'
-model_id='v5_ru'
-sample_rate=48000
-speaker='xenia'
-device=torch.device('cpu')
+class TTS:
+    def __init__(self):
+        self.language='ru'
+        self.model_id='v5_ru'
+        self.sample_rate=48000
+        self.speaker='xenia'
+        self.device=torch.device('cpu')
 
-model, example_text = torch.hub.load(
-    repo_or_dir='snakers4/silero-models',
-    model='silero_tts',
-    language=language,
-    speaker=model_id
-)
+    def generate_tts(self):
+        model, example_text = torch.hub.load(
+            repo_or_dir='snakers4/silero-models',
+            model='silero_tts',
+            language=self.language,
+            speaker=self.model_id
+        )
 
-model.to(device)
+        model.to(self.device)
 
-audio = model.apply_tts(
-    text='Привет, как дела?',
-    speaker=speaker,
-    sample_rate=sample_rate
-)
+        audio = model.apply_tts(
+            text='Закрой свой рот, парень, иначе я тебя изобью!',
+            speaker=self.speaker,
+            sample_rate=self.sample_rate
+        )
 
-audio = audio.cpu().numpy().astype(np.float32)
+        audio = audio.cpu().numpy().astype(np.float32)
 
-sf.write(
-    "output.wav",
-    audio,
-    sample_rate,
-    subtype="PCM_16"
-)
+        sf.write(
+            "output.wav",
+            audio,
+            self.sample_rate,
+            subtype="PCM_16"
+        )
