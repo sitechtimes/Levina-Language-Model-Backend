@@ -111,10 +111,10 @@ def formulate_data(files:int):
 
 def align():
     conda_bat = os.getenv("CONDA_BAT")
-    dictionary_output_path = os.getenv("STRESSED_DICTIONARY_PATH")
-    dictionary_output_path_trimmed = os.path.splitext(os.path.basename(dictionary_output_path))[0]  # 'russian_mfa_stressed_output_new'
-    print(conda_bat)
-    print(dictionary_output_path_trimmed)
+    # dictionary_output_path = os.getenv("STRESSED_DICTIONARY_PATH")
+    # dictionary_output_path_trimmed = os.path.splitext(os.path.basename(dictionary_output_path))[0]  # 'russian_mfa_stressed_output_new'
+    # print(conda_bat)
+    # print(dictionary_output_path_trimmed)
     audio_path = "data/corpus/audio.wav"
 
     # cmd = f'"{conda_bat}" run -n aligner mfa --help'
@@ -126,7 +126,7 @@ def align():
     # cmd = f'"{conda_bat}" run -n aligner mfa validate_dictionary {dictionary_output_path_trimmed}'
 
     #main production script below
-    cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa_stressed_output russian_mfa training_data/aligned_output --clean --verbose"
+    cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa russian_mfa training_data/aligned_output --clean --verbose"
     
     #working one below
     # cmd = f"{conda_bat} run -n aligner mfa align training_data/corpus russian_mfa russian_mfa training_data/aligned_output --clean --verbose"
@@ -138,6 +138,10 @@ def align():
 def extract_phonemes(text_grid_content):
     phonemes = []
     durations = []
+    #find the stressed phoneme indexes first
+    word = text_grid_content.split("item [1]:")[1].split("intervals [")[1].split("]")[0]
+    print("WORD: ", word)
+
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
     for interval in intervals:
@@ -394,11 +398,13 @@ def test_dictionary():
     print("UNKNOWN WORD COUNT:", len(unknown))
     print("SAMPLE:", list(unknown)[:40])
 
-# formulate_data(1000)
-run_phoneme_stats()
-plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
-# create_stress_dictionary()
+formulate_data(10)
+
+create_stress_dictionary()
 # apply_stress_to_dictionary()
 # normalize_dictionary()
-# align()
+align()
 # test_dictionary()
+
+run_phoneme_stats()
+plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
