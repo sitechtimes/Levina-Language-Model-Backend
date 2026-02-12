@@ -140,7 +140,7 @@ def extract_phonemes(text_grid_content):
     durations = []
     #find the stressed phoneme indexes first
     word = text_grid_content.split("item [1]:")[1].split("intervals [")[1].split("]")[0]
-    print("WORD: ", word)
+    # print("WORD: ", word)
 
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
@@ -372,6 +372,42 @@ def apply_stress_to_dictionary():
 
     print("Stressed dictionary created at:", output_path)
 
+
+
+def create_phoneme_word_mappings():
+    #Function that makes a jsonl file with each word, then the stress positoin of hte phoneme, NOT the letter
+    input_path = os.getenv("OUTPUT_JSONL_PATH")
+    output_path = "Phoneme_word_mappings.jsonl"
+    total_bytes = os.path.getsize(input_path)
+    bytes_read = 0
+    with open(input_path, "r", encoding="utf-8") as inf, open(output_path, "w", encoding="utf-8") as outf:
+        unknown_characters = set()
+        count = 0
+        for line in inf:
+            bytes_read += len(line.encode("utf-8"))
+            obj = json.loads(line)
+            form = obj.get("form")
+            stress_positions = obj.get("stress_positions", [])
+            aligned,unknown_characters_sample = g2p_with_alignment(form)
+            unknown_characters.update(unknown_characters_sample)
+            stressed_phonemes = apply_stress(aligned, stress_positions)
+
+            phoneme_sequence = ""
+            for Tuple in aligned:
+                phoneme_sequence += Tuple[0]
+            
+            outf.write(f"{form} {phoneme_sequence} {stress_positions}\n")
+            #phoneme sequence needs to be packaged into the dictinoary in order to check to make sure the word to phoneme actaull aligns with the phonemes outputed by MFA
+            count += 1
+            loading_bar(bytes_read, total_bytes)
+            # if count > 100:
+            #     break
+    if unknown_characters:
+        print("Unknown characters encountered during G2P conversion:", unknown_characters)
+
+    print("Stressed dictionary created at:", output_path)
+
+
 def normalize_dictionary():
     input_path = "russian_mfa_stressed_output.dict"
     text = Path(input_path).read_text(encoding="utf-8")
@@ -398,13 +434,12 @@ def test_dictionary():
     print("UNKNOWN WORD COUNT:", len(unknown))
     print("SAMPLE:", list(unknown)[:40])
 
-formulate_data(10)
-
-create_stress_dictionary()
+# formulate_data(10)
+# print("Creating stress dictionary"); create_stress_dictionary()
 # apply_stress_to_dictionary()
 # normalize_dictionary()
-align()
+# print("Aligning"); align()
 # test_dictionary()
-
-run_phoneme_stats()
-plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
+create_phoneme_word_mappings()
+print("Running Phoneme Stats"); run_phoneme_stats()
+# plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
