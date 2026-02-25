@@ -140,7 +140,7 @@ def extract_phonemes(text_grid_content):
     durations = []
     #find the stressed phoneme indexes first
     word = text_grid_content.split("item [1]:")[1].split("intervals [")[1].split("]")[0]
-    # print("WORD: ", word)
+    print("WORD: ", word)
 
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
@@ -440,6 +440,6 @@ def test_dictionary():
 # normalize_dictionary()
 # print("Aligning"); align()
 # test_dictionary()
-create_phoneme_word_mappings()
+# create_phoneme_word_mappings()
 print("Running Phoneme Stats"); run_phoneme_stats()
 # plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
