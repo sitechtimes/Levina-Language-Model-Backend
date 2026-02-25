@@ -11,6 +11,7 @@ import unicodedata
 import json
 from pathlib import Path
 import re, unicodedata
+import ast
 
 
 dotenv.load_dotenv()
@@ -135,12 +136,81 @@ def align():
 
     subprocess.run(cmd, shell=True, check=True)
 
+def get_words_from_textgrid(text_grid_content: str):
+    """
+    Return a list of non-empty word strings from the 'words' (item [1]) tier of a TextGrid content.
+    """
+    # isolate the item [1] block (words) up to item [2]
+    _, _, words_block = text_grid_content.partition("item [1]:")
+    if not words_block:
+        return []
+    words_block, _, _ = words_block.partition("item [2]:")
+    # extract all text = "..." occurrences and filter out empty strings
+    texts = re.findall(r'text\s*=\s*"([^"]*)"', words_block)
+    return [t for t in texts if t.strip() != ""]
+
+
 def extract_phonemes(text_grid_content):
+    # phonemes = []
+    # durations = []
+    # #find the stressed phoneme indexes first
+    # words = get_words_from_textgrid(text_grid_content)
+    # with open("Phoneme_word_mappings.jsonl", "r", encoding="utf-8") as f:
+    #     for word in words:
+    #         for line in f:
+    #             if not line.startswith(word + " "):
+    #                 continue
+    #             print(line)
+    #             line.split()
+    #             if len(line) < 3:
+    #                 print("No stress position found for word:", word)
+    #                 continue
+        
+    #             stress_positions = line[2].strip("[]").split(",")
+    #             print(f"Word: {word}, Stress Positions: {stress_positions}")
+
     phonemes = []
     durations = []
-    #find the stressed phoneme indexes first
-    word = text_grid_content.split("item [1]:")[1].split("intervals [")[1].split("]")[0]
-    print("WORD: ", word)
+
+    # load mapping file once into dict: form_unstressed -> list_of_letter_stress_positions
+    mapping = {}
+    if Path("Phoneme_word_mappings.jsonl").exists():
+        with open("Phoneme_word_mappings.jsonl", "r", encoding="utf-8") as mf:
+            for line in mf:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(" ", 2)
+                if len(parts) < 3:
+                    continue
+                form, phon_seq, stress_str = parts
+                try:
+                    stress_positions = list(ast.literal_eval(stress_str))
+                except Exception:
+                    print("error parsing stress array")
+                    stress_positions = []
+                # normalize, just in case
+                form_norm = unicodedata.normalize("NFC", unicodedata.normalize("NFD", form).replace("\u0301", "")).lower()
+                mapping[form_norm] = stress_positions
+    print(len(mapping))
+    # get words from TextGrid and map to phoneme stress indices
+    words = get_words_from_textgrid(text_grid_content)
+    for word in words:
+        # normalize textgrid word: remove combining acute, NFC, lowercase
+        word_norm = unicodedata.normalize("NFC", unicodedata.normalize("NFD", word).replace("\u0301", "")).lower()
+        print(word_norm)
+        print(mapping.get(word_norm))
+        letter_stresses = mapping.get(word_norm, [])
+        # convert letter stress positions -> phoneme indices via g2p alignment
+        phoneme_stress_idxs = set()
+        aligned, _ = g2p_with_alignment(word_norm)
+        for pi, (p, letter_idxs) in enumerate(aligned):
+            # letter_idxs in g2p_with_alignment are lists of letter indices; mark phoneme index if any letter index is stressed
+            if any(i in letter_stresses for i in letter_idxs):
+                phoneme_stress_idxs.add(pi)
+        # print(f"Word: {word} -> normalized: {word_norm}, letter stresses: {letter_stresses}, phoneme stress idxs: {sorted(phoneme_stress_idxs)}")
+
+
 
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
