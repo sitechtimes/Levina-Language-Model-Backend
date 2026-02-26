@@ -149,30 +149,8 @@ def get_words_from_textgrid(text_grid_content: str):
     texts = re.findall(r'text\s*=\s*"([^"]*)"', words_block)
     return [t for t in texts if t.strip() != ""]
 
-
-def extract_phonemes(text_grid_content):
-    # phonemes = []
-    # durations = []
-    # #find the stressed phoneme indexes first
-    # words = get_words_from_textgrid(text_grid_content)
-    # with open("Phoneme_word_mappings.jsonl", "r", encoding="utf-8") as f:
-    #     for word in words:
-    #         for line in f:
-    #             if not line.startswith(word + " "):
-    #                 continue
-    #             print(line)
-    #             line.split()
-    #             if len(line) < 3:
-    #                 print("No stress position found for word:", word)
-    #                 continue
-        
-    #             stress_positions = line[2].strip("[]").split(",")
-    #             print(f"Word: {word}, Stress Positions: {stress_positions}")
-
-    phonemes = []
-    durations = []
-
-    # load mapping file once into dict: form_unstressed -> list_of_letter_stress_positions
+def create_mapping_dictionary():
+    
     mapping = {}
     if Path("Phoneme_word_mappings.jsonl").exists():
         with open("Phoneme_word_mappings.jsonl", "r", encoding="utf-8") as mf:
@@ -192,14 +170,17 @@ def extract_phonemes(text_grid_content):
                 # normalize, just in case
                 form_norm = unicodedata.normalize("NFC", unicodedata.normalize("NFD", form).replace("\u0301", "")).lower()
                 mapping[form_norm] = stress_positions
-    print(len(mapping))
-    # get words from TextGrid and map to phoneme stress indices
+    if mapping == {}:
+        print("Mapping dictionary is empty. Please run create_phoneme_word_mappings() first to generate the mapping file.")
+        raise ValueError("Mapping dictionary is empty. Please run create_phoneme_word_mappings() first to generate the mapping file.")
+    return mapping
+def extract_phonemes(text_grid_content,mapping):
+    phonemes = []
+    durations = []
     words = get_words_from_textgrid(text_grid_content)
     for word in words:
         # normalize textgrid word: remove combining acute, NFC, lowercase
         word_norm = unicodedata.normalize("NFC", unicodedata.normalize("NFD", word).replace("\u0301", "")).lower()
-        print(word_norm)
-        print(mapping.get(word_norm))
         letter_stresses = mapping.get(word_norm, [])
         # convert letter stress positions -> phoneme indices via g2p alignment
         phoneme_stress_idxs = set()
@@ -209,7 +190,6 @@ def extract_phonemes(text_grid_content):
             if any(i in letter_stresses for i in letter_idxs):
                 phoneme_stress_idxs.add(pi)
         # print(f"Word: {word} -> normalized: {word_norm}, letter stresses: {letter_stresses}, phoneme stress idxs: {sorted(phoneme_stress_idxs)}")
-
 
 
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
@@ -233,11 +213,20 @@ def extract_phonemes(text_grid_content):
 def organize_phonemes():
     full_data = []
     full_data_separated = []
+    mapping = create_mapping_dictionary()
+    file_count_path = Path("training_data/aligned_output/")
+    files_count = len([p for p in file_count_path.rglob('*') if p.is_file()])
+    print(files_count)
+    count = 0
+    loading_bar(count, files_count)
     for path in os.listdir("training_data/aligned_output/"):
+        count += 1
+        if count % 10 == 0:
+            loading_bar(count, files_count)
         if path.endswith(".TextGrid"):
             with open(os.path.join("training_data/aligned_output/", path), "r", encoding="utf-8") as f:
                 content = f.read()
-            single_file_data = extract_phonemes(content)
+            single_file_data = extract_phonemes(content,mapping)
             full_data = full_data + single_file_data
             full_data_separated.append(single_file_data)
     full_data_no_whitespace = [(p, d) for p, d in full_data if p != '']
@@ -512,4 +501,4 @@ def test_dictionary():
 # test_dictionary()
 # create_phoneme_word_mappings()
 print("Running Phoneme Stats"); run_phoneme_stats()
-# plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
+plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
