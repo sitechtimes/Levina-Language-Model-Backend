@@ -3,7 +3,7 @@ from FeedbackModule.feedback import model_gen
 if __name__ == "__main__":
     gen = model_gen()
 
-    streamer, thread = gen.generate_response("")
+    streamer, thread = gen.generate_response("", essay_analysis=False)
 
     bot_reply = ""
     print("Mrs. Natalya Levina: \n", end="", flush=True)
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         if user_message.lower() in ["exit", "quit"]:
             break
 
-        streamer, thread = gen.generate_response(user_message)
+        streamer, thread = gen.generate_response(user_message, essay_analysis=False)
 
         bot_reply = ""
         print("Mrs. Natalya Levina: \n", end="", flush=True)

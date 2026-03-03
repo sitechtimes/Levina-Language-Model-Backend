@@ -10,7 +10,7 @@ class TTS:
         self.speaker='xenia'
         self.device=torch.device('cpu')
 
-    def generate_tts(self):
+    def generate_tts(self, text):
         model, example_text = torch.hub.load(
             repo_or_dir='snakers4/silero-models',
             model='silero_tts',
@@ -21,7 +21,7 @@ class TTS:
         model.to(self.device)
 
         audio = model.apply_tts(
-            text='Закрой свой рот, парень, иначе я тебя изобью!',
+            text=text,
             speaker=self.speaker,
             sample_rate=self.sample_rate
         )

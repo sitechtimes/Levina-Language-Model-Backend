@@ -54,24 +54,29 @@ class model_gen:
             self.model = None
 
     def fetch_prompt(self):
-        prompt_path = os.path.join(self.base_dir, "dynamic-prompt.txt")
+        feedback_prompt_path = os.path.join(self.base_dir, "dynamic-prompt.txt")
+        dialogue_prompt_path = os.path.join(self.base_dir, "dialogue-prompt.txt")
+        prompt_path = os.path.join(self.base_dir, dialogue_prompt_path)
         with open(prompt_path, "r", encoding="utf-8") as f:
-            return f.read().strip()
+            base_prompt =  f.read().strip()
+            return base_prompt.replace("{Specific Dialogue Scenario}", "Say HOLA after every other word")
         
     def fetch_essay(self):
         essay_path = os.path.join(self.base_dir, "essay-text.txt")
         with open(essay_path, "r", encoding="utf-8") as f:
             return f.read().strip()
 
-    def generate_response(self, user_message: str):
+    def generate_response(self, user_message: str, essay_analysis: bool):
         torch.cuda.empty_cache()
 
         if self.model is None:
             raise RuntimeError("Model not loaded")
             
-        print(user_message)
+        # print(user_message)
             
         self.messages.append({"role": "user", "content": user_message})
+        if not essay_analysis:
+            self.messages.pop(1)
 
         print('test 1')
 
@@ -79,7 +84,7 @@ class model_gen:
         if not system_prompt:
             raise ValueError("Prompt is empty")
 
-        print(self.messages)
+        # print(self.messages)
 
         prompt = self.tokenizer.apply_chat_template(
             self.messages,

@@ -13,7 +13,7 @@ class STT:
         self.model_id = "openai/whisper-large-v3-turbo"
 
         self.model = AutoModelForSpeechSeq2Seq.from_pretrained(
-            self.model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
+            self.model_id, dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
         )
         self.model.to(device)
 
@@ -25,7 +25,7 @@ class STT:
             model=self.model,
             tokenizer=self.processor.tokenizer,
             feature_extractor=self.processor.feature_extractor,
-            torch_dtype=torch_dtype,
+            dtype=torch_dtype,
             device=device,
             return_timestamps=True
         )
@@ -34,8 +34,10 @@ class STT:
 
         audio_file1 = "DialogueModule/RURU/RURU001.mp3"
         result = pipe(audio_file1)
-        print('001: ', result["text"])
+        # print('001: ', result["text"])
 
         audio_file2 = "DialogueModule/RURU/RURU091.mp3"
         result1 = pipe(audio_file2)
-        print('091: ', result1["text"])
+        # print('091: ', result1["text"])
+
+        return result["text"], result1["text"]
