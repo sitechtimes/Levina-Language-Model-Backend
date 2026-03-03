@@ -178,26 +178,30 @@ def extract_phonemes(text_grid_content,mapping):
     phonemes = []
     durations = []
     words = get_words_from_textgrid(text_grid_content)
+    phoneme_stress_idxs_combined = []
     for word in words:
         # normalize textgrid word: remove combining acute, NFC, lowercase
         word_norm = unicodedata.normalize("NFC", unicodedata.normalize("NFD", word).replace("\u0301", "")).lower()
         letter_stresses = mapping.get(word_norm, [])
-        # convert letter stress positions -> phoneme indices via g2p alignment
+        # convert letter stress positions -> phoneme indices via g2p alignment (ex. the letter л to the phoneme for that letter)
         phoneme_stress_idxs = set()
         aligned, _ = g2p_with_alignment(word_norm)
         for pi, (p, letter_idxs) in enumerate(aligned):
-            # letter_idxs in g2p_with_alignment are lists of letter indices; mark phoneme index if any letter index is stressed
             if any(i in letter_stresses for i in letter_idxs):
                 phoneme_stress_idxs.add(pi)
+        phoneme_stress_idxs_combined.append(phoneme_stress_idxs)
+        
         # print(f"Word: {word} -> normalized: {word_norm}, letter stresses: {letter_stresses}, phoneme stress idxs: {sorted(phoneme_stress_idxs)}")
-
-
+    print(f"Combined phoneme stress idxs for all words in TextGrid: {phoneme_stress_idxs_combined}")
+    
+    #phoneme_stress_idxs_combined encompasses the indexes of stress
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
     for interval in intervals:
         if "text" in interval:
             _,_,text = interval.partition("text = ")
             phoneme = text.strip().strip('"')
+            
             _,_,xmin = interval.partition("xmin = ")
             xmin,_,_ = xmin.partition("\n")
             xmin = float(xmin.strip())
@@ -207,6 +211,8 @@ def extract_phonemes(text_grid_content,mapping):
             duration = xmax - xmin
             durations.append(duration)
             phonemes.append(phoneme)
+            if len(phonemes) != len(durations):
+                raise ValueError("Mismatched phonemes and durations lengths")
     phoneme_data = list(zip(phonemes, durations))
     return phoneme_data
 
