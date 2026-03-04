@@ -179,6 +179,7 @@ def extract_phonemes(text_grid_content,mapping):
     durations = []
     words = get_words_from_textgrid(text_grid_content)
     phoneme_stress_idxs_combined = []
+    word_phoneme_counts = []
     for word in words:
         # normalize textgrid word: remove combining acute, NFC, lowercase
         word_norm = unicodedata.normalize("NFC", unicodedata.normalize("NFD", word).replace("\u0301", "")).lower()
@@ -190,18 +191,27 @@ def extract_phonemes(text_grid_content,mapping):
             if any(i in letter_stresses for i in letter_idxs):
                 phoneme_stress_idxs.add(pi)
         phoneme_stress_idxs_combined.append(phoneme_stress_idxs)
-        
-        # print(f"Word: {word} -> normalized: {word_norm}, letter stresses: {letter_stresses}, phoneme stress idxs: {sorted(phoneme_stress_idxs)}")
-    print(f"Combined phoneme stress idxs for all words in TextGrid: {phoneme_stress_idxs_combined}")
-    
+        word_phoneme_counts.append(len(aligned))
+
+    # compute global stressed phoneme indices across words
+    stressed_global_indices = set()
+    offset = 0
+    for count, idxset in zip(word_phoneme_counts, phoneme_stress_idxs_combined):
+        for idx in idxset:
+            stressed_global_indices.add(offset + idx)
+        offset += count
+
+    # print(f"Global stressed phoneme indices: {sorted(stressed_global_indices)}")
+
     #phoneme_stress_idxs_combined encompasses the indexes of stress
     _,_,phoneme_text = text_grid_content.partition("item [2]:")
     intervals = phoneme_text.split("intervals [")[1:]
+    phoneme_index = 0  # counts only non-empty phoneme tokens to align with g2p output
     for interval in intervals:
         if "text" in interval:
             _,_,text = interval.partition("text = ")
             phoneme = text.strip().strip('"')
-            
+
             _,_,xmin = interval.partition("xmin = ")
             xmin,_,_ = xmin.partition("\n")
             xmin = float(xmin.strip())
@@ -210,7 +220,19 @@ def extract_phonemes(text_grid_content,mapping):
             xmax = float(xmax.strip())
             duration = xmax - xmin
             durations.append(duration)
-            phonemes.append(phoneme)
+
+            # decide stressed marking only for non-empty phonemes "error handling"
+            if phoneme != "":
+                if phoneme_index in stressed_global_indices:
+                    phoneme_marked = f"{phoneme} 1"
+                else:
+                    phoneme_marked = phoneme
+                phoneme_index += 1
+            else:
+                phoneme_marked = phoneme
+
+            phonemes.append(phoneme_marked)
+
             if len(phonemes) != len(durations):
                 raise ValueError("Mismatched phonemes and durations lengths")
     phoneme_data = list(zip(phonemes, durations))
