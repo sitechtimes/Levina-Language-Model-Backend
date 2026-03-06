@@ -496,7 +496,7 @@ def create_phoneme_word_mappings():
 
 
 def normalize_dictionary():
-    input_path = "russian_mfa_stressed_output.dict"
+    input_path = env.getenv("STRESSED_DICTIONARY_PATH")
     text = Path(input_path).read_text(encoding="utf-8")
     text = unicodedata.normalize("NFC", text)
     Path(input_path).write_text(text, encoding="utf-8")
@@ -521,12 +521,31 @@ def test_dictionary():
     print("UNKNOWN WORD COUNT:", len(unknown))
     print("SAMPLE:", list(unknown)[:40])
 
-# formulate_data(10)
-# print("Creating stress dictionary"); create_stress_dictionary()
-# apply_stress_to_dictionary()
-# normalize_dictionary()
-# print("Aligning"); align()
+
+#TRY NORMALIZED VS NON NORMALIZED THEN DO T TEST!!!
+
 # test_dictionary()
-# create_phoneme_word_mappings()
-print("Running Phoneme Stats"); run_phoneme_stats()
+
+print("STEP 1: Creating stress dictionary (will read russian_dictionary.jsonl and write OUTPUT_JSONL_PATH)")
+create_stress_dictionary()
+
+print("STEP 2: Converting JSONL -> stressed dictionary (apply_stress_to_dictionary will write STRESSED_DICTIONARY_PATH)")
+apply_stress_to_dictionary()
+
+print("STEP 3: Normalizing stressed dictionary file (normalize_dictionary)")
+normalize_dictionary()
+
+print("STEP 4: Creating phoneme->word mappings (create_phoneme_word_mappings -> Phoneme_word_mappings.jsonl)")
+create_phoneme_word_mappings()
+
+print("STEP 5: Preparing corpus and copying clips + generating .lab files (formulate_data)")
+formulate_data(100000000000000)
+
+print("STEP 6: Running MFA alignment (align) to produce TextGrid outputs in training_data/aligned_output")
+align()
+
+print("STEP 7: Computing phoneme statistics from aligned TextGrids (run_phoneme_stats)")
+run_phoneme_stats()
+
+print("STEP 8: Plotting phoneme durations from phoneme_stats_normalized.csv (plot_phoneme_durations)")
 plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
