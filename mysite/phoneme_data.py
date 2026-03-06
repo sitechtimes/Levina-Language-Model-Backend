@@ -69,7 +69,6 @@ RUS_MFA_G2P = {
 
 
 def convert_to_wav(file_name):
-    print(file_name)
     file_name = file_name.split(".mp3")[0]
     input_mp3 = "training_data/corpus/" + file_name + ".mp3"
     output_wav = "training_data/corpus/" + file_name + ".wav"
@@ -94,7 +93,6 @@ for txt in Path("training_data/corpus").rglob("*.txt"):
 
 def formulate_data(files:int):
     tsv_file_path = os.getenv("TSV_FILE_TRAIN_PATH")
-    print(tsv_file_path)
     df = pd.read_csv(tsv_file_path, sep='\t')
     df_train = df[df["age"].isin(["twenties", "teens"])]
     df_train = df_train[:files]
@@ -496,7 +494,7 @@ def create_phoneme_word_mappings():
 
 
 def normalize_dictionary():
-    input_path = env.getenv("STRESSED_DICTIONARY_PATH")
+    input_path = os.getenv("STRESSED_DICTIONARY_PATH")
     text = Path(input_path).read_text(encoding="utf-8")
     text = unicodedata.normalize("NFC", text)
     Path(input_path).write_text(text, encoding="utf-8")
