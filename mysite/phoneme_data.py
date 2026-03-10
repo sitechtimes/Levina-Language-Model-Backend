@@ -524,26 +524,27 @@ def test_dictionary():
 
 # test_dictionary()
 
-print("STEP 1: Creating stress dictionary (will read russian_dictionary.jsonl and write OUTPUT_JSONL_PATH)")
-create_stress_dictionary()
+# print("STEP 1: Creating stress dictionary (will read russian_dictionary.jsonl and write OUTPUT_JSONL_PATH)")
+# create_stress_dictionary()
 
-print("STEP 2: Converting JSONL -> stressed dictionary (apply_stress_to_dictionary will write STRESSED_DICTIONARY_PATH)")
-apply_stress_to_dictionary()
+# print("STEP 2: Converting JSONL -> stressed dictionary (apply_stress_to_dictionary will write STRESSED_DICTIONARY_PATH)")
+# apply_stress_to_dictionary()
 
-print("STEP 3: Normalizing stressed dictionary file (normalize_dictionary)")
-normalize_dictionary()
+# print("STEP 3: Normalizing stressed dictionary file (normalize_dictionary)")
+# normalize_dictionary()
 
-print("STEP 4: Creating phoneme->word mappings (create_phoneme_word_mappings -> Phoneme_word_mappings.jsonl)")
-create_phoneme_word_mappings()
+# print("STEP 4: Creating phoneme->word mappings (create_phoneme_word_mappings -> Phoneme_word_mappings.jsonl)")
+# create_phoneme_word_mappings()
 
-print("STEP 5: Preparing corpus and copying clips + generating .lab files (formulate_data)")
-formulate_data(100000000000000)
+# print("STEP 5: Preparing corpus and copying clips + generating .lab files (formulate_data)")
+# formulate_data(100000000000000)
 
-print("STEP 6: Running MFA alignment (align) to produce TextGrid outputs in training_data/aligned_output")
-align()
+# print("STEP 6: Running MFA alignment (align) to produce TextGrid outputs in training_data/aligned_output")
+# align()
 
-print("STEP 7: Computing phoneme statistics from aligned TextGrids (run_phoneme_stats)")
-run_phoneme_stats()
+# print("STEP 7: Computing phoneme statistics from aligned TextGrids (run_phoneme_stats)")
+# run_phoneme_stats()
 
 print("STEP 8: Plotting phoneme durations from phoneme_stats_normalized.csv (plot_phoneme_durations)")
 plot_phoneme_durations(pd.read_csv("phoneme_stats_normalized.csv"))
+
