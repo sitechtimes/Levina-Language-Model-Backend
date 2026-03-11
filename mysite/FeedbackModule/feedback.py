@@ -59,7 +59,7 @@ class model_gen:
         prompt_path = os.path.join(self.base_dir, dialogue_prompt_path)
         with open(prompt_path, "r", encoding="utf-8") as f:
             base_prompt =  f.read().strip()
-            return base_prompt.replace("{Specific Dialogue Scenario}", "Say HOLA after every other word")
+            return base_prompt.replace("{Specific Dialogue Scenario}", "Ты, Levina, — турист в Москве. Ты впервые приехал в Россию и хочешь узнать, какие достопримечательности стоит посетить в Москве. Спроси у местного жителя или гида о самых интересных местах, исторических памятниках, музеях, парках и культурных объектах. Уточни, как до них добраться, сколько стоит вход и в какое время лучше посещать. Также спроси рекомендации по ресторанам с традиционной русской кухней. Веди диалог вежливо и дружелюбно.")
         
     def fetch_essay(self):
         essay_path = os.path.join(self.base_dir, "essay-text.txt")
@@ -135,3 +135,6 @@ class model_gen:
     
     def save_ai_response(self, bot_reply: str):
         self.messages.append({"role": "assistant", "content": bot_reply})
+
+    def context(self):
+        return self.messages
