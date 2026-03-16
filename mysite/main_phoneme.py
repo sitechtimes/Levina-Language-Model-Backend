@@ -41,6 +41,8 @@ from llm_aligner.aligner import align
 
 
 if __name__ == "__main__":
+    import dotenv
+    dotenv.load_dotenv()
     # Step 1
     print("STEP 1: Creating stress dictionary")
     create_stress_dictionary()
