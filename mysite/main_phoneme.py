@@ -1,3 +1,6 @@
+import pandas as pd
+import dotenv
+
 # g2p
 from llm_aligner.g2p import (
     RUS_MFA_G2P,
@@ -41,7 +44,6 @@ from llm_aligner.aligner import align
 
 
 if __name__ == "__main__":
-    import dotenv
     dotenv.load_dotenv()
     # Step 1
     print("STEP 1: Creating stress dictionary")
@@ -71,7 +73,8 @@ if __name__ == "__main__":
     print("STEP 7: Computing phoneme statistics")
     mapping = create_mapping_dictionary()
     phoneme_df, separated_data = organize_phonemes(mapping)
-    stats = run_phoneme_stats(phoneme_df, separated_data)
+    run_phoneme_stats(phoneme_df, separated_data)
+    stats = pd.read_csv("phoneme_stats_normalized.csv")
 
     # Step 8
     print("STEP 8: Plotting phoneme durations")
