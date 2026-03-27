@@ -16,7 +16,7 @@ def align_audio(audio_path, output_dir):
 
     subprocess.run(cmd, shell=True, check=True)
 
-def extract_phoneme_durations(textgrid_file):
+def extract_phoneme_durations(textgrid_file,total_mean):
     """Extract phoneme durations from TextGrid file using text parsing (no praatio dependency)."""
     with open(textgrid_file, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -46,7 +46,12 @@ def extract_phoneme_durations(textgrid_file):
         
         if phoneme:  # Skip empty labels
             phoneme_durations.append((phoneme, duration))
-    
+    if total_mean is not None and phoneme_durations:
+        clip_mean = sum(d for _, d in phoneme_durations) / len(phoneme_durations)
+        if clip_mean != 0:
+            normalization_factor = total_mean / clip_mean
+            phoneme_durations = [(p, d * normalization_factor) for p, d in phoneme_durations]
+
     return phoneme_durations
 
 
@@ -63,6 +68,7 @@ if __name__ == '__main__':
     audio_file = 'run_tests_corpus'
     stats_file = 'phoneme_stats_normalized.csv'
     output_dir = './alignments'
+    alpha = 0.05  # Significance level for hypothesis testing
     
     os.makedirs(output_dir, exist_ok=True)
  
@@ -73,11 +79,24 @@ if __name__ == '__main__':
         # print("Aligning audio file...")
         # align_audio(audio_file, output_dir)
 
-        textgrid_file = output_dir + "/" + audio_file.replace('.wav', '.TextGrid')
+        textgrid_folder = output_dir + "/" + audio_file.replace('.wav', '.TextGrid')
+        for root, _, files in os.walk(output_dir):
+            candidates = sorted(
+                os.path.join(root, f)
+                for f in files
+                if f.lower().endswith(".textgrid")
+            )
+            if candidates:
+                textgrid_file = candidates[0]
+                break
+            else:
+                raise FileNotFoundError(f"No .TextGrid file found under: {output_dir}")
         print(textgrid_file)
         # Step 2: Extract durations from textgrid output
         print("Extracting phoneme durations...")
-        phoneme_durations = extract_phoneme_durations(textgrid_file)
+        total_clip_mean =  0.10474026101545329
+        phoneme_durations = extract_phoneme_durations(textgrid_file,total_clip_mean)
+
         
         # Step 3: Import hypothesis test and run it on the extracted durations
         print("Running hypothesis test...")
@@ -91,5 +110,20 @@ if __name__ == '__main__':
             else:
                 print(f"  - {phoneme}: {p_value:.6f}")
                 
+        # Step 4: Flag phonemes that fail the hypothesis test at the given alpha
+        flagged = []
+        for phoneme, p_value in results.items():
+            if pd.isna(p_value):
+                continue
+            if p_value < alpha:
+                flagged.append((phoneme, p_value))
+
+        if flagged:
+            print(f"\nFlagged phonemes (p < {alpha}):")
+            for phoneme, p_value in sorted(flagged, key=lambda x: x[1]):
+                print(f"  - {phoneme}: {p_value:.6f}")
+        else:
+            print(f"\nNo phonemes flagged (all available p-values >= {alpha}).")
+
     except Exception as e:
         print(f"Error: {e}")

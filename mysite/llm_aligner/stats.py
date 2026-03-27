@@ -51,7 +51,8 @@ def run_phoneme_stats(phoneme_df,separated_data):
         clip_mean = clip_df['duration'].mean()
         clip_means.append(clip_mean)
     total_mean = sum(clip_means) / len(clip_means)
-
+    print("TOTAL MEAN")
+    print(total_mean)
     separated_data_normalized = []
 
     for i, clip_phonemes in enumerate(separated_data):

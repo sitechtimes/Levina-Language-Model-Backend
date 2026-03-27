@@ -45,29 +45,29 @@ from llm_aligner.aligner import align
 
 if __name__ == "__main__":
     dotenv.load_dotenv()
-    # Step 1
-    print("STEP 1: Creating stress dictionary")
-    create_stress_dictionary()
+    # # Step 1
+    # print("STEP 1: Creating stress dictionary")
+    # create_stress_dictionary()
 
-    # Step 2
-    print("STEP 2: Applying stress to dictionary")
-    apply_stress_to_dictionary()
+    # # Step 2
+    # print("STEP 2: Applying stress to dictionary")
+    # apply_stress_to_dictionary()
 
-    # Step 3
-    print("STEP 3: Normalizing stressed dictionary")
-    normalize_dictionary()
+    # # Step 3
+    # print("STEP 3: Normalizing stressed dictionary")
+    # normalize_dictionary()
 
-    # Step 4
-    print("STEP 4: Creating phoneme-word mappings")
-    create_phoneme_word_mappings()
+    # # Step 4
+    # print("STEP 4: Creating phoneme-word mappings")
+    # create_phoneme_word_mappings()
 
-    # Step 5
-    print("STEP 5: Preparing corpus (formulate_data)")
-    formulate_data(100000000000000)
+    # # Step 5
+    # print("STEP 5: Preparing corpus (formulate_data)")
+    # formulate_data(100000000000000)
 
-    # Step 6
-    print("STEP 6: Running MFA alignment")
-    align()
+    # # Step 6
+    # print("STEP 6: Running MFA alignment")
+    # align()
 
     # Step 7
     print("STEP 7: Computing phoneme statistics")

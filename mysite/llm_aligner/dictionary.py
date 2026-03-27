@@ -10,8 +10,7 @@ from .loading_bar import loading_bar
 
 def create_stress_dictionary():
     json_file_path = "russian_dictionary.jsonl"
-    out_path = os.getenv("OUTPUT_JSONL_PATH")
-
+    out_path = os.getenv("LLM_ALIGNER_OUTPUT_JSONL_PATH")
     seen = set()
     total_bytes = os.path.getsize(json_file_path)
     written = 0
