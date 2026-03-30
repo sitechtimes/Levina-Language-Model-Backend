@@ -2,6 +2,7 @@ import torch
 from .dialogue_STT import STT
 from .dialogue_TTS import TTS
 from .review import Review
+from .listening import Listening
 from FeedbackModule.feedback import model_gen
 
 print('Loading dialogue.py')
@@ -49,11 +50,14 @@ def main():
         tts.generate_tts(full_response)
 
         chat_history = gen.context()
-        print("CHAT HISTORY:", chat_history)
+        # print("CHAT HISTORY:", chat_history)
 
         dialogue_analysis = review.analyze_response(chat_history)
         print("REVIEW ANALYSIS:", dialogue_analysis)
 
+def listen():
+    audio = Listening()
+    output = audio.listening()
 
 if __name__ == "__main__":
-    main()
+    listen()

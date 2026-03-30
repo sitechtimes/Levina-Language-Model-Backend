@@ -40,4 +40,4 @@ class STT:
         result1 = pipe(audio_file2)
         # print('091: ', result1["text"])
 
-        return result1["text"]
+        return result["text"]
