@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Question, QuestionInstance
+from .models import Question, QuestionInstance, DialogueQuestion
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -157,3 +157,38 @@ class QuestionInstanceSerializer(serializers.ModelSerializer):
                     )
 
         return data
+
+
+class DialogueQuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DialogueQuestion
+        fields = [
+            "id",
+            "starts_with",
+            "ai_statements",
+            "student_statements",
+        ]
+        read_only_fields = ["id"]
+
+    def validate(self, data):
+        if not data.get("starts_with"):
+            raise serializers.ValidationError(
+                {"starts_with": "Starts with field is required"}
+            )
+        if data.get("starts_with") not in ["AI", "STUDENT"]:
+            raise serializers.ValidationError(
+                {
+                    "starts_with": "Invalid value for starts_with. Must be one of: AI, STUDENT"
+                }
+            )
+        if data.get("starts_with") == "AI":
+            if not data.get("starting_statement"):
+                raise serializers.ValidationError(
+                    {
+                        "starting_statement": "Starting statement is required when starts_with is AI"
+                    }
+                )
+            if not type(data.get("starting_statement")) == str:
+                raise serializers.ValidationError(
+                    {"starting_statement": "Starting statement must be a string"}
+                )

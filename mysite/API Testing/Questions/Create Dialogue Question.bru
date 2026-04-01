@@ -1,0 +1,22 @@
+meta {
+  name: Create Dialogue Question
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}/dialogue-questions/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "prompt": "talk about the stuff",
+    "starts_with": "Student "
+  }
+}
+
+settings {
+  encodeUrl: true
+}
