@@ -94,8 +94,14 @@ if __name__ == '__main__':
         print(textgrid_file)
         # Step 2: Extract durations from textgrid output
         print("Extracting phoneme durations...")
-        total_clip_mean =  0.10474026101545329
-        phoneme_durations = extract_phoneme_durations(textgrid_file,total_clip_mean)
+        stats_df = pd.read_csv(stats_file)
+        if "total_mean" not in stats_df.columns:
+            raise ValueError(
+                "total_mean not found in phoneme_stats_normalized.csv. "
+                "Regenerate stats using llm_aligner/stats.py after adding total_mean persistence."
+            )
+        total_mean = float(stats_df["total_mean"].iloc[0])
+        phoneme_durations = extract_phoneme_durations(textgrid_file, total_mean)
 
         
         # Step 3: Import hypothesis test and run it on the extracted durations

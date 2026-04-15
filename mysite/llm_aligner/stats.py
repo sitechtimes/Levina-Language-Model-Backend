@@ -48,7 +48,9 @@ def run_phoneme_stats(phoneme_df,separated_data):
     clip_means = []
     for clip in separated_data:
         clip_df = pd.DataFrame(clip, columns=["phoneme", "duration"])
-        clip_mean = clip_df['duration'].mean()
+        # Keep this consistent with downstream usage: ignore empty labels in per-clip mean.
+        clip_df = clip_df[clip_df["phoneme"] != ""]
+        clip_mean = clip_df["duration"].mean()
         clip_means.append(clip_mean)
     total_mean = sum(clip_means) / len(clip_means)
     print("TOTAL MEAN")
@@ -88,6 +90,8 @@ def run_phoneme_stats(phoneme_df,separated_data):
     # counts = pd.DataFrame(list(counts.items()), columns=['phoneme', 'normalized_count'])
     normalized_phoneme_stats = pd.merge(normalized_averages, normalized_stddevs, on='phoneme')
     normalized_phoneme_stats = normalized_phoneme_stats.merge(phoneme_stats, on='phoneme')
+    # Persist the reference used for normalization so inference/tests can stay consistent.
+    normalized_phoneme_stats["total_mean"] = total_mean
     normalized_phoneme_stats.to_csv("phoneme_stats_normalized.csv", index=False)
     print(normalized_phoneme_stats)
 

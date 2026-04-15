@@ -17,11 +17,15 @@ def load_phoneme_stats(file_path):
         raise FileNotFoundError(f"Statistics file not found at: {file_path}")
     
     df = pd.read_csv(file_path)
-    # Use the raw average and standard deviation for the test
+
+    # Use normalized average/std if available (matches run_tests normalization).
+    mean_col = 'normalized_avg_duration' if 'normalized_avg_duration' in df.columns else 'avg_duration'
+    std_col = 'normalized_std_deviation' if 'normalized_std_deviation' in df.columns else 'std_deviation'
+
     stats_dict = {
         row['phoneme']: {
-            'mean': row['avg_duration'],
-            'std_dev': row['std_deviation'],
+            'mean': row[mean_col],
+            'std_dev': row[std_col],
             'count': row['count']
         }
         for index, row in df.iterrows()
