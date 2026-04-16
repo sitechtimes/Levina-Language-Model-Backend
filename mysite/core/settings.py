@@ -41,7 +41,8 @@ ALLOWED_HOSTS = []
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # Application definition
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "drf_spectacular",
     "corsheaders",
     "users",
     "courses",
@@ -103,6 +105,26 @@ SIMPLE_JWT = {
 
 WSGI_APPLICATION = "core.wsgi.application"
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Levina Language Model Backend",
+    "DESCRIPTION": "Comprehensive API documentation for Levina Language Model Backend",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/",
+    "AUTHENTICATION_WHITELIST": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "SWAGGER_UI_SETTINGS": {
+        "deepLinking": True,
+        "persistAuthorization": True,
+        "displayOperationId": True,
+    },
+    "REDOC_UI_SETTINGS": {
+        "hideDownloadButton": False,
+        "expandResponses": "200,201",
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

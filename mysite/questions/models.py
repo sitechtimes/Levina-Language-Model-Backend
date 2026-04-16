@@ -64,26 +64,3 @@ class SessionQuestionInstance(models.Model):
         upload_to="audio/session_audio_answers/", null=True, blank=True
     )
     submitted = models.BooleanField(default=False)
-
-
-class DialogueQuestion(models.Model):
-    STARTS_WITH_CHOICES = [
-        ("AI", "AI"),
-        ("STUDENT", "Student"),
-    ]
-    author = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE)
-    prompt = models.TextField()
-    starts_with = models.CharField(choices=STARTS_WITH_CHOICES, max_length=20)
-    starting_statement = models.TextField(null=True, blank=True)
-
-
-class DialogueQuestionInstance(models.Model):
-    question = models.ForeignKey("questions.DialogueQuestion", on_delete=models.CASCADE)
-    assignment_instance = models.ForeignKey(
-        "assignments.AssignmentInstance",
-        on_delete=models.CASCADE,
-        related_name="dialogue_question_instances",
-    )
-    ai_statements = models.JSONField(null=True, blank=True)
-    student_statements = models.JSONField(null=True, blank=True)
-    submitted = models.BooleanField(default=False)
