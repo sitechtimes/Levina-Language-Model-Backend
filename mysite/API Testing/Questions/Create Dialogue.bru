@@ -1,0 +1,24 @@
+meta {
+  name: Create Dialogue
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}/dialogues/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "description": "talk about the stuff",
+    "initial_statement": "so, stuff am i right",
+    "max_statements": 5
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

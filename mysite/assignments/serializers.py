@@ -11,10 +11,12 @@ from .models import (
     Session,
     SessionInstance,
 )
+from questions.serializers import DialogueInstanceSerializer, DialogueSerializer
 
 
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
     question_instances = QuestionInstanceSerializer(many=True, read_only=True)
+    dialogue_instances = DialogueInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = AssignmentInstance
@@ -25,12 +27,14 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
             "submitted",
             "time_used",
             "question_instances",
+            "dialogue_instances",
         ]
         read_only_fields = [
             "id",
             "assignment",
             "student",
             "question_instances",
+            "dialogue_instances",
         ]
 
     def delete(self, instance):
@@ -39,6 +43,7 @@ class AssignmentInstanceSerializer(serializers.ModelSerializer):
 
 class AssignmentTemplateSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
+    dialogues = DialogueSerializer(many=True, read_only=True)
 
     class Meta:
         model = AssignmentTemplate
@@ -49,12 +54,14 @@ class AssignmentTemplateSerializer(serializers.ModelSerializer):
             "time_limit",
             "teacher",
             "questions",
+            "dialogues",
         ]
 
         read_only_fields = [
             "id",
             "teacher",
             "questions",
+            "dialogues",
         ]
 
     def create(self, validated_data):
@@ -69,6 +76,7 @@ class AssignmentTemplateSerializer(serializers.ModelSerializer):
 
 class AssignmentSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
+    dialogues = DialogueSerializer(many=True, read_only=True)
     assignment_instances = AssignmentInstanceSerializer(many=True, read_only=True)
 
     class Meta:
@@ -85,6 +93,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
             "date_assigned",
             "assignment_instances",
             "questions",
+            "dialogues",
         ]
 
         read_only_fields = [

@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from .models import Question, QuestionInstance
+from .models import (
+    DialogueInstance,
+    Question,
+    QuestionInstance,
+    DialogueStatement,
+    Dialogue,
+)
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -157,3 +163,42 @@ class QuestionInstanceSerializer(serializers.ModelSerializer):
                     )
 
         return data
+
+
+class DialogueStatementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DialogueStatement
+        fields = [
+            "id",
+            "text",
+            "author",
+            "created_at",
+            "dialogue_instance",
+        ]
+        read_only_fields = ["id", "created_at", "dialogue_instance", "author"]
+
+
+class DialogueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dialogue
+        fields = [
+            "id",
+            "initial_statement",
+            "description",
+            "max_statements",
+        ]
+        read_only_fields = ["id"]
+
+
+class DialogueInstanceSerializer(serializers.ModelSerializer):
+    statements = DialogueStatementSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DialogueInstance
+        fields = [
+            "id",
+            "dialogue",
+            "assignment_instance",
+            "statements",
+        ]
+        read_only_fields = ["id", "dialogue", "assignment_instance", "statements"]

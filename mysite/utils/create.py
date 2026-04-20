@@ -6,7 +6,12 @@ from assignments.models import (
     SessionInstance,
 )
 from django.utils import timezone
-from questions.models import QuestionInstance, SessionQuestionInstance
+from questions.models import (
+    DialogueInstance,
+    DialogueStatement,
+    QuestionInstance,
+    SessionQuestionInstance,
+)
 
 
 def assign_assignment(assignment_template, course, due_date=None):
@@ -35,11 +40,28 @@ def assign_assignment(assignment_template, course, due_date=None):
         for question in assignment_template.questions.all()
     ]
     QuestionInstance.objects.bulk_create(question_instances)
+    dialogue_instances = [
+        DialogueInstance(assignment_instance=instance, dialogue=dialogue)
+        for instance in assignment_instances
+        for dialogue in assignment_template.dialogues.all()
+    ]
+    DialogueInstance.objects.bulk_create(dialogue_instances)
+    initial_statements = [
+        DialogueStatement(
+            dialogue_instance=dialogue_instance,
+            text=dialogue_instance.dialogue.initial_statement,
+            author="AI",
+        )
+        for dialogue_instance in dialogue_instances
+    ]
+    DialogueStatement.objects.bulk_create(initial_statements)
     return assignment
 
 
 def join_session(session, student_name):
-    session_instance = SessionInstance.objects.create(session=session, student_name=student_name)
+    session_instance = SessionInstance.objects.create(
+        session=session, student_name=student_name
+    )
     session_question_instances = [
         SessionQuestionInstance(session_instance=session_instance, question=question)
         for question in session.assignment_template.questions.all()

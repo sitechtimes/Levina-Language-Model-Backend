@@ -64,3 +64,42 @@ class SessionQuestionInstance(models.Model):
         upload_to="audio/session_audio_answers/", null=True, blank=True
     )
     submitted = models.BooleanField(default=False)
+
+
+class Dialogue(models.Model):
+    description = models.TextField()
+    initial_statement = models.TextField()
+    max_statements = models.IntegerField()
+    assignments = models.ManyToManyField(
+        "assignments.Assignment", related_name="dialogues", blank=True
+    )
+    assignment_templates = models.ManyToManyField(
+        "assignments.AssignmentTemplate", related_name="dialogues", blank=True
+    )
+
+
+class DialogueStatement(models.Model):
+    author_choices = [
+        ("STUDENT", "Student"),
+        ("AI", "AI"),
+    ]
+    text = models.TextField()
+    dialogue_instance = models.ForeignKey(
+        "questions.DialogueInstance",
+        on_delete=models.CASCADE,
+        related_name="statements",
+    )
+    author = models.CharField(choices=author_choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+
+class DialogueInstance(models.Model):
+    dialogue = models.ForeignKey("questions.Dialogue", on_delete=models.CASCADE)
+    assignment_instance = models.ForeignKey(
+        "assignments.AssignmentInstance",
+        on_delete=models.CASCADE,
+        related_name="dialogue_instances",
+    )

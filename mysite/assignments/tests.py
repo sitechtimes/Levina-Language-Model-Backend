@@ -1,5 +1,5 @@
 from courses.models import Course
-from questions.models import Question
+from questions.models import Dialogue, Question
 from rest_framework.test import APITestCase
 from users.models import CustomUser
 
@@ -8,7 +8,9 @@ from assignments.models import Assignment, AssignmentTemplate
 
 class AssignmentTestCase(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(email="test@example.com", password="testpass123", user_type=2)
+        self.user = CustomUser.objects.create_user(
+            email="test@example.com", password="testpass123", user_type=2
+        )
         self.client.force_authenticate(user=self.user)
 
     def test_get_assignment_detail(self):
@@ -101,6 +103,56 @@ class AssignmentTestCase(APITestCase):
         self.assertEqual(len(response.data["questions"]), 1)
         self.assertEqual(response.data["questions"][0]["id"], question.id)
 
+    def test_create_assignment_with_dialogues_renders_dialogue_instances(self):
+        course = Course.objects.create(
+            name="Sample Course",
+            period="1",
+            class_type="Freshman Russian",
+        )
+        course.teachers.add(self.user)
+        student = CustomUser.objects.create_user(
+            email="student@example.com",
+            password="testpass123",
+            user_type=0,
+        )
+        course.students.add(student)
+        question = Question.objects.create(
+            description="Sample Question",
+            question_type="MCQ",
+            author=self.user,
+            question_content_type="TEXT",
+            text_question="What is 1 + 1?",
+            answer_content_type="TEXT",
+            text_answer="2",
+            false_answers=["1", "3"],
+        )
+        dialogue = Dialogue.objects.create(
+            description="Sample Dialogue",
+            initial_statement="Hello",
+            max_statements=3,
+        )
+        url = "/assignments/"
+        data = {
+            "name": "the name 2",
+            "timed": True,
+            "time_limit": 3600,
+            "questions": [question.id],
+            "dialogues": [dialogue.id],
+            "due_date": "2025-12-15T23:59:00Z",
+            "course": course.id,
+        }
+
+        response = self.client.post(url, data, format="json")
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["name"], "the name 2")
+        self.assertEqual(len(response.data["assignment_instances"]), 1)
+        assignment_instance = response.data["assignment_instances"][0]
+        self.assertEqual(len(assignment_instance["dialogue_instances"]), 1)
+        dialogue_instance = assignment_instance["dialogue_instances"][0]
+        self.assertEqual(dialogue_instance["dialogue"], dialogue.id)
+        self.assertEqual(dialogue_instance["statements"], [])
+
     def test_update_assignment(self):
         course = Course.objects.create(
             name="Sample Course",
@@ -152,7 +204,9 @@ class AssignmentTestCase(APITestCase):
 
 class AssignmentTemplateTestCase(APITestCase):
     def setUp(self):
-        self.user = CustomUser.objects.create_user(email="test@example.com", password="testpass123", user_type=2)
+        self.user = CustomUser.objects.create_user(
+            email="test@example.com", password="testpass123", user_type=2
+        )
         self.client.force_authenticate(user=self.user)
 
     def test_get_assignment_template_detail(self):

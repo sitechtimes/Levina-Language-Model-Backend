@@ -1,0 +1,16 @@
+meta {
+  name: Get Dialogues
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{base_url}}/dialogues/
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
