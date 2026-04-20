@@ -148,6 +148,11 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"])
     def add_statement(self, request, pk=None):
         dialogue_instance = self.get_object()
+        if dialogue_instance.assignment_instance.submitted:
+            return Response(
+                "Cannot update question instance that has been submitted.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if (
             dialogue_instance.statements.filter(author="STUDENT").count()
             >= dialogue_instance.dialogue.max_statements
