@@ -68,7 +68,7 @@ class SessionQuestionInstance(models.Model):
 
 class Dialogue(models.Model):
     description = models.TextField()
-    initial_statement = models.TextField()
+    initial_statement = models.FileField(upload_to="dialogue_statements/")
     max_statements = models.IntegerField()
     assignments = models.ManyToManyField(
         "assignments.Assignment", related_name="dialogues", blank=True
@@ -83,7 +83,7 @@ class DialogueStatement(models.Model):
         ("STUDENT", "Student"),
         ("AI", "AI"),
     ]
-    text = models.TextField()
+    audio = models.FileField(upload_to="dialogue_statements/")
     dialogue_instance = models.ForeignKey(
         "questions.DialogueInstance",
         on_delete=models.CASCADE,

@@ -90,16 +90,17 @@ class DialogueViewSet(viewsets.ModelViewSet):
         return [p() for p in permission_classes]
 
     def create(self, request, *args, **kwargs):
-        initial_statement_text = request.data.get("initial_statement")
+        initial_statement_file = request.data.get("initial_statement")
         description = request.data.get("description")
         max_statements = request.data.get("max_statements")
-        if (
-            not initial_statement_text
-            or initial_statement_text.strip() == ""
-            or type(initial_statement_text) != str
-        ):
+        if not initial_statement_file:
             return Response(
-                {"error": "Initial statement is required."},
+                {"error": "Initial statement file is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if initial_statement_file.content_type != "audio/mp4":
+            return Response(
+                {"error": "Initial statement file must be a WAV audio file."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if not description or description.strip() == "" or type(description) != str:
@@ -107,6 +108,8 @@ class DialogueViewSet(viewsets.ModelViewSet):
                 {"error": "Description is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        if type(max_statements) == str and max_statements.isdigit():
+            max_statements = int(max_statements)
         if not max_statements or type(max_statements) != int or max_statements <= 0:
             return Response(
                 {"error": "Max length is required."},
@@ -161,19 +164,27 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
                 {"error": "Maximum number of statements reached."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        text = request.data.get("text")
-        if not text or text.strip() == "" or type(text) != str:
+        audio_file = request.data.get("audio")
+        if not audio_file:
             return Response(
-                {"error": "Text is required."}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Audio file is required."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+        if audio_file.content_type != "audio/mp4":
+            return Response(
+                {"error": "Audio file must be a mp4 audio file."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         student_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
-            text=text,
+            audio=audio_file,
             author="STUDENT",
         )
+        # replace audio_file with ai generated response
         ai_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
-            text=f"AI response to: {text}",
+            audio=audio_file,
             author="AI",
         )
         return Response(

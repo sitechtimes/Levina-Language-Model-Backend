@@ -5,8 +5,8 @@ meta {
 }
 
 post {
-  url: {{base_url}}/dialogue-instances/1/add_statement/
-  body: json
+  url: {{base_url}}/dialogue-instances/4/add_statement/
+  body: multipartForm
   auth: inherit
 }
 
@@ -14,6 +14,10 @@ body:json {
   {
     "text": "i think that bla bla bla"
   }
+}
+
+body:multipart-form {
+  audio: @file(C:\Users\samuel.kipnis23\Downloads\sample.m4a)
 }
 
 settings {

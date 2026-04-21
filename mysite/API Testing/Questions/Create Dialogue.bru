@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{base_url}}/dialogues/
-  body: json
+  body: multipartForm
   auth: inherit
 }
 
@@ -18,7 +18,12 @@ body:json {
   }
 }
 
+body:multipart-form {
+  description: "Talk a bout Stuff"
+  max_statements: 5
+  initial_statement: @file(C:\Users\samuel.kipnis23\Downloads\sample.m4a)
+}
+
 settings {
   encodeUrl: true
-  timeout: 0
 }

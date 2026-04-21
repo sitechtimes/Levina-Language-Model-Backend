@@ -170,7 +170,7 @@ class DialogueStatementSerializer(serializers.ModelSerializer):
         model = DialogueStatement
         fields = [
             "id",
-            "text",
+            "audio",
             "author",
             "created_at",
             "dialogue_instance",

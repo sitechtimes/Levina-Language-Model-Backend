@@ -143,7 +143,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         initial_statements = [
             DialogueStatement(
                 dialogue_instance=dialogue_instance,
-                text=dialogue_instance.dialogue.initial_statement,
+                audio=dialogue_instance.dialogue.initial_statement,
                 author="AI",
             )
             for dialogue_instance in dialogue_instances
