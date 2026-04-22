@@ -10,6 +10,7 @@ from questions.models import (
     DialogueInstance,
     DialogueStatement,
     QuestionInstance,
+    SessionDialogueInstance,
     SessionQuestionInstance,
 )
 
@@ -67,6 +68,11 @@ def join_session(session, student_name):
         for question in session.assignment_template.questions.all()
     ]
     SessionQuestionInstance.objects.bulk_create(session_question_instances)
+    session_dialogue_instances = [
+        SessionDialogueInstance(session_instance=session_instance, dialogue=dialogue)
+        for dialogue in session.assignment_template.dialogues.all()
+    ]
+    SessionDialogueInstance.objects.bulk_create(session_dialogue_instances)
     token_string = f"token_{session_instance.id}"
     token = hashlib.sha256(token_string.encode()).hexdigest()
     session_instance.token = token
