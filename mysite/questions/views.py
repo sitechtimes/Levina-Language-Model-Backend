@@ -22,6 +22,8 @@ from .serializers import (
     DialogueSerializer,
     DialogueStatementSerializer,
 )
+from DialogueModule import dialogue_STT, dialogue_TTS
+from FeedbackModule.feedback import model_gen
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -181,10 +183,15 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
             audio=audio_file,
             author="STUDENT",
         )
+        text_statement = dialogue_STT.generate_sst(audio_file)
+        text_response = model_gen.generate_response(
+            dialogue_instance.dialogue.description, text_statement
+        )
+        audio_response = dialogue_TTS.generate_tts(text_response)
         # replace audio_file with ai generated response
         ai_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
-            audio=audio_file,
+            audio=audio_response,
             author="AI",
         )
         return Response(

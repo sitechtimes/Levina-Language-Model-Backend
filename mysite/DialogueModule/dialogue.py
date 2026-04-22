@@ -5,10 +5,11 @@ from .review import Review
 from .listening import Listening
 from FeedbackModule.feedback import model_gen
 
-print('Loading dialogue.py')
+print("Loading dialogue.py")
 print(torch.__version__)
 print(torch.cuda.is_available())
 print(torch.cuda.get_device_name(0))
+
 
 def test():
     stt = STT()
@@ -24,7 +25,8 @@ def test():
         # model_output = tts.generate_tts()
 
         return streamer, thread
-    
+
+
 def main():
     stt = STT()
     tts = TTS()
@@ -55,9 +57,11 @@ def main():
         dialogue_analysis = review.analyze_response(chat_history)
         print("REVIEW ANALYSIS:", dialogue_analysis)
 
+
 def listen():
     audio = Listening()
     output = audio.listening()
+
 
 if __name__ == "__main__":
     listen()
