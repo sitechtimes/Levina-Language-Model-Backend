@@ -171,6 +171,7 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
             text=text,
             author="STUDENT",
         )
+        # replace with actual AI response generation logic
         ai_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
             text=f"AI response to: {text}",
