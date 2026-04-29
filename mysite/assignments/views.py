@@ -366,6 +366,7 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
             text=request.data.get("text"),
             author="STUDENT",
         )
+        # replace with actual AI response generation logic
         ai_statement = SessionDialogueStatement.objects.create(
             session_dialogue_instance=session_dialogue_instance,
             text=f"AI response to: {request.data.get('text')}",
