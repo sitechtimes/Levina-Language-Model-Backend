@@ -127,6 +127,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 class SessionInstanceSerializer(serializers.ModelSerializer):
     session_question_instances = QuestionInstanceSerializer(many=True, read_only=True)
+    session_dialogue_instances = DialogueInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = SessionInstance
@@ -137,6 +138,7 @@ class SessionInstanceSerializer(serializers.ModelSerializer):
             "joined_at",
             "submitted",
             "session_question_instances",
+            "session_dialogue_instances",
         ]
         read_only_fields = [
             "id",
@@ -144,11 +146,13 @@ class SessionInstanceSerializer(serializers.ModelSerializer):
             "joined_at",
             "submitted",
             "session_question_instances",
+            "session_dialogue_instances",
         ]
 
 
 class SessionSerializer(serializers.ModelSerializer):
     session_instances = SessionInstanceSerializer(many=True, read_only=True)
+    assignment_template = AssignmentTemplateSerializer(read_only=True)
 
     class Meta:
         model = Session

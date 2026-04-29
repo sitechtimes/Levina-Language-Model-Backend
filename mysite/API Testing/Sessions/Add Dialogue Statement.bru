@@ -1,0 +1,23 @@
+meta {
+  name: Add Dialogue Statement
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}/session-instances/add_dialogue_statement/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "{{session_token}}",
+    "session_dialogue_instance": 1,
+    "text": "test"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

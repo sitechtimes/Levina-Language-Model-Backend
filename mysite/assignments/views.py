@@ -5,7 +5,7 @@ from core.permissions import (
 )
 from courses.models import Course
 from django.utils.dateparse import parse_datetime
-from questions.models import Question, QuestionInstance
+from questions.models import Question, QuestionInstance, SessionDialogueStatement
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -336,6 +336,42 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
         else:
             return Response("answer_required", status=status.HTTP_400_BAD_REQUEST)
         session_question_instance.save()
+        return Response(
+            SessionInstanceSerializer(session_instance).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"])
+    def add_dialogue_statement(self, request):
+        session_instance = SessionInstance.objects.get(token=request.data.get("token"))
+        if not session_instance.session.active:
+            return Response("session_inactive", status=status.HTTP_400_BAD_REQUEST)
+        session_dialogue_instance = session_instance.session_dialogue_instances.get(
+            id=request.data.get("session_dialogue_instance")
+        )
+        if (
+            session_dialogue_instance.statements.filter(author="STUDENT").count()
+            >= session_dialogue_instance.dialogue.max_statements
+        ):
+            return Response(
+                {"error": "Maximum number of statements reached."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not request.data.get("text") or request.data.get("text").strip() == "":
+            return Response(
+                {"error": "Text is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        student_statement = SessionDialogueStatement.objects.create(
+            session_dialogue_instance=session_dialogue_instance,
+            text=request.data.get("text"),
+            author="STUDENT",
+        )
+        # replace with actual AI response generation logic
+        ai_statement = SessionDialogueStatement.objects.create(
+            session_dialogue_instance=session_dialogue_instance,
+            text=f"AI response to: {request.data.get('text')}",
+            author="AI",
+        )
         return Response(
             SessionInstanceSerializer(session_instance).data,
             status=status.HTTP_200_OK,

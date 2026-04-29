@@ -181,7 +181,7 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
             audio=audio_file,
             author="STUDENT",
         )
-        # replace audio_file with ai generated response
+        # replace with actual AI response generation logic
         ai_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
             audio=audio_file,

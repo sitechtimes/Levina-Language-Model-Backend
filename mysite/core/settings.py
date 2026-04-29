@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "drf_spectacular",
+    "schema_viewer",
     "corsheaders",
     "users",
     "courses",

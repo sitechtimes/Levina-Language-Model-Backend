@@ -103,3 +103,30 @@ class DialogueInstance(models.Model):
         on_delete=models.CASCADE,
         related_name="dialogue_instances",
     )
+
+
+class SessionDialogueStatement(models.Model):
+    author_choices = [
+        ("STUDENT", "Student"),
+        ("AI", "AI"),
+    ]
+    text = models.TextField()
+    session_dialogue_instance = models.ForeignKey(
+        "questions.SessionDialogueInstance",
+        on_delete=models.CASCADE,
+        related_name="statements",
+    )
+    author = models.CharField(choices=author_choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+
+class SessionDialogueInstance(models.Model):
+    dialogue = models.ForeignKey("questions.Dialogue", on_delete=models.CASCADE)
+    session_instance = models.ForeignKey(
+        "assignments.SessionInstance",
+        on_delete=models.CASCADE,
+        related_name="session_dialogue_instances",
+    )
