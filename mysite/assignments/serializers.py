@@ -1,4 +1,6 @@
 from questions.serializers import (
+    DialogueInstanceSerializer,
+    DialogueSerializer,
     QuestionInstanceSerializer,
     QuestionSerializer,
 )
@@ -11,7 +13,6 @@ from .models import (
     Session,
     SessionInstance,
 )
-from questions.serializers import DialogueInstanceSerializer, DialogueSerializer
 
 
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
@@ -174,6 +175,4 @@ class SessionSerializer(serializers.ModelSerializer):
 
     def destroy(self, instance):
         if instance.session_instances.exists():
-            raise serializers.ValidationError(
-                "Cannot delete session with active session instances."
-            )
+            raise serializers.ValidationError("Cannot delete session with active session instances.")

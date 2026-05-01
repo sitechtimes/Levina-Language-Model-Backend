@@ -4,23 +4,23 @@ from core.permissions import (
     IsTeacher,
 )
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from utils.permissions import UNSAFE_ACTIONS
-from rest_framework.decorators import action
 
 from .models import (
+    Dialogue,
     DialogueInstance,
+    DialogueStatement,
     Question,
     QuestionInstance,
-    Dialogue,
-    DialogueStatement,
 )
 from .serializers import (
     DialogueInstanceSerializer,
-    QuestionInstanceSerializer,
-    QuestionSerializer,
     DialogueSerializer,
     DialogueStatementSerializer,
+    QuestionInstanceSerializer,
+    QuestionSerializer,
 )
 
 
@@ -73,9 +73,7 @@ class QuestionInstanceViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        return Response(
-            QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK
-        )
+        return Response(QuestionInstanceSerializer(instance).data, status=status.HTTP_200_OK)
 
 
 class DialogueViewSet(viewsets.ModelViewSet):
@@ -120,9 +118,7 @@ class DialogueViewSet(viewsets.ModelViewSet):
             initial_statement=request.data.get("initial_statement"),
             max_statements=request.data.get("max_statements"),
         )
-        return Response(
-            DialogueSerializer(dialogue).data, status=status.HTTP_201_CREATED
-        )
+        return Response(DialogueSerializer(dialogue).data, status=status.HTTP_201_CREATED)
 
 
 class DialogueStatementViewSet(viewsets.ModelViewSet):
@@ -156,10 +152,7 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
                 "Cannot update question instance that has been submitted.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if (
-            dialogue_instance.statements.filter(author="STUDENT").count()
-            >= dialogue_instance.dialogue.max_statements
-        ):
+        if dialogue_instance.statements.filter(author="STUDENT").count() >= dialogue_instance.dialogue.max_statements:
             return Response(
                 {"error": "Maximum number of statements reached."},
                 status=status.HTTP_400_BAD_REQUEST,
