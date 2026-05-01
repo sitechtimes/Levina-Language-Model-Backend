@@ -114,8 +114,17 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save(teacher=request.user)
         questions = Question.objects.filter(id__in=request.data.get("questions", []))
+        if not questions.exists() and request.data.get("questions"):
+            return Response(
+                "One or more questions do not exist", status=status.HTTP_400_BAD_REQUEST
+            )
         assignment.questions.set(questions)
         dialogues = Dialogue.objects.filter(id__in=request.data.get("dialogues", []))
+        if not dialogues.exists() and request.data.get("dialogues"):
+            return Response(
+                "One or more dialogues do not exist", status=status.HTTP_400_BAD_REQUEST
+            )
+        print(dialogues[0])
         assignment.dialogues.set(dialogues)
         assignment_instances = [
             AssignmentInstance(
