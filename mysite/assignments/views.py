@@ -350,13 +350,13 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
             )
         if not request.data.get("text") or request.data.get("text").strip() == "":
             return Response({"error": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
-        student_statement = SessionDialogueStatement.objects.create(
+        SessionDialogueStatement.objects.create(
             session_dialogue_instance=session_dialogue_instance,
             text=request.data.get("text"),
             author="STUDENT",
         )
         # replace with actual AI response generation logic
-        ai_statement = SessionDialogueStatement.objects.create(
+        SessionDialogueStatement.objects.create(
             session_dialogue_instance=session_dialogue_instance,
             text=f"AI response to: {request.data.get('text')}",
             author="AI",

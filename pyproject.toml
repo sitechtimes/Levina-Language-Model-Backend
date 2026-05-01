@@ -28,6 +28,7 @@ ignore = [
     "DJ008", # Nullable foreign key
     "DJ012", # Model ordering
     "B007",
+    "E721",  # Allow type() instead of isinstance()
 ]
 
 [tool.ruff.format]
