@@ -1,5 +1,4 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 
 # Create your models here.
 
@@ -22,17 +21,13 @@ class Question(models.Model):
 
     question_content_type = models.CharField(choices=CONTENT_TYPES)
     text_question = models.TextField(null=True, blank=True)
-    audio_question = models.FileField(
-        upload_to="audio/audio_questions/", null=True, blank=True
-    )
+    audio_question = models.FileField(upload_to="audio/audio_questions/", null=True, blank=True)
 
     answer_content_type = models.CharField(choices=CONTENT_TYPES)
     text_answer = models.TextField(null=True, blank=True)
     false_answers = models.JSONField(null=True, blank=True)
 
-    assignments = models.ManyToManyField(
-        "assignments.Assignment", related_name="questions", blank=True
-    )
+    assignments = models.ManyToManyField("assignments.Assignment", related_name="questions", blank=True)
     assignment_templates = models.ManyToManyField(
         "assignments.AssignmentTemplate", related_name="questions", blank=True
     )
@@ -46,9 +41,7 @@ class QuestionInstance(models.Model):
         related_name="question_instances",
     )
     text_answer = models.TextField(null=True, blank=True)
-    audio_answer = models.FileField(
-        upload_to="audio/audio_answers/", null=True, blank=True
-    )
+    audio_answer = models.FileField(upload_to="audio/audio_answers/", null=True, blank=True)
     submitted = models.BooleanField(default=False)
 
 
@@ -60,9 +53,7 @@ class SessionQuestionInstance(models.Model):
         related_name="session_question_instances",
     )
     text_answer = models.TextField(null=True, blank=True)
-    audio_answer = models.FileField(
-        upload_to="audio/session_audio_answers/", null=True, blank=True
-    )
+    audio_answer = models.FileField(upload_to="audio/session_audio_answers/", null=True, blank=True)
     submitted = models.BooleanField(default=False)
 
 
@@ -70,9 +61,7 @@ class Dialogue(models.Model):
     description = models.TextField()
     initial_statement = models.FileField(upload_to="dialogue_statements/")
     max_statements = models.IntegerField()
-    assignments = models.ManyToManyField(
-        "assignments.Assignment", related_name="dialogues", blank=True
-    )
+    assignments = models.ManyToManyField("assignments.Assignment", related_name="dialogues", blank=True)
     assignment_templates = models.ManyToManyField(
         "assignments.AssignmentTemplate", related_name="dialogues", blank=True
     )
@@ -102,4 +91,31 @@ class DialogueInstance(models.Model):
         "assignments.AssignmentInstance",
         on_delete=models.CASCADE,
         related_name="dialogue_instances",
+    )
+
+
+class SessionDialogueStatement(models.Model):
+    author_choices = [
+        ("STUDENT", "Student"),
+        ("AI", "AI"),
+    ]
+    text = models.TextField()
+    session_dialogue_instance = models.ForeignKey(
+        "questions.SessionDialogueInstance",
+        on_delete=models.CASCADE,
+        related_name="statements",
+    )
+    author = models.CharField(choices=author_choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+
+class SessionDialogueInstance(models.Model):
+    dialogue = models.ForeignKey("questions.Dialogue", on_delete=models.CASCADE)
+    session_instance = models.ForeignKey(
+        "assignments.SessionInstance",
+        on_delete=models.CASCADE,
+        related_name="session_dialogue_instances",
     )

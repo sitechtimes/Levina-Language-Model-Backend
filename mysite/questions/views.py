@@ -4,23 +4,23 @@ from core.permissions import (
     IsTeacher,
 )
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from utils.permissions import UNSAFE_ACTIONS
-from rest_framework.decorators import action
 
 from .models import (
+    Dialogue,
     DialogueInstance,
+    DialogueStatement,
     Question,
     QuestionInstance,
-    Dialogue,
-    DialogueStatement,
 )
 from .serializers import (
     DialogueInstanceSerializer,
-    QuestionInstanceSerializer,
-    QuestionSerializer,
     DialogueSerializer,
     DialogueStatementSerializer,
+    QuestionInstanceSerializer,
+    QuestionSerializer,
 )
 from DialogueModule import dialogue_STT, dialogue_TTS
 from FeedbackModule.feedback import model_gen
@@ -188,7 +188,6 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
             dialogue_instance.dialogue.description, text_statement
         )
         audio_response = dialogue_TTS.generate_tts(text_response)
-        # replace audio_file with ai generated response
         ai_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
             audio=audio_response,

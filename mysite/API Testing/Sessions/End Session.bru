@@ -7,7 +7,7 @@ meta {
 post {
   url: {{base_url}}/sessions/1/end_session/
   body: json
-  auth: none
+  auth: inherit
 }
 
 script:post-response {
@@ -25,5 +25,4 @@ script:post-response {
 
 settings {
   encodeUrl: true
-  timeout: 0
 }

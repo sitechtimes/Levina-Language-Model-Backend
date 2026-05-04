@@ -4,9 +4,9 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     DialogueInstanceViewSet,
     DialogueStatementViewSet,
+    DialogueViewSet,
     QuestionInstanceViewSet,
     QuestionViewSet,
-    DialogueViewSet,
 )
 
 router = DefaultRouter()

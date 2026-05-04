@@ -1,4 +1,6 @@
 from questions.serializers import (
+    DialogueInstanceSerializer,
+    DialogueSerializer,
     QuestionInstanceSerializer,
     QuestionSerializer,
 )
@@ -11,7 +13,6 @@ from .models import (
     Session,
     SessionInstance,
 )
-from questions.serializers import DialogueInstanceSerializer, DialogueSerializer
 
 
 class AssignmentInstanceSerializer(serializers.ModelSerializer):
@@ -127,6 +128,7 @@ class AssignmentSerializer(serializers.ModelSerializer):
 
 class SessionInstanceSerializer(serializers.ModelSerializer):
     session_question_instances = QuestionInstanceSerializer(many=True, read_only=True)
+    session_dialogue_instances = DialogueInstanceSerializer(many=True, read_only=True)
 
     class Meta:
         model = SessionInstance
@@ -137,6 +139,7 @@ class SessionInstanceSerializer(serializers.ModelSerializer):
             "joined_at",
             "submitted",
             "session_question_instances",
+            "session_dialogue_instances",
         ]
         read_only_fields = [
             "id",
@@ -144,11 +147,13 @@ class SessionInstanceSerializer(serializers.ModelSerializer):
             "joined_at",
             "submitted",
             "session_question_instances",
+            "session_dialogue_instances",
         ]
 
 
 class SessionSerializer(serializers.ModelSerializer):
     session_instances = SessionInstanceSerializer(many=True, read_only=True)
+    assignment_template = AssignmentTemplateSerializer(read_only=True)
 
     class Meta:
         model = Session
@@ -170,6 +175,4 @@ class SessionSerializer(serializers.ModelSerializer):
 
     def destroy(self, instance):
         if instance.session_instances.exists():
-            raise serializers.ValidationError(
-                "Cannot delete session with active session instances."
-            )
+            raise serializers.ValidationError("Cannot delete session with active session instances.")

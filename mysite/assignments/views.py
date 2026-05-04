@@ -5,7 +5,14 @@ from core.permissions import (
 )
 from courses.models import Course
 from django.utils.dateparse import parse_datetime
-from questions.models import Question, QuestionInstance
+from questions.models import (
+    Dialogue,
+    DialogueInstance,
+    DialogueStatement,
+    Question,
+    QuestionInstance,
+    SessionDialogueStatement,
+)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -28,7 +35,6 @@ from assignments.serializers import (
     SessionInstanceSerializer,
     SessionSerializer,
 )
-from questions.models import Dialogue, DialogueStatement, DialogueInstance
 
 
 class AssignmentTemplateViewSet(viewsets.ModelViewSet):
@@ -56,9 +62,7 @@ class AssignmentTemplateViewSet(viewsets.ModelViewSet):
             )
         due_date = parse_datetime(request.data.get("due_date"))
         assignment = assign_assignment(assignment_template, course, due_date=due_date)
-        return Response(
-            AssignmentSerializer(assignment).data, status=status.HTTP_200_OK
-        )
+        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -93,9 +97,7 @@ class AssignmentTemplateViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save()
-        return Response(
-            AssignmentTemplateSerializer(instance).data, status=status.HTTP_200_OK
-        )
+        return Response(AssignmentTemplateSerializer(instance).data, status=status.HTTP_200_OK)
 
 
 class AssignmentViewSet(viewsets.ModelViewSet):
@@ -114,8 +116,13 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save(teacher=request.user)
         questions = Question.objects.filter(id__in=request.data.get("questions", []))
+        if not questions.exists() and request.data.get("questions"):
+            return Response("One or more questions do not exist", status=status.HTTP_400_BAD_REQUEST)
         assignment.questions.set(questions)
         dialogues = Dialogue.objects.filter(id__in=request.data.get("dialogues", []))
+        if not dialogues.exists() and request.data.get("dialogues"):
+            return Response("One or more dialogues do not exist", status=status.HTTP_400_BAD_REQUEST)
+        print(dialogues[0])
         assignment.dialogues.set(dialogues)
         assignment_instances = [
             AssignmentInstance(
@@ -149,9 +156,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             for dialogue_instance in dialogue_instances
         ]
         DialogueStatement.objects.bulk_create(initial_statements)
-        return Response(
-            AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED
-        )
+        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
@@ -184,9 +189,7 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(assignment, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         assignment = serializer.save()
-        return Response(
-            AssignmentSerializer(assignment).data, status=status.HTTP_200_OK
-        )
+        return Response(AssignmentSerializer(assignment).data, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -268,13 +271,9 @@ class SessionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     def host_session(self, request):
         try:
-            assignment_template = AssignmentTemplate.objects.get(
-                id=request.data.get("assignment_template")
-            )
+            assignment_template = AssignmentTemplate.objects.get(id=request.data.get("assignment_template"))
         except AssignmentTemplate.DoesNotExist:
-            return Response(
-                "Assignment template does not exist", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Assignment template does not exist", status=status.HTTP_400_BAD_REQUEST)
         session = Session.objects.create(
             assignment_template=assignment_template,
             host=request.user,
@@ -285,18 +284,12 @@ class SessionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["post"])
     def join_session(self, request):
         if not request.data.get("student_name"):
-            return Response(
-                "student_name is required", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("student_name is required", status=status.HTTP_400_BAD_REQUEST)
         try:
             session = Session.objects.get(access_code=request.data.get("access_code"))
         except Session.DoesNotExist:
-            return Response(
-                "Session does not exist", status=status.HTTP_400_BAD_REQUEST
-            )
-        session_instance, token = join_session(
-            session=session, student_name=request.data.get("student_name")
-        )
+            return Response("Session does not exist", status=status.HTTP_400_BAD_REQUEST)
+        session_instance, token = join_session(session=session, student_name=request.data.get("student_name"))
         return Response(
             {
                 "session_instance": SessionInstanceSerializer(session_instance).data,
@@ -309,9 +302,7 @@ class SessionViewSet(viewsets.ModelViewSet):
     def end_session(self, request, pk=None):
         session = self.get_object()
         if not session.active:
-            return Response(
-                "Session already inactive", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("Session already inactive", status=status.HTTP_400_BAD_REQUEST)
         session.active = False
         session.save()
         return Response(SessionSerializer(session).data)
@@ -342,14 +333,46 @@ class SessionInstanceViewSet(viewsets.ModelViewSet):
         )
 
     @action(detail=False, methods=["post"])
+    def add_dialogue_statement(self, request):
+        session_instance = SessionInstance.objects.get(token=request.data.get("token"))
+        if not session_instance.session.active:
+            return Response("session_inactive", status=status.HTTP_400_BAD_REQUEST)
+        session_dialogue_instance = session_instance.session_dialogue_instances.get(
+            id=request.data.get("session_dialogue_instance")
+        )
+        if (
+            session_dialogue_instance.statements.filter(author="STUDENT").count()
+            >= session_dialogue_instance.dialogue.max_statements
+        ):
+            return Response(
+                {"error": "Maximum number of statements reached."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not request.data.get("text") or request.data.get("text").strip() == "":
+            return Response({"error": "Text is required."}, status=status.HTTP_400_BAD_REQUEST)
+        SessionDialogueStatement.objects.create(
+            session_dialogue_instance=session_dialogue_instance,
+            text=request.data.get("text"),
+            author="STUDENT",
+        )
+        # replace with actual AI response generation logic
+        SessionDialogueStatement.objects.create(
+            session_dialogue_instance=session_dialogue_instance,
+            text=f"AI response to: {request.data.get('text')}",
+            author="AI",
+        )
+        return Response(
+            SessionInstanceSerializer(session_instance).data,
+            status=status.HTTP_200_OK,
+        )
+
+    @action(detail=False, methods=["post"])
     def submit(self, request, pk=None):
         session_instance = SessionInstance.objects.get(token=request.data.get("token"))
         if not session_instance.session.active:
             return Response("session_inactive", status=status.HTTP_400_BAD_REQUEST)
         if session_instance.submitted:
-            return Response(
-                "SessionInstance_already_submitted", status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response("SessionInstance_already_submitted", status=status.HTTP_400_BAD_REQUEST)
         session_instance.submitted = True
         session_instance.save()
         return Response(
