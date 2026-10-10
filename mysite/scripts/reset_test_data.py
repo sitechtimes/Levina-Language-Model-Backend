@@ -1,3 +1,7 @@
+from pathlib import Path
+
+from django.core.files import File
+
 from assignments.models import AssignmentTemplate
 from courses.models import Course
 from questions.models import Question
@@ -51,7 +55,7 @@ def run():
         first_name="Super",
         last_name="User",
     )
-    question = Question.objects.create(
+    text_question = Question.objects.create(
         question_type="MCQ",
         question_content_type="TEXT",
         text_question="What is the capital of France?",
@@ -59,13 +63,26 @@ def run():
         text_answer="Paris",
         author=teacher,
     )
+
+    audio_path = Path(__file__).resolve().parents[1] / "audio2.wav"
+
+    with audio_path.open("rb") as audio_file:
+        audio_question = Question.objects.create(
+            question_type="FRQ",
+            question_content_type="AUDIO",
+            answer_content_type="AUDIO",
+            text_answer="The answer is in the audio.",
+            audio_question=File(audio_file, name=audio_path.name),
+            author=teacher,
+        )
     assignment_template = AssignmentTemplate.objects.create(
         name="Test Assignment",
         teacher=teacher,
         timed=True,
         time_limit=3600,
     )
-    assignment_template.questions.add(question)
+    assignment_template.questions.add(text_question)
+    assignment_template.questions.add(audio_question)
     course = Course.objects.create(
         name="Test Course",
         period=1,
