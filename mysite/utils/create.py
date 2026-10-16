@@ -1,4 +1,4 @@
-import hashlib
+import hashlib, secrets
 
 from assignments.models import (
     Assignment,
@@ -71,9 +71,7 @@ def join_session(session, student_name):
         for dialogue in session.assignment_template.dialogues.all()
     ]
     SessionDialogueInstance.objects.bulk_create(session_dialogue_instances)
-    token_string = f"token_{session_instance.id}"
-    token = hashlib.sha256(token_string.encode()).hexdigest()
-    session_instance.token = token
+    token = secrets.token_urlsafe(32)
     session_instance.save()
     return session_instance, token
 
