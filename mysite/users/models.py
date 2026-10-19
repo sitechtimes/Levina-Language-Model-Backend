@@ -46,7 +46,7 @@ class CustomUser(AbstractUser):
 
 class PasswordResetCode(models.Model):
     user = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, related_name="reset_codes")
-    code = models.CharField(max_length=6)
+    code = models.CharField(max_length=32, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_used = models.BooleanField(default=False)
 

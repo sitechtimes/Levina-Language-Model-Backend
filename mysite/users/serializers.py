@@ -8,7 +8,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
-    code = serializers.CharField(max_length=6)
+    code = serializers.CharField(max_length=32)
     new_password = serializers.CharField(min_length=8)
 
 

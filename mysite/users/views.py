@@ -1,11 +1,12 @@
 # views.py
 import os
+import secrets
 
 from django.core.mail import send_mail
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from utils.random import random_alphanumeric
+from rest_framework.throttling import ScopedRateThrottle
 
 from .models import CustomUser, PasswordResetCode
 from .serializers import (
@@ -25,7 +26,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             requested_user = CustomUser.objects.get(email=request.data.get("email"))
         except CustomUser.DoesNotExist:
             return Response({"error": "No account found with this email."}, status=404)
-        code = random_alphanumeric(20)
+        code = secrets.token_urlsafe(24)
         PasswordResetCode.objects.create(user=requested_user, code=code)
         url = f"{os.getenv('FRONTEND_URL')}/reset-password/confirm?code={code}"
         send_mail(
@@ -42,17 +43,24 @@ class PasswordResetConfirmView(generics.GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
     queryset = CustomUser.objects.all()
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "password_reset_confirm"
 
     def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        code = serializer.validated_data["code"]
+        new_password = serializer.validated_data["new_password"]
+
         try:
-            reset_code = PasswordResetCode.objects.filter(code=request.data.get("code")).latest("created_at")
+            reset_code = PasswordResetCode.objects.filter(code=code).latest("created_at")
         except PasswordResetCode.DoesNotExist:
             return Response({"error": "Invalid code."}, status=400)
         if reset_code.is_used:
             return Response({"error": "Code already used."}, status=400)
         if reset_code.is_expired():
             return Response({"error": "Code expired."}, status=400)
-        reset_code.user.set_password(request.data.get("new_password"))
+        reset_code.user.set_password(new_password)
         reset_code.is_used = True
         reset_code.user.save()
         reset_code.save()
