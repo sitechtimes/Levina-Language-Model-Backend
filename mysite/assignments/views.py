@@ -15,7 +15,7 @@ from questions.models import (
 )
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from utils.create import assign_assignment, join_session
 from utils.permissions import UNSAFE_ACTIONS
@@ -258,7 +258,9 @@ class SessionViewSet(viewsets.ModelViewSet):
     serializer_class = SessionSerializer
 
     def get_permissions(self):
-        if self.action in [
+        if self.action == "join_session":
+            permission_classes = [IsAuthenticated]
+        elif self.action in [
             *UNSAFE_ACTIONS,
             "host_session",
             "end_session",
@@ -293,7 +295,7 @@ class SessionViewSet(viewsets.ModelViewSet):
         return Response(
             {
                 "session_instance": SessionInstanceSerializer(session_instance).data,
-                "token": session_instance.token,
+                "token": token,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -311,6 +313,13 @@ class SessionViewSet(viewsets.ModelViewSet):
 class SessionInstanceViewSet(viewsets.ModelViewSet):
     queryset = SessionInstance.objects.all()
     permission_classes = [AllowAny]
+
+    def get_permissions(self):
+        if self.action == "update_answer":
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = self.permission_classes
+        return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=["post"])
     def update_answer(self, request):

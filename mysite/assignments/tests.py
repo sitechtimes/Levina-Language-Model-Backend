@@ -6,6 +6,18 @@ from users.models import CustomUser
 from assignments.models import Assignment, AssignmentTemplate
 
 
+class SessionEndpointAuthenticationTests(APITestCase):
+    def test_join_session_requires_authentication(self):
+        response = self.client.post("/sessions/join_session/", {}, format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_update_answer_requires_authentication(self):
+        response = self.client.post("/session-instances/update_answer/", {}, format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+
 class AssignmentTestCase(APITestCase):
     def setUp(self):
         self.user = CustomUser.objects.create_user(email="test@example.com", password="testpass123", user_type=2)

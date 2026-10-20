@@ -60,7 +60,8 @@ def assign_assignment(assignment_template, course, due_date=None):
 
 
 def join_session(session, student_name):
-    session_instance = SessionInstance.objects.create(session=session, student_name=student_name)
+    token = secrets.token_urlsafe(32)
+    session_instance = SessionInstance.objects.create(session=session, student_name=student_name, token=token)
     session_question_instances = [
         SessionQuestionInstance(session_instance=session_instance, question=question)
         for question in session.assignment_template.questions.all()
@@ -71,8 +72,6 @@ def join_session(session, student_name):
         for dialogue in session.assignment_template.dialogues.all()
     ]
     SessionDialogueInstance.objects.bulk_create(session_dialogue_instances)
-    token = secrets.token_urlsafe(32)
-    session_instance.save()
     return session_instance, token
 
 
