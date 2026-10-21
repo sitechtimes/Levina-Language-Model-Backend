@@ -161,8 +161,10 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
         if new_questions := request.data.get("questions"):
-            current_ids = set(assignment.questions.values_list("id", flat=True))
-            new_ids = set(new_questions)
+            current_ids = set(assignment.questions.filter(author=request.user).values_list("id", flat=True))
+            new_ids = set(
+                Question.objects.filter(id__in=new_questions, author=request.user).values_list("id", flat=True)
+            )
             to_add = new_ids - current_ids
             to_remove = current_ids - new_ids
             if to_add:

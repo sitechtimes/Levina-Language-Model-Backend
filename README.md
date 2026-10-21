@@ -337,8 +337,6 @@ This mirrors the logic already in `assign_assignment()` and ensures late-joining
 
 **Requirements:** Python 3.11+
 
-On Linux, install the system `libmagic` library (for example, `sudo apt-get install libmagic1`) before installing Python requirements. The Windows requirements include a bundled libmagic package.
-
 ```bash
 cd mysite
 python -m venv venv

@@ -113,6 +113,51 @@ class AssignmentTestCase(APITestCase):
         self.assertEqual(len(response.data["questions"]), 1)
         self.assertEqual(response.data["questions"][0]["id"], question.id)
 
+    def test_update_assignment_cannot_add_questions_authored_by_another_user(self):
+        course = Course.objects.create(
+            name="Sample Course",
+            period="1",
+            class_type="Freshman Russian",
+        )
+        owned_question = Question.objects.create(
+            description="Owned question",
+            question_type="FRQ",
+            author=self.user,
+            question_content_type="TEXT",
+            text_question="Owned?",
+            answer_content_type="TEXT",
+        )
+        other_user = CustomUser.objects.create_user(
+            email="other-author@example.com",
+            password="password",
+            user_type=1,
+        )
+        other_question = Question.objects.create(
+            description="Other user's question",
+            question_type="FRQ",
+            author=other_user,
+            question_content_type="TEXT",
+            text_question="Not yours?",
+            answer_content_type="TEXT",
+        )
+        assignment = Assignment.objects.create(
+            name="Sample Assignment",
+            due_date="2025-12-15T23:59:00Z",
+            timed=True,
+            time_limit=3600,
+            teacher=self.user,
+            course=course,
+        )
+
+        response = self.client.patch(
+            f"/assignments/{assignment.id}/",
+            {"questions": [owned_question.id, other_question.id]},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(assignment.questions.all(), [owned_question])
+
     def test_create_assignment_with_dialogues_renders_dialogue_instances(self):
         course = Course.objects.create(
             name="Sample Course",
