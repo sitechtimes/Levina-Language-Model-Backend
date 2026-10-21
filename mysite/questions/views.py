@@ -1,3 +1,4 @@
+import magic
 from core.permissions import (
     IsAdmin,
     IsStudentAndOwnsAssignmentInstance,
@@ -22,6 +23,30 @@ from .serializers import (
     QuestionInstanceSerializer,
     QuestionSerializer,
 )
+
+MAX_AUDIO_UPLOAD_SIZE = 10 * 1024 * 1024
+
+
+def validate_audio_upload(upload):
+    if upload.size > MAX_AUDIO_UPLOAD_SIZE:
+        return Response(
+            {"error": "Audio file must not exceed 10 MiB."},
+            status=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+        )
+
+    position = upload.tell()
+    try:
+        upload.seek(0)
+        detected_type = magic.from_buffer(upload.read(2048), mime=True)
+    finally:
+        upload.seek(position)
+
+    if detected_type not in {"audio/mp4", "audio/x-m4a"}:
+        return Response(
+            {"error": "Audio file must be a valid MP4 audio file."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    return None
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
@@ -96,11 +121,9 @@ class DialogueViewSet(viewsets.ModelViewSet):
                 {"error": "Initial statement file is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if initial_statement_file.content_type != "audio/mp4":
-            return Response(
-                {"error": "Initial statement file must be a WAV audio file."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        validation_error = validate_audio_upload(initial_statement_file)
+        if validation_error:
+            return validation_error
         if not description or description.strip() == "" or type(description) != str:
             return Response(
                 {"error": "Description is required."},
@@ -163,11 +186,9 @@ class DialogueInstanceViewSet(viewsets.ModelViewSet):
                 {"error": "Audio file is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        if audio_file.content_type != "audio/mp4":
-            return Response(
-                {"error": "Audio file must be a mp4 audio file."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        validation_error = validate_audio_upload(audio_file)
+        if validation_error:
+            return validation_error
 
         student_statement = DialogueStatement.objects.create(
             dialogue_instance=dialogue_instance,
